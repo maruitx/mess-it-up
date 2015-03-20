@@ -1,0 +1,544 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4C1F0C32-9273-322B-88F3-F09429EA85AF}</ProjectGuid>
+    <RootNamespace>scene_mess</RootNamespace>
+    <Keyword>Qt4VSv1.0</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <PlatformToolSet>v120</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\Users\rui\Desktop\StarlabPackageRelease\plugins\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <IntermediateDirectory>release\</IntermediateDirectory>
+    <PrimaryOutput>scene_mess</PrimaryOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <PlatformToolSet>v120</PlatformToolSet>
+    <OutputDirectory>..\..\..\..\Users\rui\Desktop\StarlabPackage\plugins\</OutputDirectory>
+    <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
+    <CharacterSet>NotSet</CharacterSet>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <IntermediateDirectory>debug\</IntermediateDirectory>
+    <PrimaryOutput>scene_mess</PrimaryOutput>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\Users\rui\Desktop\StarlabPackageRelease\plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">scene_mess</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</IgnoreImportLibrary>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\Users\rui\Desktop\StarlabPackage\plugins\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">scene_mess</TargetName>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</IgnoreImportLibrary>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\starlab\core\starlib;..\..\..\starlab\core\starlib\parameters;..\..\..\starlab\core\starlib\interfaces;.;..\..\..\starlab\core\external\eigen-3.2.1;..\..\..\starlab\surfacemesh\surfacemesh;..\..\..\starlab\surfacemesh\surfacemesh\helpers;C:\Graphics\starlab\surfacemesh\surfacemesh\parameters;..\..\..\starlab\core\external\cholmod-4.0.0\include;..\..\..\starlab\core\external\nanoflann-1.1.9;..\..\..\opencv\opencv-3.0.0\opencv\build\install\include;$(KINECTSDK10_DIR)\inc;$(CGAL_DIR)\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\auxiliary\gmp\include;..\..\..\boost_1_57_0;..\..\..\pcl\PCL_install\include\pcl-1.8;..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp;..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore;release;.;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013;.\GeneratedFiles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zm200 -arch:AVX -Zc:strictStrings -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>release\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PreprocessKeepComments>true</PreprocessKeepComments>
+      <PreprocessorDefinitions>;_WINDOWS;UNICODE;WIN32;EIGEN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;CHOLMOD;CGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES;CGAL_CFG_NO_NEXTAFTER;CGAL_CFG_NO_TR1_ARRAY;CGAL_CFG_NO_TR1_TUPLE;QT_NO_DEBUG;QT_PLUGIN;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;gdi32.lib;user32.lib;C:\Users\rui/Desktop/StarlabPackageRelease/starlib.lib;C:\Users\rui\Desktop\StarlabPackageRelease\surfacemesh.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libcholmod.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libgoto_CHOLMOD.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libmetis_CHOLMOD.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libamd.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libcamd.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libcolamd.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libccolamd.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_core300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_highgui300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_features2d300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_flann300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_imgproc300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_video300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_imgcodecs300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_videoio300.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_surface_matching300.lib;$(KINECTSDK10_DIR)\lib\x86\Kinect10.lib;C:\Graphics\CGAL-4.5\lib\CGAL-vc120-mt-gd-4.5.lib;C:\Graphics\CGAL-4.5\lib\CGAL-vc120-mt-4.5.lib;C:\Graphics\CGAL-4.5\lib\CGAL_Core-vc120-mt-gd-4.5.lib;C:\Graphics\CGAL-4.5\lib\CGAL_Core-vc120-mt-4.5.lib;C:\Graphics\CGAL-4.5\auxiliary\gmp\lib\libgmp-10.lib;C:\Graphics\pcl\PCL_install\lib\pcl_visualization_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_tracking_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_common_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_octree_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_search_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_features_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_filters_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_surface_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_kdtree_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_segmentation_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_keypoints_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_sample_consensus_release.lib;C:\Graphics\pcl\PCL_install\lib\pcl_registration_release.lib;C:\Graphics\flann-1.8.4-src\flann-1.8.4-src\build\lib\Release\flann_cpp_s.lib;C:\Graphics\flann-1.8.4-src\flann-1.8.4-src\build\lib\Release\flann.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkalglib-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkChartsCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonColor-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonComputationalGeometry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonDataModel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonExecutionModel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonMath-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonMisc-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonSystem-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonTransforms-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkDICOMParser-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkDomainsChemistry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkexoIIc-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkexpat-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersAMR-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersExtraction-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersFlowPaths-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersGeneral-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersGeneric-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersGeometry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersHybrid-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersHyperTree-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersImaging-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersModeling-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersParallel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersParallelImaging-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersProgrammable-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersSelection-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersSMP-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersSources-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersStatistics-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersTexture-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersVerdict-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkfreetype-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkftgl-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkGeovisCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkgl2ps-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkhdf5-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkhdf5_hl-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingColor-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingFourier-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingGeneral-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingHybrid-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingMath-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingMorphological-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingSources-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingStatistics-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingStencil-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInfovisCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInfovisLayout-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInteractionImage-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInteractionStyle-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInteractionWidgets-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOAMR-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOEnSight-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOExodus-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOExport-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOGeometry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOImage-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOImport-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOInfovis-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOLegacy-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOLSDyna-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOMINC-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOMovie-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIONetCDF-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOParallel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOPLY-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOSQL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOVideo-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOXML-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOXMLParser-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkjpeg-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkjsoncpp-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtklibxml2-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkmetaio-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkNetCDF-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkNetCDF_cxx-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkoggtheora-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkParallelCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkpng-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkproj4-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingAnnotation-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingContext2D-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingFreeType-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingFreeTypeOpenGL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingGL2PS-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingImage-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingLabel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingLIC-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingLOD-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingOpenGL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingVolume-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingVolumeAMR-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingVolumeOpenGL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtksqlite-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtksys-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtktiff-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkverdict-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsContext2D-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsGeovis-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsInfovis-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkzlib-6.1.lib;$(QTDIR)\lib\Qt5OpenGL.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Xml.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\Users\rui\Desktop\StarlabPackageRelease;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib;$(KINECTSDK10_DIR)\lib\x86;C:\Graphics\CGAL-4.5\lib;C:\Graphics\CGAL-4.5\auxiliary\gmp\lib;C:\Graphics\boost_1_57_0\lib32-msvc-12.0;C:\Graphics\pcl\PCL_install\lib;C:\Graphics\flann-1.8.4-src\flann-1.8.4-src\build\lib\Release;C:\Graphics\VTK-6.1.0\VTK_install\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkDLL>true</LinkDLL>
+      <LinkIncremental>false</LinkIncremental>
+      <OutputFile>$(OutDir)\scene_mess.dll</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>;_WINDOWS;UNICODE;WIN32;EIGEN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;CHOLMOD;CGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES;CGAL_CFG_NO_NEXTAFTER;CGAL_CFG_NO_TR1_ARRAY;CGAL_CFG_NO_TR1_TUPLE;QT_NO_DEBUG;QT_PLUGIN;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\starlab\core\starlib;..\..\..\starlab\core\starlib\parameters;..\..\..\starlab\core\starlib\interfaces;.;..\..\..\starlab\core\external\eigen-3.2.1;..\..\..\starlab\surfacemesh\surfacemesh;..\..\..\starlab\surfacemesh\surfacemesh\helpers;C:\Graphics\starlab\surfacemesh\surfacemesh\parameters;..\..\..\starlab\core\external\cholmod-4.0.0\include;..\..\..\starlab\core\external\nanoflann-1.1.9;..\..\..\opencv\opencv-3.0.0\opencv\build\install\include;$(KINECTSDK10_DIR)\inc;$(CGAL_DIR)\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\auxiliary\gmp\include;..\..\..\boost_1_57_0;..\..\..\pcl\PCL_install\include\pcl-1.8;..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp;..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore;debug;.;..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013;.\GeneratedFiles;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zm200 -arch:AVX -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
+      <AssemblerListingLocation>debug\</AssemblerListingLocation>
+      <BrowseInformation>false</BrowseInformation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <PreprocessKeepComments>true</PreprocessKeepComments>
+      <PreprocessorDefinitions>;_WINDOWS;UNICODE;WIN32;EIGEN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;CHOLMOD;CGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES;CGAL_CFG_NO_NEXTAFTER;CGAL_CFG_NO_TR1_ARRAY;CGAL_CFG_NO_TR1_TUPLE;QT_PLUGIN;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessToFile>false</PreprocessToFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <WarningLevel>Level3</WarningLevel>
+      <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>glu32.lib;opengl32.lib;gdi32.lib;user32.lib;C:\Users\rui/Desktop/StarlabPackage/starlib.lib;C:\Users\rui\Desktop\StarlabPackage\surfacemesh.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libcholmod.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libgoto_CHOLMOD.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libmetis_CHOLMOD.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libamd.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libcamd.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libcolamd.lib;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32\libccolamd.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_core300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_highgui300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_features2d300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_flann300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_imgproc300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_video300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_imgcodecs300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_videoio300d.lib;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib\opencv_surface_matching300d.lib;$(KINECTSDK10_DIR)\lib\x86\Kinect10.lib;C:\Graphics\CGAL-4.5\lib\CGAL-vc120-mt-gd-4.5.lib;C:\Graphics\CGAL-4.5\lib\CGAL-vc120-mt-4.5.lib;C:\Graphics\CGAL-4.5\lib\CGAL_Core-vc120-mt-gd-4.5.lib;C:\Graphics\CGAL-4.5\lib\CGAL_Core-vc120-mt-4.5.lib;C:\Graphics\CGAL-4.5\auxiliary\gmp\lib\libgmp-10.lib;C:\Graphics\pcl\PCL_install\lib\pcl_visualization_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_tracking_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_common_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_octree_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_search_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_features_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_filters_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_surface_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_kdtree_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_segmentation_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_keypoints_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_sample_consensus_debug.lib;C:\Graphics\pcl\PCL_install\lib\pcl_registration_debug.lib;C:\Graphics\flann-1.8.4-src\flann-1.8.4-src\build\lib\Debug\flann_cpp_s.lib;C:\Graphics\flann-1.8.4-src\flann-1.8.4-src\build\lib\Debug\flann.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkalglib-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkChartsCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonColor-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonComputationalGeometry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonDataModel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonExecutionModel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonMath-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonMisc-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonSystem-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkCommonTransforms-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkDICOMParser-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkDomainsChemistry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkexoIIc-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkexpat-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersAMR-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersExtraction-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersFlowPaths-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersGeneral-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersGeneric-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersGeometry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersHybrid-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersHyperTree-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersImaging-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersModeling-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersParallel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersParallelImaging-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersProgrammable-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersSelection-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersSMP-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersSources-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersStatistics-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersTexture-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkFiltersVerdict-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkfreetype-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkftgl-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkGeovisCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkgl2ps-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkhdf5-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkhdf5_hl-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingColor-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingFourier-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingGeneral-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingHybrid-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingMath-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingMorphological-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingSources-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingStatistics-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkImagingStencil-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInfovisCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInfovisLayout-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInteractionImage-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInteractionStyle-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkInteractionWidgets-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOAMR-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOEnSight-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOExodus-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOExport-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOGeometry-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOImage-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOImport-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOInfovis-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOLegacy-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOLSDyna-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOMINC-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOMovie-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIONetCDF-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOParallel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOPLY-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOSQL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOVideo-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOXML-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkIOXMLParser-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkjpeg-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkjsoncpp-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtklibxml2-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkmetaio-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkNetCDF-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkNetCDF_cxx-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkoggtheora-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkParallelCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkpng-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkproj4-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingAnnotation-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingContext2D-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingFreeType-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingFreeTypeOpenGL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingGL2PS-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingImage-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingLabel-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingLIC-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingLOD-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingOpenGL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingVolume-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingVolumeAMR-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkRenderingVolumeOpenGL-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtksqlite-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtksys-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtktiff-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkverdict-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsContext2D-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsCore-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsGeovis-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkViewsInfovis-6.1.lib;C:\Graphics\VTK-6.1.0\VTK_install\lib\vtkzlib-6.1.lib;$(QTDIR)\lib\Qt5OpenGLd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Xmld.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;C:\Users\rui\Desktop\StarlabPackage;C:\Graphics\starlab\core\external\cholmod-4.0.0\lib\win32;C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib;$(KINECTSDK10_DIR)\lib\x86;C:\Graphics\CGAL-4.5\lib;C:\Graphics\CGAL-4.5\auxiliary\gmp\lib;C:\Graphics\boost_1_57_0\lib32-msvc-12.0;C:\Graphics\pcl\PCL_install\lib;C:\Graphics\flann-1.8.4-src\flann-1.8.4-src\build\lib\Debug;C:\Graphics\VTK-6.1.0\VTK_install\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreImportLibrary>true</IgnoreImportLibrary>
+      <LinkDLL>true</LinkDLL>
+      <OutputFile>$(OutDir)\scene_mess.dll</OutputFile>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Link>
+    <Midl>
+      <DefaultCharType>Unsigned</DefaultCharType>
+      <EnableErrorChecks>None</EnableErrorChecks>
+      <WarningLevel>0</WarningLevel>
+    </Midl>
+    <ResourceCompile>
+      <PreprocessorDefinitions>;_WINDOWS;UNICODE;WIN32;EIGEN;_CRT_SECURE_NO_WARNINGS;NOMINMAX;CHOLMOD;CGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES;CGAL_CFG_NO_NEXTAFTER;CGAL_CFG_NO_TR1_ARRAY;CGAL_CFG_NO_TR1_TUPLE;QT_PLUGIN;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_XML_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Debug\moc_ActionLabeler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ActionLabelerWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ActionLearner.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ActionViewerWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_DepthCloud.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_DepthSensor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_mess_mode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_mess_widget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RgbdViewer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RgbdViewerWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_scene_mess.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Geometry\AABB.cpp" />
+    <ClCompile Include="Action\ActionFeature.cpp" />
+    <ClCompile Include="Action\ActionLabeler.cpp" />
+    <ClCompile Include="Action\ActionLabelerWidget.cpp" />
+    <ClCompile Include="Action\ActionLearner.cpp" />
+    <ClCompile Include="Action\ActionViewer.cpp" />
+    <ClCompile Include="Action\ActionViewerWidget.cpp" />
+    <ClCompile Include="Geometry\BestFit.cpp" />
+    <ClCompile Include="Geometry\BoundingBox.cpp" />
+    <ClCompile Include="Geometry\CModel.cpp" />
+    <ClCompile Include="Kinect\DepthCloud.cpp" />
+    <ClCompile Include="Kinect\DepthSensor.cpp" />
+    <ClCompile Include="Kinect\FrameRateTracker.cpp" />
+    <ClCompile Include="Kinect\MS_OpenCVFrameHelper.cpp" />
+    <ClCompile Include="Geometry\OBB.cpp" />
+    <ClCompile Include="Geometry\OBBEstimator.cpp" />
+    <ClCompile Include="Geometry\OBBOBBIntersect.cpp" />
+    <ClCompile Include="Kinect\OpenCVHelper.cpp" />
+    <ClCompile Include="Kinect\RgbdViewer.cpp" />
+    <ClCompile Include="Kinect\RgbdViewerWidget.cpp" />
+    <ClCompile Include="Geometry\Scene.cpp" />
+    <ClCompile Include="Geometry\SceneRG.cpp" />
+    <ClCompile Include="Geometry\SimplePointCloud.cpp" />
+    <ClCompile Include="Geometry\Skeleton.cpp" />
+    <ClCompile Include="Geometry\SkeletonSampler.cpp" />
+    <ClCompile Include="Geometry\SuppPlane.cpp" />
+    <ClCompile Include="Geometry\SuppPlaneBuilder.cpp" />
+    <ClCompile Include="Geometry\TriTriIntersect.cpp" />
+    <ClCompile Include="Geometry\UDGraph.cpp" />
+    <ClCompile Include="Geometry\VoxelOctree.cpp" />
+    <ClCompile Include="Geometry\Voxeler.cpp" />
+    <ClCompile Include="Math\mathlib.cpp" />
+    <ClCompile Include="mess_mode.cpp" />
+    <ClCompile Include="mess_widget.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_ActionLabelerWidget.h" />
+    <ClInclude Include="GeneratedFiles\ui_ActionViewerWidget.h" />
+    <ClInclude Include="GeneratedFiles\ui_mess_widget.h" />
+    <ClInclude Include="GeneratedFiles\ui_RgbdViewerWidget.h" />
+    <ClInclude Include="Geometry\AABB.h" />
+    <ClInclude Include="Action\ActionFeature.h" />
+    <CustomBuild Include="Action\ActionLabeler.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing ActionLabeler.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing ActionLabeler.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Action\ActionLabelerWidget.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing ActionLabelerWidget.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing ActionLabelerWidget.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Action\ActionLearner.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing ActionLearner.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing ActionLearner.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Action\ActionViewer.h" />
+    <CustomBuild Include="Action\ActionViewerWidget.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing ActionViewerWidget.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing ActionViewerWidget.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Geometry\BestFit.h" />
+    <ClInclude Include="Geometry\BoundingBox.h" />
+    <ClInclude Include="Geometry\CModel.h" />
+    <ClInclude Include="Utilities\CustomDrawObjects.h" />
+    <CustomBuild Include="Kinect\DepthCloud.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing DepthCloud.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing DepthCloud.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Kinect\DepthCloudTracker.h" />
+    <CustomBuild Include="Kinect\DepthSensor.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing DepthSensor.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing DepthSensor.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Math\Eigen3x3.h" />
+    <ClInclude Include="Kinect\FrameRateTracker.h" />
+    <ClInclude Include="Kinect\MS_KinectHelper.h" />
+    <ClInclude Include="Kinect\MS_OpenCVFrameHelper.h" />
+    <ClInclude Include="Math\MatrixType.h" />
+    <ClInclude Include="Geometry\OBB.h" />
+    <ClInclude Include="Geometry\OBBEstimator.h" />
+    <ClInclude Include="Geometry\OBBOBBIntersect.h" />
+    <ClInclude Include="Kinect\OpenCVHelper.h" />
+    <ClInclude Include="Geometry\QuickMeshDraw.h" />
+    <CustomBuild Include="Kinect\RgbdViewer.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing RgbdViewer.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing RgbdViewer.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Kinect\RgbdViewerWidget.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing RgbdViewerWidget.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing RgbdViewerWidget.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Geometry\Scene.h" />
+    <ClInclude Include="Geometry\SceneRG.h" />
+    <ClInclude Include="Geometry\ShapeLib.h" />
+    <ClInclude Include="Geometry\SimplePointCloud.h" />
+    <ClInclude Include="Geometry\Skeleton.h" />
+    <ClInclude Include="Geometry\SkeletonSampler.h" />
+    <ClInclude Include="Geometry\SuppPlane.h" />
+    <ClInclude Include="Geometry\SuppPlaneBuilder.h" />
+    <ClInclude Include="Geometry\TriTriIntersect.h" />
+    <ClInclude Include="Geometry\UDGraph.h" />
+    <ClInclude Include="Geometry\Voxel.h" />
+    <ClInclude Include="Geometry\VoxelOctree.h" />
+    <ClInclude Include="Geometry\Voxeler.h" />
+    <ClInclude Include="Geometry\font.inl" />
+    <ClInclude Include="Kinect\kinect_grabber.h" />
+    <ClInclude Include="Math\mathlib.h" />
+    <CustomBuild Include="mess_mode.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing mess_mode.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing mess_mode.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="mess_widget.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_NO_DEBUG -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -DNDEBUG -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\release" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing mess_widget.h...</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+if errorlevel 1 goto VCEnd
+if errorlevel 1 goto VCEnd
+endlocal
+"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp"  -D_WINDOWS -DUNICODE -DWIN32 -DEIGEN -D_CRT_SECURE_NO_WARNINGS -DNOMINMAX -DCHOLMOD -DCGAL_CFG_NO_CPP0X_VARIADIC_TEMPLATES -DCGAL_CFG_NO_NEXTAFTER -DCGAL_CFG_NO_TR1_ARRAY -DCGAL_CFG_NO_TR1_TUPLE -DQT_PLUGIN -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_XML_LIB -DQT_CORE_LIB -D_WINDLL  "-I.\..\..\..\starlab\core\starlib" "-I.\..\..\..\starlab\core\starlib\parameters" "-I.\..\..\..\starlab\core\starlib\interfaces" "-I." "-I.\..\..\..\starlab\core\external\eigen-3.2.1" "-I.\..\..\..\starlab\surfacemesh\surfacemesh" "-I.\..\..\..\starlab\surfacemesh\surfacemesh\helpers" "-IC:\Graphics\starlab\surfacemesh\surfacemesh\parameters" "-I.\..\..\..\starlab\core\external\cholmod-4.0.0\include" "-I.\..\..\..\starlab\core\external\nanoflann-1.1.9" "-I.\..\..\..\opencv\opencv-3.0.0\opencv\build\install\include" "-I$(KINECTSDK10_DIR)\inc" "-I$(CGAL_DIR)\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I.\..\..\..\boost_1_57_0" "-I.\..\..\..\pcl\PCL_install\include\pcl-1.8" "-I.\..\..\..\flann-1.8.4-src\flann-1.8.4-src\src\cpp" "-I.\..\..\..\VTK-6.1.0\VTK_install\include\vtk-6.1" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtOpenGL" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtWidgets" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtGui" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtXml" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\include\QtCore" "-I.\debug" "-I.\..\..\..\..\qt\qt5.4.0\5.4\msvc2013_opengl\mkspecs\win32-msvc2013" "-I.\GeneratedFiles"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing mess_widget.h...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Utilities\utility.h" />
+    <ClInclude Include="Geometry\voxel_wed.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Release\moc_ActionLabeler.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ActionLabelerWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ActionLearner.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ActionViewerWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_DepthCloud.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_DepthSensor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_mess_mode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_mess_widget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RgbdViewer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RgbdViewerWidget.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Action\ActionLabelerWidget.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Action\ActionViewerWidget.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Kinect\RgbdViewerWidget.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="mess_widget.ui">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon\font.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="icon\mess_mode.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
+    <CustomBuild Include="scene_mess.qrc">
+      <FileType>Document</FileType>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(FullPath);.\icon\mess_mode.png;.\icon\font.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Rcc%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath);.\icon\mess_mode.png;.\icon\font.png;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Rcc%27ing %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="5.4_msvc2013_opengl" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

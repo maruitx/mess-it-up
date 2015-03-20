@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file>icon/mess_mode.png</file>
+	<file>icon/font.png</file>
+  </qresource>
+</RCC>
