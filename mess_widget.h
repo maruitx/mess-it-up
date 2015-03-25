@@ -18,7 +18,7 @@ public:
     explicit mess_widget(mess_mode * m = 0);
     ~mess_widget();
 
-	QString loadScanSceneName();
+	QString loadSceneName();
 	QString loadActionJobName();
 
 public slots:

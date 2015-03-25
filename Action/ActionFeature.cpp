@@ -151,3 +151,8 @@ void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &o
 	objectStructFeature.push_back(supportLevel);
 	objectStructFeature.push_back(supportChindrenNum);
 }
+
+void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, std::vector<double> &actionFeature)
+{
+
+}

@@ -6,6 +6,7 @@
 #include "mess_mode.h"
 #include "Kinect/RgbdViewer.h"
 #include "Action/ActionLearner.h"
+#include "Action/ActionPredictor.h"
 #include "Action/ActionLabeler.h"
 
 
@@ -29,7 +30,10 @@ mess_widget::mess_widget(mess_mode * m) :
 	connect(ui->resetAlignButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(resetAlignView()));
 	connect(ui->startLearnButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(startLearning()));
 
-	connect(ui->startPredictButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(startPredicting()));
+	connect(ui->loadTestSceneButton, SIGNAL(clicked()), m_mode, SLOT(loadTestScene()));
+	//connect(ui->startPredictButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(startPredicting()));
+	connect(ui->startPredictButton, SIGNAL(clicked()), m_mode->actionPreditor, SLOT(startPredicting()));
+	connect(ui->loadTrainingResultButton, SIGNAL(clicked()), m_mode->actionPreditor, SLOT(loadTrainingResult()));
 	connect(ui->openActionViewerButton, SIGNAL(clicked()), m_mode, SLOT(openActionViewer()));
 }
 
@@ -38,7 +42,7 @@ mess_widget::~mess_widget()
     delete ui;
 }
 
-QString mess_widget::loadScanSceneName()
+QString mess_widget::loadSceneName()
 {
 	QString filename = QFileDialog::getOpenFileName(0, tr("Load scene"),
 		m_mode->mainWindow()->settings()->getString("lastUsedDirectory"),

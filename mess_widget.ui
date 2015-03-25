@@ -129,17 +129,31 @@
       <string>Arrange</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
+      <item row="2" column="1">
+       <widget class="QPushButton" name="openActionViewerButton">
+        <property name="text">
+         <string>Action Viewer</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
        <widget class="QPushButton" name="startPredictButton">
         <property name="text">
          <string>Start Predicting</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="openActionViewerButton">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="loadTestSceneButton">
         <property name="text">
-         <string>Action Viewer</string>
+         <string>Load Test Scene</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="loadTrainingResultButton">
+        <property name="text">
+         <string>Load Training Result</string>
         </property>
        </widget>
       </item>

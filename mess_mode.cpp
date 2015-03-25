@@ -7,6 +7,7 @@
 #include "Kinect/RgbdViewer.h"
 #include "Geometry/Scene.h"
 #include "Action/ActionLearner.h"
+#include "Action/ActionPredictor.h"
 #include "Kinect/kinect_grabber.h"
 
 mess_mode::mess_mode()
@@ -18,6 +19,7 @@ mess_mode::mess_mode()
 	
 	rgbdViewer = new RgbdViewer(this);
 	actionLearner = new ActionLearner(this);
+	actionPreditor = new ActionPredictor(this);
 
 	m_actionViewerWidgetCreated = false;
 }
@@ -62,18 +64,18 @@ void mess_mode::decorate()
 	if (actionLearner->hasJob())
 	{
 		actionLearner->drawSkeleton();
+	}
 
-		if (actionLearner->isShowSampledSkeletons() && m_actionViewerWidgetCreated)
-		{
-			actionLearner->drawSampledSkeletons(actionViewer->getSelectModelID(), actionViewer->getSelectActionID());
-		}
-	}	
+	if (actionPreditor->isShowSampledSkeletons() && m_actionViewerWidgetCreated)
+	{
+		actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), actionViewer->getSelectActionID());
+	}
 }
 
 void mess_mode::loadScene()
 {
 	m_scene = new CScene();
-	m_scene->loadScene(m_widget->loadScanSceneName());
+	m_scene->loadScene(m_widget->loadSceneName());
 	m_scene->setSceneDrawArea(drawArea());
 
 	// set viewer
@@ -115,8 +117,12 @@ void mess_mode::setSceneBounds()
 
 void mess_mode::loadActionJob()
 {
+	if (m_scene)
+	{
+		delete m_scene;
+	}
+
 	m_scene = new CScene();
-	//actionLearner->init(rgbdViewer, m_scene, drawArea());
 	actionLearner->init(this);
 
 	if (actionLearner->loadJob(m_widget->loadActionJobName()))
@@ -130,6 +136,26 @@ void mess_mode::loadActionJob()
 		actionLearner->setTrackingObj();
 	}
 }
+
+
+void mess_mode::loadTestScene()
+{
+	if (m_scene)
+	{
+		delete m_scene;
+	}
+
+	m_scene = new CScene();
+	actionPreditor->init(this);
+
+	if (actionPreditor->loadTestScene(m_widget->loadSceneName()));
+	{
+		setSceneBounds();
+	}
+
+	actionLearner->setJobStatus(false);
+}
+
 
 void mess_mode::syncWithScan(bool state)
 {
@@ -188,9 +214,17 @@ void mess_mode::openActionLabeler()
 
 void mess_mode::openActionViewer()
 {
-	if (actionLearner != NULL && actionLearner->isFinishPredict())
+	//if (actionLearner != NULL && actionLearner->isFinishPredict())
+	//{
+	//	actionViewer = new ActionViewer(actionLearner);
+	//	actionViewer->createWidget();
+
+	//	m_actionViewerWidgetCreated = true;
+	//}
+
+	if (actionPreditor != NULL && actionPreditor->isFinishPredict())
 	{
-		actionViewer = new ActionViewer(actionLearner);
+		actionViewer = new ActionViewer(actionPreditor);
 		actionViewer->createWidget();
 
 		m_actionViewerWidgetCreated = true;

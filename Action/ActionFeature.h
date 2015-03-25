@@ -33,12 +33,20 @@ public:
 	std::map<int, std::vector<double>>& getFeatureVector() { return m_actionFeatures; };
 
 	void computeActionFeatureAt(int frame_id, std::vector<double> &actionFeature);
+
+	// skeleton shape
 	void computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<double> &skeletonShapeFeature);
 
+	// object shape + structure
 	void computeObjectGeoFeatures(CModel *m, std::vector<double> &objectGeoFeature);
 	void computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature);
 
+	// skeleton + object
 	void computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature);
+
+	// for test stage
+	// simply compute feature for one skeleton at sampled location
+	void computeActionFeatureForSkel(Skeleton *skeleton, std::vector<double> &actionFeature);
 
 	int actionID();
 	int featureDim() { return m_featureDim; };

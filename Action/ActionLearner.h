@@ -32,20 +32,19 @@ public:
 	ActionLearner(QObject *parent);
 	~ActionLearner();
 
-	//void init(RgbdViewer *viewer, CScene *s, Starlab::DrawArea *area);
 	void init(mess_mode *m);
 	
 	void alignSceneToScan();
 	void loadScanToSceneTransMat();
 
 	bool loadJob(const QString &filename);
-	void setSkeletonStream();
+	bool hasJob() { return m_hasJob; };
+	void setJobStatus(bool s) { m_hasJob = s; };
 
+	void setSkeletonStream();
 	void setTrackingObj();
 
 	void drawSkeleton();
-
-	bool hasJob() { return m_hasJob; };
 
 	void syncWithScan();
 	void updateFrameId();
@@ -61,13 +60,7 @@ public:
 	void extractActionInstances();    // extract action instances from frame labels
 	void saveExtractedFeatures();
 	void saveActionRepSkels();
-	void loadActionRepSkels();
-	
-	void genRandomSkeletonList(int num);
-	void drawSampledSkeletons(int modelID, int actionID);
-	bool isShowSampledSkeletons() { return m_showSampledSkeleton; };
-	bool isFinishPredict() { return m_finishPredict; };
-
+	//void loadActionRepSkels();
 	
 	//					       z  y
 	//				  	       | /
@@ -83,9 +76,9 @@ public:
 
 public slots:
 	void startLearning();
-	void startPredicting();
 
 	void resetAlignView();
+	void updateDrawArea();
 
 private:
 	RgbdViewer *m_rgbdViewer;
@@ -114,12 +107,7 @@ private:
 	std::vector<ActionInstance> m_actionInstances;
 	std::vector<std::vector<ActionFeature>> m_actionFeatures;
 
-	std::vector<SkeletonPtrList> m_actionRepSkeletons;
-	std::map<int, std::vector<SkeletonPtrList>> m_sampledSkeletonsForActions;
-	std::map<int, std::vector<std::vector<int>>> m_randomSkeletonIdList;
-
-	bool m_showSampledSkeleton;
-	bool m_finishPredict;
+	//std::vector<SkeletonPtrList> m_actionRepSkeletons;
 };
 
 #endif // ACTIONLEARNER_H

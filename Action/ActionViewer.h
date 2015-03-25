@@ -4,12 +4,16 @@
 
 class ActionViewerWidget;
 class ActionLearner;
+class ActionPredictor;
 class CScene; 
 
-class ActionViewer
+class ActionViewer : public QObject
 {
+	Q_OBJECT
+
 public:
 	ActionViewer(ActionLearner *actionLearner);
+	ActionViewer(ActionPredictor *actionPredictor);
 	~ActionViewer();
 
 	void createWidget();
@@ -19,11 +23,15 @@ public:
 
 	bool hasWidget() { return m_hasWidget; };
 
+public slots:
+	void updateDisplayedSkels();
+
 public:
 	QVector<QString> allModelNameList;
 
 private:
 	ActionLearner *m_actionLearner;
+	ActionPredictor *m_actionPredictor;
 	CScene *m_scene;
 
 	ActionViewerWidget *m_widget;

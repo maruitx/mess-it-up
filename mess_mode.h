@@ -13,6 +13,7 @@
 
 class RgbdViewer;
 class ActionLearner;
+class ActionPredictor;
 class CScene;
 
 class mess_mode : public SurfaceMeshModePlugin
@@ -41,6 +42,8 @@ public:
 
 	ActionLabeler *actionLabeler;
 	ActionLearner *actionLearner;
+
+	ActionPredictor *actionPreditor;
 	ActionViewer *actionViewer;
 
 	QPoint mouseClickPos;
@@ -55,6 +58,7 @@ public slots:
 	void setSceneShowModelName(int state);
 
 	void loadActionJob();
+	void loadTestScene();
 	void openActionLabeler();
 	void openActionViewer();
 
