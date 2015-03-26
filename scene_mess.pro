@@ -53,6 +53,7 @@ HEADERS += \
 	Kinect/FrameRateTracker.h \
 	Kinect/kinect_grabber.h \
 	Action/ActionLearner.h \
+	Action/ActionPredictor.h \
 	Action/ActionLabelerWidget.h \
 	Action/ActionLabeler.h \
 	Action/ActionFeature.h \
@@ -93,6 +94,7 @@ SOURCES += \
 	Kinect/DepthSensor.cpp \
 	Kinect/FrameRateTracker.cpp \
 	Action/ActionLearner.cpp \
+	Action/ActionPredictor.cpp \
 	Action/ActionLabelerWidget.cpp \
 	Action/ActionLabeler.cpp \
 	Action/ActionFeature.cpp \

@@ -92,6 +92,8 @@ void ActionPredictor::startPredicting()
 
 	m_showSampledSkeleton = true;
 	m_finishPredict = true;
+
+	Simple_Message_Box("Action prediction done");
 }
 
 

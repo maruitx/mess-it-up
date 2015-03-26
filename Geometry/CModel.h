@@ -28,6 +28,8 @@ public:
 	void setLabel(QString &l);
 	QString label() { return m_label; };
 
+	void setFilePath(const QString &filepath) { m_filePath = filepath; };
+
 	void setID(int i) { m_id = i; };
 	int getID() { return m_id; };
 
@@ -79,6 +81,8 @@ public:
 	bool isPointInside(SurfaceMesh::Vector3 &point);
 	bool isSegmentIntersect(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt);
 
+	bool loadVoxelData(const QString &filename, std::vector<VoxelerLibrary::Voxel> &voxels);
+
 	// interaction
 	void setPicked(bool state) { m_isPicked = state; };
 	void updatePickedState() { m_isPicked = !m_isPicked; };
@@ -97,6 +101,7 @@ public:
 
 private:
 	QString m_label;
+	QString m_filePath;
 	int m_id;
 
 	Eigen::Matrix4d m_transMat;
@@ -109,6 +114,8 @@ private:
 
 	VoxelerLibrary::Voxeler *m_voxeler;
 	bool m_isVoxelized;
+	int m_voxelNum;
+	double m_voxelSize;
 
 	bool m_isPicked;
 	bool m_isInteractSkeleton;

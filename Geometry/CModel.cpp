@@ -3,6 +3,8 @@
 #include "OBBEstimator.h"
 #include "TriTriIntersect.h"
 #include "Skeleton.h"
+#include "Voxeler.h"
+#include <QFile>
 
 const double VOXEL_SIZE = 0.05;
 
@@ -630,14 +632,28 @@ std::vector<double> CModel::getAABBXYRange()
 
 void CModel::voxelize()
 {
+	std::vector<VoxelerLibrary::Voxel > voxels;
+
 	if (m_voxeler)
 	{
 		delete m_voxeler;
 	}
 
-	m_voxeler = new VoxelerLibrary::Voxeler(m_mesh, VOXEL_SIZE);
-	m_voxeler->setupDraw();
-	m_voxeler->buildOctree();
+	QString voxelFileName = m_filePath + "/" + m_label + ".voxel";
+
+	if (loadVoxelData(voxelFileName, voxels))
+	{
+		m_voxeler = new VoxelerLibrary::Voxeler(voxels, m_voxelSize);
+	}
+
+	else
+	{
+		m_voxelSize = VOXEL_SIZE;
+		m_voxeler = new VoxelerLibrary::Voxeler(m_mesh, m_voxelSize);
+		//m_voxeler->setupDraw();
+
+		m_voxeler->saveVoxelData(voxelFileName);
+	}
 
 	m_isVoxelized = true;
 }
@@ -678,4 +694,28 @@ void CModel::drawVoxelOctree()
 bool CModel::isSegmentIntersect(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt)
 {
 	return m_voxeler->isIntersectSegment(startPt, endPt);
+}
+
+bool CModel::loadVoxelData(const QString &filename, std::vector<VoxelerLibrary::Voxel> &voxels)
+{
+	QFile inFile(filename);
+
+	QTextStream ifs(&inFile);
+
+	if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) return false;
+
+	ifs >> m_voxelNum;
+	ifs >> m_voxelSize;
+
+	VoxelerLibrary::Voxel v;
+
+	for (int i = 0; i < m_voxelNum; i++)
+	{
+		ifs >> v.x >> v.y >> v.z;
+		voxels.push_back(v);
+	}
+
+	inFile.close();
+
+	return true;
 }

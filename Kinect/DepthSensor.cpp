@@ -607,7 +607,7 @@ void DepthSensor::loadSkeletonFile()
 
 	QTextStream ifs(&inFile);
 
-	if (!inFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
+	if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text)) return;
 
 	m_skeletonStream.resize(m_loadFrameNum);
 

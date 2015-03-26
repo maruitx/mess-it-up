@@ -1,5 +1,6 @@
 #pragma once
 
+//#include "../Utilities/utility.h"
 #include "Voxel.h"
 
 #include "NanoKdTree.h"
@@ -23,6 +24,7 @@ private:
 
 public:
     Voxeler( SurfaceMesh::Model * src_mesh, double voxel_size, bool verbose = false);
+	Voxeler(const std::vector< Voxel > &voxels, double voxel_size, bool verbose = false);
 
 	FaceBounds findFaceBounds( SurfaceMesh::Model::Face f );
 	bool isVoxelIntersects( const Voxel & v, Surface_mesh::Face f );
@@ -49,6 +51,9 @@ public:
 	void setupDraw();
 	static void drawVoxels( const std::vector< Voxel > & voxels, double voxel_size = 1.0);
 
+	// Save voxel centers
+	void saveVoxelData(const QString &filename);
+
     NanoKdTree corner_kd;
 	std::vector< SurfaceMesh::Point > corners;
 	std::vector< std::vector<int> > cornerIndices;
@@ -66,12 +71,14 @@ public:
 	bool isReadyDraw;
 
 	double voxelSize;
+	int numVoxelPerNode;
 
 	Voxel minVox;
 	Voxel maxVox;
 
 public:
 	void buildOctree();
+	void setOctree();
 	void drawOctree();
 
 	VoxelOctree *m_voxelOctree;

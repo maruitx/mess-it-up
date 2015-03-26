@@ -54,8 +54,9 @@ void CScene::loadScene(const QString filename)
 	{
 		modelName = ifs.readLine();
 		CModel *newModel = new CModel();
-		newModel->loadModel(m_sceneFilePath + "/" + modelName + ".obj");
+		newModel->loadModel(m_sceneFilePath + "/" + modelName + ".obj");	
 		newModel->setLabel(modelName);
+		newModel->setFilePath(m_sceneFilePath);
 		newModel->setID(i);
 		m_modelList.push_back(newModel);
 		m_modelNameIdMap[modelName] = i;

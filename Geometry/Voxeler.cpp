@@ -1,6 +1,7 @@
 #include "qgl.h"
 #include "Voxeler.h"
 #include "VoxelOctree.h"
+#include <QFile>
 
 using namespace VoxelerLibrary;
 
@@ -18,6 +19,7 @@ Voxeler::Voxeler( SurfaceMesh::Model * src_mesh, double voxel_size, bool verbose
 	this->voxelSize = voxel_size;
 	this->isVerbose = verbose;
 	this->isReadyDraw = false;
+	numVoxelPerNode = 10;
 
 	if(mesh == NULL)
 		return;
@@ -54,10 +56,22 @@ Voxeler::Voxeler( SurfaceMesh::Model * src_mesh, double voxel_size, bool verbose
 	kd.build();
 
 	computeBounds();
-
 	buildOctree();
 
 	if(isVerbose) qDebug() << "Voxel count = " << (int)voxels.size();
+}
+
+
+VoxelerLibrary::Voxeler::Voxeler(const std::vector< Voxel > &input_voxels, double voxel_size, bool verbose /*= false*/)
+{
+	this->voxelSize = voxel_size;
+	this->isVerbose = verbose;
+	numVoxelPerNode = 10;
+
+	voxels = input_voxels;
+
+	buildOctree();
+
 }
 
 void Voxeler::update()
@@ -539,9 +553,7 @@ bool VoxelerLibrary::Voxeler::isIntersectWithPoint(SurfaceMesh::Point p)
 
 void VoxelerLibrary::Voxeler::buildOctree()
 {
-	int numVoxelPerNode = 10;
-
-	m_voxelOctree = new VoxelOctree(10, this);
+	m_voxelOctree = new VoxelOctree(numVoxelPerNode, this);
 
 	m_isBuiltOctree = true;
 }
@@ -554,4 +566,22 @@ void VoxelerLibrary::Voxeler::drawOctree()
 bool VoxelerLibrary::Voxeler::isIntersectSegment(const SurfaceMesh::Vec3d &startPt, const SurfaceMesh::Vec3d &endPt)
 {
 	return m_voxelOctree->intersectSegment(startPt, endPt);
+}
+
+void VoxelerLibrary::Voxeler::saveVoxelData(const QString &filename)
+{
+	QFile outFile(filename);
+	QTextStream out(&outFile);
+
+	if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
+
+	out << voxels.size() << "\n";
+	out << voxelSize << "\n";
+
+	foreach(Voxel v, voxels)
+	{
+		out << v.x << " " << v.y << " " << v.z << " ";
+	}
+
+	outFile.close();
 }
