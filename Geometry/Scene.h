@@ -58,6 +58,7 @@ public:
 	void setShowOBB(bool state) { m_isShowOBB = state; };
 	void setShowRG(bool state) { m_isShowRG = state; };
 	void setShowModelName(bool state) { m_isShowModelName = state; };
+	void setShowModelVoxel(bool state) { m_isShowModelVoxel = state; };
 
 	void updateDrawArea() { m_drawArea->updateGL(); };
 	
@@ -83,11 +84,13 @@ public:
 	void voxelizeModels();
 	bool isInsideModel(SurfaceMesh::Vector3 &point, int modelID);
 	bool isIntersectModel(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt, int modelID);
+	void setShowModelVoxel(int state) { m_isShowModelVoxel = state; };
 
 	// arrangement
 	bool isModelFixed(int modelID) {return m_modelList[modelID]->isFixed(); };
+	void setCenterModelID(int id) { m_centerModelID = id; };
 
-	// interaction
+	// select interaction
 	void pickModelAt(QPoint p);
 	void setPickModelMode(bool state) { m_isPickModelMode = state; };
 	bool isPickModelModeOn() { return m_isPickModelMode; };
@@ -149,10 +152,13 @@ private:
 	QString m_sceneFileName;
 	QString m_sceneFilePath;
 
+	int m_centerModelID;
+
 	bool m_isShowModel;
 	bool m_isShowOBB;
 	bool m_isShowRG;
 	bool m_isShowModelName;
+	bool m_isShowModelVoxel;
 
 	bool m_isPickModelMode;
 };

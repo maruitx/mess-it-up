@@ -20,8 +20,13 @@ public:
 
 	void loadActionRepSkels();
 
+	int getSampledSkelNum(int modelID, int actionID);
 	void genRandomSkeletonList(int num);
+	void resampleSkeleton(int num);
+
 	void drawSampledSkeletons(int modelID, int actionID);
+	void drawSampleRange(int modelID);
+
 	bool isShowSampledSkeletons() { return m_showSampledSkeleton; };
 	bool isFinishPredict() { return m_finishPredict; };
 
@@ -48,6 +53,7 @@ private:
 	std::map<int, std::vector<std::vector<int>>> m_randomSkeletonIdList;
 
 	bool m_showSampledSkeleton;
+	bool m_showSampeRegion;
 	bool m_finishPredict;
 };
 

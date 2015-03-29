@@ -30,9 +30,10 @@ CModel::~CModel()
 
 }
 
-void CModel::loadModel(QString filename)
+void CModel::loadModel(QString filename, double metric)
 {
 	m_mesh = new SurfaceMesh::SurfaceMeshModel(filename, m_label);
+	m_metric = metric;
 
 	//m_mesh->read(qPrintable(filename));
 
@@ -78,7 +79,7 @@ void CModel::readScanObj(SurfaceMesh::SurfaceMeshModel *mesh, std::string filena
 		{
 			if (sscanf(s, "v %f %f %f", &x, &y, &z))
 			{
-				mesh->add_vertex(Surface_mesh::Point(x, y, z));
+				mesh->add_vertex(Surface_mesh::Point(x*m_metric, y*m_metric, z*m_metric));
 			}
 		}
 
@@ -650,10 +651,11 @@ void CModel::voxelize()
 	{
 		m_voxelSize = VOXEL_SIZE;
 		m_voxeler = new VoxelerLibrary::Voxeler(m_mesh, m_voxelSize);
-		//m_voxeler->setupDraw();
-
+		
 		m_voxeler->saveVoxelData(voxelFileName);
 	}
+
+	m_voxeler->setupDraw();
 
 	m_isVoxelized = true;
 }

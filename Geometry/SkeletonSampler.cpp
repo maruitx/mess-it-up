@@ -6,12 +6,13 @@ const double SampleGridSize = 0.4;
 
 SkeletonSampler::SkeletonSampler()
 {
+
 }
 
 SkeletonSampler::SkeletonSampler(CScene *scene):
 m_scene(scene)
 {
-
+	m_sampleRegions.resize(m_scene->getModelNum());
 }
 
 SkeletonSampler::~SkeletonSampler()
@@ -30,6 +31,8 @@ void SkeletonSampler::sampleSkeletonAroundModel(int modelID)
 	sampleRange[1] += DistanceThreshold; // xmax
 	sampleRange[2] -= DistanceThreshold; // ymin
 	sampleRange[3] += DistanceThreshold; // ymax
+
+	m_sampleRegions[modelID] = sampleRange;
 
 	int xGridNum, yGridNum;
 

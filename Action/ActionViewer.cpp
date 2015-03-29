@@ -1,7 +1,7 @@
 #include "ActionViewer.h"
+#include "ActionViewerWidget.h"
 #include "ActionLearner.h"
 #include "ActionPredictor.h"
-#include "ActionViewerWidget.h"
 #include "../Geometry/Scene.h"
 
 
@@ -23,10 +23,10 @@ m_actionLearner(actionLearner)
 	m_hasWidget = false;
 }
 
-ActionViewer::ActionViewer(ActionPredictor *actionPredictor):
-m_actionPredictor(actionPredictor)
+ActionViewer::ActionViewer(ActionPredictor *actPredictor):
+actionPredictor(actPredictor)
 {
-	m_scene = m_actionPredictor->getScene();
+	m_scene = actionPredictor->getScene();
 
 	allModelNameList = m_scene->getModelNameList();
 
@@ -67,9 +67,13 @@ int ActionViewer::getSelectActionID()
 	return m_widget->getCurrSelectActionID();
 }
 
-void ActionViewer::updateDisplayedSkels()
+void ActionViewer::setCenterModelID()
 {
-	//m_actionLearner->updateDrawArea();
+	m_selectModelID = m_widget->getCurrSelectModelID();
+	m_scene->setCenterModelID(m_selectModelID);
+}
 
-	m_actionPredictor->updateDrawArea();
+void ActionViewer::setShowModelVoxel(int state)
+{
+	m_scene->setShowModelVoxel(state);
 }

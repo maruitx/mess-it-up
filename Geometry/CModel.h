@@ -23,7 +23,7 @@ public:
 	CModel();
 	~CModel();
 
-	void loadModel(QString filename);
+	void loadModel(QString filename, double metric);
 	
 	void setLabel(QString &l);
 	QString label() { return m_label; };
@@ -103,6 +103,7 @@ private:
 	QString m_label;
 	QString m_filePath;
 	int m_id;
+	double m_metric;
 
 	Eigen::Matrix4d m_transMat;
 	bool m_isTransformed;

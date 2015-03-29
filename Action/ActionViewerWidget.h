@@ -20,8 +20,14 @@ public:
 
 	Ui::ActionViewerWidget ui;
 
+public slots:
+	void updateShowSkelNumLabel();
+	void updateShowSkelNumLabel(int displayNum);
+	void resampleSkeleton();
+
 private:
 	ActionViewer *m_viewer;
+	int m_showSampledSkelNum;
 
 };
 

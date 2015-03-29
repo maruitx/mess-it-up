@@ -14,6 +14,7 @@ public:
 
 	void sampleSkeletonAroundModel(int modelID);
 	std::vector<Skeleton*> getSampledSkeletons() { return m_sampledSkeletons; };
+	std::vector<double> getSampleRange(int modelID) { return m_sampleRegions[modelID]; };
 
 	bool isHardConflictWithScene(Skeleton *skel);
 
@@ -21,5 +22,7 @@ private:
 	Skeleton *m_inputSkeleton;
 	std::vector<Skeleton*> m_sampledSkeletons;
 	CScene *m_scene;
+
+	std::vector<std::vector<double>> m_sampleRegions;
 };
 

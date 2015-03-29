@@ -24,14 +24,15 @@ public:
 	bool hasWidget() { return m_hasWidget; };
 
 public slots:
-	void updateDisplayedSkels();
+	void setShowModelVoxel(int state);
+	void setCenterModelID();
 
 public:
 	QVector<QString> allModelNameList;
+	ActionPredictor *actionPredictor;
 
 private:
 	ActionLearner *m_actionLearner;
-	ActionPredictor *m_actionPredictor;
 	CScene *m_scene;
 
 	ActionViewerWidget *m_widget;

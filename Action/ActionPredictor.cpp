@@ -7,6 +7,7 @@ ActionPredictor::ActionPredictor(QObject *parent)
 	: QObject(parent)
 {
 	m_showSampledSkeleton = false;
+	m_showSampeRegion = false;
 	m_finishPredict = false;
 }
 
@@ -91,11 +92,11 @@ void ActionPredictor::startPredicting()
 	genRandomSkeletonList(10);
 
 	m_showSampledSkeleton = true;
+	m_showSampeRegion = true;
 	m_finishPredict = true;
 
 	Simple_Message_Box("Action prediction done");
 }
-
 
 void ActionPredictor::loadActionRepSkels()
 {
@@ -147,8 +148,14 @@ void ActionPredictor::genRandomSkeletonList(int num)
 
 		for (int actionID = 0; actionID < m_actionRepSkeletons.size(); actionID++)
 		{
-			if (it->second[actionID].size() > 0)
+			int actionNum = it->second[actionID].size();
+			if (actionNum > 0)
 			{
+				if (actionNum < num)
+				{
+					num = actionNum;
+				}
+
 				std::vector<int> randIdList(num);
 
 				for (int i = 0; i < num; i++)
@@ -172,11 +179,69 @@ void ActionPredictor::drawSampledSkeletons(int modelID, int actionID)
 			int skeID = m_randomSkeletonIdList[modelID][actionID][i];
 			m_sampledSkeletonsForActions[modelID][actionID][skeID]->draw();
 		}
+
+		// show sample region
+		drawSampleRange(modelID);
 	}
 }
 
 void ActionPredictor::updateDrawArea()
 {
 	m_drawArea->updateGL();
+}
+
+void ActionPredictor::drawSampleRange(int modelID)
+{
+	std::vector<double> sampleRange = m_skeletonSampler->getSampleRange(modelID);
+
+	GLfloat red[] = { 1.0, 0.3, 0.3, 1.0 };
+
+	glPushAttrib(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glDepthMask(GL_FALSE);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glColor4f(red[0], red[1], red[2], 0.1f);
+
+	MathLib::Vector3 upright = m_scene->getUprightVec();
+
+	/*
+	xmin, xmax, ymin, ymax
+	  0,	1,	  2,	3
+	
+	0,3 -------------- 1,3
+	 |                  |
+	 |					|
+	 |					|	
+	0,2 -------------- 1,2	
+	*/
+
+	glBegin(GL_TRIANGLES);
+	for (int i = 0; i < 4; i++) {
+		glNormal3f(upright.x, upright.y, upright.z);
+		glVertex3d(sampleRange[0], sampleRange[2], 0);
+		glVertex3d(sampleRange[1], sampleRange[2], 0);
+		glVertex3d(sampleRange[0], sampleRange[3], 0);
+
+		glNormal3f(upright.x, upright.y, upright.z);
+		glVertex3d(sampleRange[0], sampleRange[3], 0);
+		glVertex3d(sampleRange[1], sampleRange[2], 0);
+		glVertex3d(sampleRange[1], sampleRange[3], 0);
+	}
+	glEnd();
+	glPopAttrib();
+}
+
+int ActionPredictor::getSampledSkelNum(int modelID, int actionID)
+{
+	return m_sampledSkeletonsForActions[modelID][actionID].size();
+}
+
+void ActionPredictor::resampleSkeleton(int num)
+{
+	m_randomSkeletonIdList.clear();
+	genRandomSkeletonList(num);
 }
 

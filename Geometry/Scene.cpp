@@ -16,6 +16,7 @@ m_isShowModel(true),
 m_isShowOBB(true),
 m_isShowRG(true),
 m_isShowModelName(false),
+m_isShowModelVoxel(false),
 m_isPickModelMode(false)
 {
 	m_modelNum = 0;
@@ -23,6 +24,7 @@ m_isPickModelMode(false)
 	m_sceneTransMat = Eigen::Matrix4d::Identity(4, 4);
 
 	m_metricConvert = 1.0;
+	m_centerModelID = 0;
 
 	fontImage = QImage(":/icon/font.png");
 }
@@ -44,8 +46,10 @@ void CScene::loadScene(const QString filename)
 	m_sceneFilePath = sceneFileInfo.absolutePath() + "/";
 	
 	QString modelName;
+	double modelMetric;
 
 	ifs>>m_modelNum;
+	ifs >> modelMetric;
 
 	// read the rest of line
 	ifs.readLine();
@@ -54,7 +58,7 @@ void CScene::loadScene(const QString filename)
 	{
 		modelName = ifs.readLine();
 		CModel *newModel = new CModel();
-		newModel->loadModel(m_sceneFilePath + "/" + modelName + ".obj");	
+		newModel->loadModel(m_sceneFilePath + "/" + modelName + ".obj",modelMetric);	
 		newModel->setLabel(modelName);
 		newModel->setFilePath(m_sceneFilePath);
 		newModel->setID(i);
@@ -132,10 +136,10 @@ void CScene::draw()
 			}
 			else
 			{
-				if (m->isVoxelized())
+				if (m->isVoxelized() && m_isShowModelVoxel && m_centerModelID == m->getID())
 				{
-					//m->drawVoxel();
-					m->drawVoxelOctree();
+					m->drawVoxel();
+					//m->drawVoxelOctree();
 				}
 			}
 					
