@@ -70,7 +70,7 @@ public:
 	Skeleton(QVector<Eigen::Vector4d> pts);
 	Skeleton(std::vector<MathLib::Vector3> pts);
 
-	void draw();
+	void draw(int drawMode = 0);
 	void drawJoint(int id, QColor c = QColor(255,0,0));
 	void drawBone(int id, QColor c = QColor(0,255,0));
 

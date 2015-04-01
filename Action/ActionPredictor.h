@@ -19,16 +19,25 @@ public:
 	bool loadTestScene(const QString &filename);
 
 	void loadActionRepSkels();
+	void loadActionRepSkels(int currentActionPhase);
 
-	int getSampledSkelNum(int modelID, int actionID);
+	void sampleSkeletons();
+	void sampleSkeletonsForActionPhrase(int currentActionPhase);
+	
 	void genRandomSkeletonList(int num);
 	void resampleSkeleton(int num);
+	int getSampledSkelNum(int modelID, int actionID);
 
-	void drawSampledSkeletons(int modelID, int actionID);
+	void drawSampledSkeletons(int modelID, int phaseID, int actionID);
 	void drawSampleRange(int modelID);
 
 	bool isShowSampledSkeletons() { return m_showSampledSkeleton; };
 	bool isFinishPredict() { return m_finishPredict; };
+
+	bool isShowStartPose() { return m_showStartPose; };
+	bool isShowEndPose() { return m_showEndPose; };
+
+
 
 	CScene* getScene() { return m_scene; };
 
@@ -37,6 +46,9 @@ public:
 public slots:
 	void loadTrainingResult();
 	void startPredicting();
+
+	void setShowStartPose(int state);
+	void setShowEndPose(int state);
 
 
 private:
@@ -48,12 +60,23 @@ private:
 
 	SkeletonSampler *m_skeletonSampler;
 
-	std::vector<SkeletonPtrList> m_actionRepSkeletons;
-	std::map<int, std::vector<SkeletonPtrList>> m_sampledSkeletonsForActions;
-	std::map<int, std::vector<std::vector<int>>> m_randomSkeletonIdList;
+	// 1st layer: for each phase of current action
+	// 2nd layer: for each action type: move, sit etc.
+	std::vector<std::vector<SkeletonPtrList>> m_loadedActionSkeletons;
+	
+	// 1st layer: for some model 
+	// 2nd layer: for each phase of current action
+	// 3rd layer: for each action type: move, sit etc.
+	// SkeletonPtrList: each phase may correspond several skeletons
+	std::map<int, std::vector<std::vector<SkeletonPtrList>>> m_sampledSkeletonsForActions;
+	std::map<int, std::vector<std::vector<std::vector<int>>>> m_randomSkeletonIdList;
 
 	bool m_showSampledSkeleton;
 	bool m_showSampeRegion;
+
+	bool m_showStartPose;
+	bool m_showEndPose;
+
 	bool m_finishPredict;
 };
 

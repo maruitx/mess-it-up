@@ -2,11 +2,15 @@
 #include "../Geometry/Scene.h"
 #include "../Geometry/Skeleton.h"
 #include "../Geometry/SkeletonSampler.h"
+#include "ActionFeature.h"
 
 ActionPredictor::ActionPredictor(QObject *parent)
 	: QObject(parent)
 {
 	m_showSampledSkeleton = false;
+	m_showStartPose = false;
+	m_showEndPose = false;
+
 	m_showSampeRegion = false;
 	m_finishPredict = false;
 }
@@ -58,7 +62,7 @@ void ActionPredictor::loadTrainingResult()
 
 void ActionPredictor::startPredicting()
 {
-	if (m_actionRepSkeletons.size() == 0)
+	if (m_loadedActionSkeletons.size() == 0)
 	{
 		Simple_Message_Box("Please load training data first");
 		return;
@@ -69,29 +73,19 @@ void ActionPredictor::startPredicting()
 
 	m_scene->voxelizeModels();  // voxelize model and build octree
 
-	// predict possible action for each model
 	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
 	{
-		m_sampledSkeletonsForActions[modelID].resize(m_actionRepSkeletons.size());
-		// test for each action
-		// random sample an/several actions from the action library
-		for (int actionID = 0; actionID < m_actionRepSkeletons.size(); actionID++)
-		{
-			if (m_actionRepSkeletons[actionID].size() > 0)
-			{
-				int k = std::rand() % m_actionRepSkeletons[actionID].size(); // random select
-				m_skeletonSampler->setSkeleton(m_actionRepSkeletons[actionID][k]);
-				m_skeletonSampler->sampleSkeletonAroundModel(modelID);
-
-				SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();
-				m_sampledSkeletonsForActions[modelID][actionID] = sampledSkeletons;
-			}
-		}
+		m_sampledSkeletonsForActions[modelID].resize(ACTION_PHASE_NUM);
 	}
+	
+	sampleSkeletons();
 
 	genRandomSkeletonList(10);
 
 	m_showSampledSkeleton = true;
+	m_showStartPose = true;
+	m_showEndPose = false;
+
 	m_showSampeRegion = true;
 	m_finishPredict = true;
 
@@ -100,14 +94,44 @@ void ActionPredictor::startPredicting()
 
 void ActionPredictor::loadActionRepSkels()
 {
-	m_actionRepSkeletons.clear();
-	m_actionRepSkeletons.resize(ACTION_NUM);
+	m_loadedActionSkeletons.resize(ACTION_PHASE_NUM);
+
+	loadActionRepSkels(ActionFeature::ActionPhase::StartAction);
+	loadActionRepSkels(ActionFeature::ActionPhase::EndAction);
+}
+
+// for action predictor, skeleton is not constraint to scenes now
+void ActionPredictor::loadActionRepSkels(int currentActionPhase)
+{
+	m_loadedActionSkeletons[currentActionPhase].clear();
+	m_loadedActionSkeletons[currentActionPhase].resize(ACTION_NUM);
+
+	QString actionPhaseStr;
+	if (currentActionPhase == ActionFeature::ActionPhase::StartAction)
+	{
+		actionPhaseStr = "start";
+	}
+
+	if (currentActionPhase == ActionFeature::ActionPhase::EndAction)
+	{
+		actionPhaseStr = "end";
+	}
+
+	if (currentActionPhase == ActionFeature::ActionPhase::FullAction)
+	{
+		actionPhaseStr = "full";
+	}
 
 	QString featureFilePath = m_jobFilePath + "Feature/Train/";
 
-	for (int actionID = 0; actionID < m_actionRepSkeletons.size(); actionID++)
+	if (m_sceneFileName.isEmpty())
 	{
-		QString filename = featureFilePath + QString(Action_Labels[actionID]) + ".skel";
+		m_sceneFileName = m_scene->getSceneName();
+	}	
+
+	for (int actionID = 0; actionID < ACTION_NUM; actionID++)
+	{
+		QString filename = featureFilePath + actionPhaseStr + "_" + QString(Action_Labels[actionID]) + ".skel";
 		QFile inFile(filename);
 		QTextStream ifs(&inFile);
 
@@ -117,6 +141,7 @@ void ActionPredictor::loadActionRepSkels()
 		while (!ifs.atEnd())
 		{
 			QString skeletonString = ifs.readLine();
+
 			QStringList skeletonJointsList = skeletonString.split(" ");
 
 			QVector<Eigen::Vector4d> joints(skeletonJointsList.size() / 3, Eigen::Vector4d(0, 0, 0, 1));
@@ -129,7 +154,7 @@ void ActionPredictor::loadActionRepSkels()
 			}
 
 			Skeleton *newSkel = new Skeleton(joints);
-			m_actionRepSkeletons[actionID].push_back(newSkel);
+			m_loadedActionSkeletons[currentActionPhase][actionID].push_back(newSkel);
 		}
 
 		inFile.close();
@@ -138,50 +163,55 @@ void ActionPredictor::loadActionRepSkels()
 
 void ActionPredictor::genRandomSkeletonList(int num)
 {
-	std::map<int, std::vector<SkeletonPtrList>>::iterator it;
+	std::map<int, std::vector<std::vector<SkeletonPtrList>>>::iterator it;
 
 	for (it = m_sampledSkeletonsForActions.begin(); it != m_sampledSkeletonsForActions.end(); it++)
 	{
 		int modelID = it->first;
 
-		m_randomSkeletonIdList[modelID].resize(m_actionRepSkeletons.size());
+		m_randomSkeletonIdList[modelID].resize(ACTION_PHASE_NUM);
 
-		for (int actionID = 0; actionID < m_actionRepSkeletons.size(); actionID++)
+		for (int phaseID = 0; phaseID < ACTION_PHASE_NUM; phaseID++)
 		{
-			int actionNum = it->second[actionID].size();
-			if (actionNum > 0)
+			m_randomSkeletonIdList[modelID][phaseID].resize(ACTION_NUM);
+
+			for (int actionID = 0; actionID < ACTION_NUM; actionID++)
 			{
-				if (actionNum < num)
+				int actionNum = it->second[phaseID][actionID].size();
+				if (actionNum > 0)
 				{
-					num = actionNum;
+					if (actionNum < num)
+					{
+						num = actionNum;
+					}
+
+					std::vector<int> randIdList(num);
+
+					for (int i = 0; i < num; i++)
+					{
+						int skelID = std::rand() % m_sampledSkeletonsForActions[modelID][phaseID][actionID].size();
+						randIdList[i] = skelID;
+					}
+
+					m_randomSkeletonIdList[modelID][phaseID][actionID] = randIdList;
 				}
-
-				std::vector<int> randIdList(num);
-
-				for (int i = 0; i < num; i++)
-				{
-					int skelID = std::rand() % m_sampledSkeletonsForActions[modelID][actionID].size();
-					randIdList[i] = skelID;
-				}
-
-				m_randomSkeletonIdList[modelID][actionID] = randIdList;
 			}
 		}
 	}
 }
 
-void ActionPredictor::drawSampledSkeletons(int modelID, int actionID)
+void ActionPredictor::drawSampledSkeletons(int modelID, int phaseID, int actionID)
 {
-	if (m_sampledSkeletonsForActions[modelID][actionID].size() > 0)
+	if (m_sampledSkeletonsForActions[modelID][phaseID][actionID].size() > 0)
 	{
-		for (int i = 0; i < m_randomSkeletonIdList[modelID][actionID].size(); i++)
+		for (int i = 0; i < m_randomSkeletonIdList[modelID][phaseID][actionID].size(); i++)
 		{
-			int skeID = m_randomSkeletonIdList[modelID][actionID][i];
-			m_sampledSkeletonsForActions[modelID][actionID][skeID]->draw();
+			int skeID = m_randomSkeletonIdList[modelID][phaseID][actionID][i];
+			m_sampledSkeletonsForActions[modelID][phaseID][actionID][skeID]->draw(phaseID);
 		}
 
 		// show sample region
-		drawSampleRange(modelID);
+		//drawSampleRange(modelID);
 	}
 }
 
@@ -236,12 +266,63 @@ void ActionPredictor::drawSampleRange(int modelID)
 
 int ActionPredictor::getSampledSkelNum(int modelID, int actionID)
 {
-	return m_sampledSkeletonsForActions[modelID][actionID].size();
+	return m_sampledSkeletonsForActions[modelID][0][actionID].size();
 }
 
 void ActionPredictor::resampleSkeleton(int num)
 {
 	m_randomSkeletonIdList.clear();
 	genRandomSkeletonList(num);
+}
+
+
+void ActionPredictor::sampleSkeletons()
+{
+	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
+	{
+		for (int phaseID = 0; phaseID < ACTION_PHASE_NUM; phaseID++)
+		{
+			m_sampledSkeletonsForActions[modelID][phaseID].resize(ACTION_NUM);
+		}
+	}
+
+	sampleSkeletonsForActionPhrase(ActionFeature::ActionPhase::StartAction);
+	sampleSkeletonsForActionPhrase(ActionFeature::ActionPhase::EndAction);
+	sampleSkeletonsForActionPhrase(ActionFeature::ActionPhase::FullAction);
+}
+
+
+void ActionPredictor::sampleSkeletonsForActionPhrase(int currentActionPhase)
+{
+	// predict possible action for each model
+	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
+	{
+		// test for each action
+		// random sample an/several actions from the action library
+		for (int actionID = 0; actionID < m_loadedActionSkeletons[currentActionPhase].size(); actionID++)
+		{
+			if (m_loadedActionSkeletons[currentActionPhase][actionID].size() > 0)
+			{
+				int k = std::rand() % m_loadedActionSkeletons[currentActionPhase][actionID].size(); // random select
+				m_skeletonSampler->setSkeleton(m_loadedActionSkeletons[currentActionPhase][actionID][k]);
+				m_skeletonSampler->sampleSkeletonAroundModel(modelID);
+
+				SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();
+				m_sampledSkeletonsForActions[modelID][currentActionPhase][actionID] = sampledSkeletons;
+			}
+		}
+	}
+}
+
+void ActionPredictor::setShowStartPose(int state)
+{
+	m_showStartPose = state;
+	updateDrawArea();
+}
+
+void ActionPredictor::setShowEndPose(int state)
+{
+	m_showEndPose = state;
+	updateDrawArea();
 }
 

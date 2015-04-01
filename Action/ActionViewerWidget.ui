@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>563</width>
-    <height>300</height>
+    <height>277</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,9 +37,9 @@
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>50</y>
+     <y>30</y>
      <width>165</width>
-     <height>201</height>
+     <height>221</height>
     </rect>
    </property>
    <property name="title">
@@ -47,20 +47,6 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QPushButton" name="pushButton">
-      <property name="text">
-       <string>Show Sampled Skels</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QCheckBox" name="showCenterModelVoxelBox">
-      <property name="text">
-       <string>Show Center Model Voxel</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
      <widget class="QFrame" name="frame">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -69,6 +55,23 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QCheckBox" name="showStartPoseBox">
+         <property name="text">
+          <string>Show Start Pose</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="showEndPoseBox">
+         <property name="text">
+          <string>Show End Pose</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QLabel" name="showSkelNumLabel">
          <property name="text">
@@ -100,6 +103,13 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="showCenterModelVoxelBox">
+      <property name="text">
+       <string>Show Center Model Voxel</string>
+      </property>
      </widget>
     </item>
    </layout>

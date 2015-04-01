@@ -68,7 +68,15 @@ void mess_mode::decorate()
 
 	if (actionPreditor->isShowSampledSkeletons() && m_actionViewerWidgetCreated)
 	{
-		actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), actionViewer->getSelectActionID());
+		if (actionPreditor->isShowStartPose())
+		{
+			actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), 0, actionViewer->getSelectActionID());
+		}
+
+		if (actionPreditor->isShowEndPose())
+		{
+			actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), 1, actionViewer->getSelectActionID());
+		}		
 	}
 }
 

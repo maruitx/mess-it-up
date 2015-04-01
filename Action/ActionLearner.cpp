@@ -23,13 +23,6 @@ ActionLearner::~ActionLearner()
 
 }
 
-//void ActionLearner::init(RgbdViewer *viewer, CScene *s, Starlab::DrawArea *area)
-//{
-//	m_rgbdViewer = viewer;
-//	m_scene = s;
-//	m_drawArea = area;
-//}
-
 void ActionLearner::init(mess_mode *m)
 {
 	m_rgbdViewer = m->rgbdViewer;
@@ -378,7 +371,7 @@ void ActionLearner::startLearning()
 		// record action feature for each type of action
 		m_actionFeatures[newFeature.actionID()].push_back(newFeature);
 
-		std::vector<Skeleton*> repSkeletons = newFeature.getActionRepSkeletons();
+		std::vector<Skeleton*> repSkeletons = newFeature.getActionRepSkeletons(ActionFeature::ActionPhase::FullAction);
 
 		//collect rep skeletons from all instances, need to re-think
 		//m_actionRepSkeletons[newFeature.actionID()].insert(m_actionRepSkeletons[newFeature.actionID()].end(), repSkeletons.begin(), repSkeletons.end());
@@ -413,6 +406,28 @@ QVector<QPair<int, Eigen::Matrix4d>> ActionLearner::getModelTrackMat(int frame_i
 
 void ActionLearner::saveExtractedFeatures()
 {
+	saveExtractedFeatures(ActionFeature::ActionPhase::StartAction);
+	saveExtractedFeatures(ActionFeature::ActionPhase::EndAction);
+}
+
+void ActionLearner::saveExtractedFeatures(int currentActionPhase)
+{
+	QString actionPhaseStr;
+	if (currentActionPhase == ActionFeature::ActionPhase::StartAction)
+	{
+		actionPhaseStr = "start";
+	}
+	
+	if (currentActionPhase == ActionFeature::ActionPhase::EndAction)
+	{
+		actionPhaseStr = "end";
+	}
+
+	if (currentActionPhase == ActionFeature::ActionPhase::FullAction)
+	{
+		actionPhaseStr = "full";
+	}
+
 	QString featureFilePath = m_jobFilePath + "Feature/Train/";
 	QVector<QString> labels;
 
@@ -421,8 +436,8 @@ void ActionLearner::saveExtractedFeatures()
 	{
 		if (m_actionFeatures[i].size() > 0)
 		{
-			QString filename = featureFilePath + QString(Action_Labels[i]) + ".txt";
-			
+			QString filename = featureFilePath + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".txt";
+
 			labels.push_back(Action_Labels[i]); // collect the available labels for weka output
 
 			QFile outFile(filename);
@@ -433,7 +448,7 @@ void ActionLearner::saveExtractedFeatures()
 			// save action features for each instance
 			for (int j = 0; j < m_actionFeatures[i].size(); j++)
 			{
-				std::map<int, std::vector<double>>& features = m_actionFeatures[i][j].getFeatureVector();
+				std::map<int, std::vector<double>>& features = m_actionFeatures[i][j].getFeatureVector((ActionFeature::ActionPhase)currentActionPhase);
 
 				std::map<int, std::vector<double>>::iterator it;
 				for (it = features.begin(); it != features.end(); it++)
@@ -493,7 +508,7 @@ void ActionLearner::saveExtractedFeatures()
 			// for each instance
 			for (int j = 0; j < m_actionFeatures[i].size(); j++)
 			{
-				std::map<int, std::vector<double>>& features = m_actionFeatures[i][j].getFeatureVector();
+				std::map<int, std::vector<double>>& features = m_actionFeatures[i][j].getFeatureVector((ActionFeature::ActionPhase)currentActionPhase);
 
 				std::map<int, std::vector<double>>::iterator it;
 				for (it = features.begin(); it != features.end(); it++)
@@ -510,30 +525,55 @@ void ActionLearner::saveExtractedFeatures()
 	}
 
 	outFile.close();
-
 }
 
 void ActionLearner::saveActionRepSkels()
 {
+	saveActionRepSkels(ActionFeature::ActionPhase::StartAction);
+	saveActionRepSkels(ActionFeature::ActionPhase::EndAction);
+}
+
+void ActionLearner::saveActionRepSkels(int currentActionPhase)
+{
+	QString actionPhaseStr;
+	if (currentActionPhase == ActionFeature::ActionPhase::StartAction)
+	{
+		actionPhaseStr = "start";
+	}
+
+	if (currentActionPhase == ActionFeature::ActionPhase::EndAction)
+	{
+		actionPhaseStr = "end";
+	}
+
+	if (currentActionPhase == ActionFeature::ActionPhase::FullAction)
+	{
+		actionPhaseStr = "full";
+	}
+
 	QString featureFilePath = m_jobFilePath + "Feature/Train/";
 
 	for (int i = 0; i < m_actionFeatures.size(); i++)
 	{
 		if (m_actionFeatures[i].size() > 0)
 		{
-			QString filename = featureFilePath + QString(Action_Labels[i]) + ".skel";
+			QString filename = featureFilePath + m_sceneFileName + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".skel";
 			QFile outFile(filename);
 			QTextStream out(&outFile);
 
 			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
 			for (int j = 0; j < m_actionFeatures[i].size(); j++)
 			{
-				std::vector<Skeleton*> repSkeletons = m_actionFeatures[i][j].getActionRepSkeletons();
+				std::vector<Skeleton*> repSkeletons = m_actionFeatures[i][j].getActionRepSkeletons((ActionFeature::ActionPhase)currentActionPhase);
+
+				int modelID = m_actionFeatures[i][j].centerModelID();
+				out << "M "<<modelID << "\n";
 
 				for (int si = 0; si < repSkeletons.size(); si++)
 				{
 					std::vector<MathLib::Vector3> joints = repSkeletons[si]->getNormalizedJoints();
 
+					out << "S\n";
 					for (int jt = 0; jt < joints.size(); jt++)
 					{
 						out << joints[jt].x << " " << joints[jt].y << " " << joints[jt].z << " ";
@@ -551,4 +591,9 @@ void ActionLearner::saveActionRepSkels()
 void ActionLearner::updateDrawArea()
 {
 	m_drawArea->updateGL();
+}
+
+void ActionLearner::loadSavedActionSkels()
+{
+
 }

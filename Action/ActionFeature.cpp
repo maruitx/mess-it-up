@@ -8,7 +8,7 @@ ActionFeature::ActionFeature()
 ActionFeature::ActionFeature(ActionLearner *learner):
 m_actionLearner(learner)
 {
-
+	m_repSkeletons.resize(ACTION_PHASE_NUM);
 }
 
 ActionFeature::~ActionFeature()
@@ -28,22 +28,52 @@ void ActionFeature::extractFeature()
 	CScene *scene = m_actionLearner->getScene();
 	scene->buildSupportHierarchy();
 
+	double FrameRate = 20;
+	double samplingTimeIntv = 0.25;
+	
+	int FrameIntv = FrameRate*samplingTimeIntv;
+
+	int totalFrameNum = m_actionInstance.endFrameID - m_actionInstance.startFrameID;
+	double lastTimeLength = totalFrameNum / FrameRate;
+
 	std::vector<double> actionFeature;
-	computeActionFeatureAt(m_actionInstance.startFrameID, actionFeature);
+
+	if (lastTimeLength > 2)
+	{
+		int sampleNum = 1 / samplingTimeIntv;
+
+		for (int i = 0; i < sampleNum; i++)
+		{
+			int currFrameID = m_actionInstance.startFrameID + i*FrameIntv;
+			computeActionFeatureAt(currFrameID, actionFeature, ActionPhase::StartAction);
+			m_startActionFeatures[currFrameID] = actionFeature;
+		}
+
+		for (int i = 0; i < sampleNum; i++)
+		{
+			int currFrameID = m_actionInstance.endFrameID - i*FrameIntv;
+			computeActionFeatureAt(currFrameID, actionFeature, ActionPhase::EndAction);
+			m_endActionFeatures[currFrameID] = actionFeature;
+		}
+	}
+
+	
+	computeActionFeatureAt(m_actionInstance.startFrameID, actionFeature, ActionPhase::FullAction);
 	m_actionFeatures[m_actionInstance.startFrameID] = actionFeature;
 	
-	computeActionFeatureAt(m_actionInstance.endFrameID, actionFeature);
+	computeActionFeatureAt(m_actionInstance.endFrameID, actionFeature, ActionPhase::FullAction);
 	m_actionFeatures[m_actionInstance.endFrameID] = actionFeature;
 
 	m_featureDim = actionFeature.size();
 }
 
-void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &actionFeature)
+void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &actionFeature, ActionPhase actionPhaseType)
 {
 	CScene *scene = m_actionLearner->getScene();
 
 	Skeleton *skeleton = m_actionLearner->getSkeleton(frame_id);
-	m_skeletonPool.push_back(skeleton);
+
+	m_repSkeletons[actionPhaseType].push_back(skeleton);	
 
 	QVector<QPair<int, Eigen::Matrix4d>> modelTrackMats = m_actionLearner->getModelTrackMat(frame_id);
 
@@ -130,11 +160,6 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 	}
 }
 
-int ActionFeature::actionID()
-{
-	return m_actionInstance.actionID;
-}
-
 void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature)
 {
 	int modelID = m->getID();
@@ -152,7 +177,44 @@ void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &o
 	objectStructFeature.push_back(supportChindrenNum);
 }
 
-void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, std::vector<double> &actionFeature)
+void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature)
 {
+	CScene *scene = m_actionLearner->getScene();
+	CModel *model = scene->getModel(model_id);
 
+	std::vector<double> skeletonShapeFeature, objectGeoFeature, objectStructFeature, skeletonObjectFeature;
+
+	// option: update scene graph
+
+
+	// compute feature using transformed scene
+	computeSkeletonShapeFeature(skeleton, skeletonShapeFeature);
+	computeObjectGeoFeatures(model, objectGeoFeature);
+	computeObjectStructFeature(model, objectStructFeature);
+	computeSkeletonObjInterFeatures(skeleton, model, skeletonObjectFeature);
+
+	//
+	actionFeature.clear();
+	actionFeature.insert(actionFeature.end(), skeletonShapeFeature.begin(), skeletonShapeFeature.end());
+	actionFeature.insert(actionFeature.end(), objectGeoFeature.begin(), objectGeoFeature.end());
+	actionFeature.insert(actionFeature.end(), objectStructFeature.begin(), objectStructFeature.end());
+	actionFeature.insert(actionFeature.end(), skeletonObjectFeature.begin(), skeletonObjectFeature.end());
+}
+
+std::map<int, std::vector<double>>& ActionFeature::getFeatureVector(ActionPhase actionFeatureType)
+{
+	if (actionFeatureType == ActionPhase::StartAction)
+	{
+		return m_startActionFeatures;
+	}
+
+	else if (actionFeatureType == ActionPhase::EndAction)
+	{
+		return m_endActionFeatures;
+	}
+	
+	else if (actionFeatureType == ActionPhase::FullAction)
+	{
+		return m_actionFeatures;
+	}
 }

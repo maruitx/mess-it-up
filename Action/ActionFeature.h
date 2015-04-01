@@ -20,19 +20,29 @@
 class ActionLearner;
 struct ActionInstance;
 
+static int ACTION_PHASE_NUM = 4;
+
 class ActionFeature
 {
 public:
 	ActionFeature();
 	~ActionFeature();
 
+	enum ActionPhase
+	{
+		StartAction,
+		EndAction,
+		InBetweenAction,
+		FullAction
+	};
+
 	ActionFeature(ActionLearner *learner);
 	void setActionInstance(int id);
 
 	void extractFeature();
-	std::map<int, std::vector<double>>& getFeatureVector() { return m_actionFeatures; };
+	std::map<int, std::vector<double>>& getFeatureVector(ActionPhase actionFeatureType);
 
-	void computeActionFeatureAt(int frame_id, std::vector<double> &actionFeature);
+	void computeActionFeatureAt(int frame_id, std::vector<double> &actionFeature, ActionPhase actionPhaseType);
 
 	// skeleton shape
 	void computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<double> &skeletonShapeFeature);
@@ -44,27 +54,36 @@ public:
 	// skeleton + object
 	void computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature);
 
-	// for test stage
+	// for test stage, also could be used for learning synthetic skeletons
 	// simply compute feature for one skeleton at sampled location
-	void computeActionFeatureForSkel(Skeleton *skeleton, std::vector<double> &actionFeature);
+	void computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature);
 
-	int actionID();
+	int centerModelID() { return m_actionInstance.modelID; };
+	int actionID(){ return m_actionInstance.actionID; };
 	int featureDim() { return m_featureDim; };
 
 	// return representative skeletons of current action instance
 	// for now, start and end frames only
 	// future work, frames in the middle + key frame + random sampled frames
-	std::vector<Skeleton*> getActionRepSkeletons() { return m_skeletonPool; };
+	std::vector<Skeleton*> getActionRepSkeletons(ActionPhase actionPhaseType) { return m_repSkeletons[actionPhaseType]; };
 
 private:
 	ActionLearner *m_actionLearner;
 
 	ActionInstance m_actionInstance;
 	int m_instanceID;
-
+	
 	int m_featureDim;
+
+	// map->first: frame id
+	// each feature is corresponding to a frame
 	std::map<int, std::vector<double>> m_actionFeatures;
-	std::vector<Skeleton*> m_skeletonPool;
+	std::map<int, std::vector<double>> m_startActionFeatures;
+	std::map<int, std::vector<double>> m_endActionFeatures;
+
+	// representative skeletons
+	// 1st layer: for each phase of current action
+	std::vector<std::vector<Skeleton*>> m_repSkeletons;
 
 	std::vector<double> m_objectSpatioFeature;
 	std::vector<double> m_objectStructureFeature;

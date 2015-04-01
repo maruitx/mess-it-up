@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>271</width>
-    <height>492</height>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -99,13 +99,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="startLearnButton">
-        <property name="text">
-         <string>Start Learning</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="openActionLabelerButton">
         <property name="text">
@@ -117,6 +110,27 @@
        <widget class="QPushButton" name="loadActionJobButton">
         <property name="text">
          <string>Load Job</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="extractFeatureButton">
+        <property name="text">
+         <string>Extract Feature</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="collectSkelButton">
+        <property name="text">
+         <string>Collect Skeleton</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QPushButton" name="startLearnButton">
+        <property name="text">
+         <string>Start Learning</string>
         </property>
        </widget>
       </item>

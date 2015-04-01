@@ -35,6 +35,7 @@ public:
 
 	void loadScene(const QString filename);
 	void setSceneName(const QString &sceneName) { m_sceneFileName = sceneName; };
+	QString getSceneName() { return m_sceneFileName; };
 
 	void setSceneDrawArea(Starlab::DrawArea *a) { m_drawArea = a; };
 	MathLib::Vector3 getUprightVec() { return m_uprightVec; };

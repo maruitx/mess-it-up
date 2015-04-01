@@ -331,6 +331,7 @@ void DepthSensor::playNextFrame()
 	{
 		if (m_currentFrameID > 0)
 		{
+			// wait and play frame at recorded time stamp
 			m_totalElapsedMs += m_timeStamp[m_currentFrameID];
 			residue = (m_totalElapsedMs / updateInv + 1)*updateInv-m_totalElapsedMs;
 			Sleep(m_timeStamp[m_currentFrameID]-residue);

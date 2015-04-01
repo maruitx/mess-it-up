@@ -31,6 +31,9 @@ ActionViewerWidget::ActionViewerWidget(ActionViewer *viewer, QWidget *parent)
 	connect(ui.modelNameListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(updateShowSkelNumLabel()));
 	connect(ui.actionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(updateShowSkelNumLabel()));
 
+	connect(ui.showStartPoseBox, SIGNAL(stateChanged(int)), m_viewer->actionPredictor, SLOT(setShowStartPose(int)));
+	connect(ui.showEndPoseBox, SIGNAL(stateChanged(int)), m_viewer->actionPredictor, SLOT(setShowEndPose(int)));
+
 	connect(ui.showSkelNumSlider, SIGNAL(valueChanged(int)), this, SLOT(updateShowSkelNumLabel(int)));
 	connect(ui.resampleSkelButton, SIGNAL(clicked()), this, SLOT(resampleSkeleton()));
 
@@ -49,14 +52,25 @@ void ActionViewerWidget::updateShowSkelNumLabel()
 
 	int totalSkelNum = m_viewer->actionPredictor->getSampledSkelNum(modelID, actionID);
 
+	int displaySkelNum;
+
+	if (totalSkelNum == 0)
+	{
+		displaySkelNum = 0;
+	}
+	else
+	{
+		displaySkelNum = m_showSampledSkelNum;
+	}
+
 	// update label
 	QString str("Skel Num: ");
-	str += QString("%1 of %2 skels").arg(m_showSampledSkelNum).arg(totalSkelNum);
+	str += QString("%1 of %2 skels").arg(displaySkelNum).arg(totalSkelNum);
 
 	ui.showSkelNumLabel->setText(str);
 
 	// reset slider postion
-	ui.showSkelNumSlider->setValue(m_showSampledSkelNum);
+	ui.showSkelNumSlider->setValue(displaySkelNum);
 }
 
 // only to indicate current slider value, don't actually change sample num

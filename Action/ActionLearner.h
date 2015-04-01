@@ -4,7 +4,6 @@
 #include "../Utilities/utility.h"
 #include "../mess_mode.h"
 
-
 class CScene;
 class Skeleton;
 class SkeletonSampler;
@@ -58,9 +57,17 @@ public:
 	QVector<QPair<int, Eigen::Matrix4d>> getModelTrackMat(int frame_id);
 
 	void extractActionInstances();    // extract action instances from frame labels
+	
+	void saveExtractedFeatures(int currentActionPhase);
 	void saveExtractedFeatures();
+
+	// skeleton is only meaningful when giving the scene and its corresponding center model
+	void saveActionRepSkels(int currentActionPhase);
 	void saveActionRepSkels();
+
 	//void loadActionRepSkels();
+
+	void loadSavedActionSkels();
 	
 	//					       z  y
 	//				  	       | /
@@ -98,13 +105,21 @@ private:
 	std::vector<Skeleton*> m_skeletonStream;
 	SkeletonSampler *m_skeletonSampler;
 
+	// pre-processed skeletons 
+	// to replace the sampled skeletons from recorded skeleton stream
+	// 1st layer: for some model 
+	// 2nd layer: for each phase of current action
+	// 3rd layer: for each action type: move, sit etc.
+	// SkeletonPtrList: each phase may correspond several skeletons
+	std::map<int, std::vector<std::vector<SkeletonPtrList>>> m_savedSkeletons;
+
 	std::vector<int> m_trackingObjID;
 
 	int m_currFrameId;
 
-
 	// actions
 	std::vector<ActionInstance> m_actionInstances;
+	// each type of action has a set of instances/features
 	std::vector<std::vector<ActionFeature>> m_actionFeatures;
 
 	//std::vector<SkeletonPtrList> m_actionRepSkeletons;

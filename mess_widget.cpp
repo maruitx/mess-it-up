@@ -28,10 +28,12 @@ mess_widget::mess_widget(mess_mode * m) :
 	connect(ui->loadActionJobButton, SIGNAL(clicked()), m_mode, SLOT(loadActionJob()));
 	connect(ui->openActionLabelerButton, SIGNAL(clicked()), m_mode, SLOT(openActionLabeler()));
 	connect(ui->resetAlignButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(resetAlignView()));
+	
+	connect(ui->collectSkelButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT());
+	connect(ui->extractFeatureButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT());
 	connect(ui->startLearnButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(startLearning()));
 
 	connect(ui->loadTestSceneButton, SIGNAL(clicked()), m_mode, SLOT(loadTestScene()));
-	//connect(ui->startPredictButton, SIGNAL(clicked()), m_mode->actionLearner, SLOT(startPredicting()));
 	connect(ui->startPredictButton, SIGNAL(clicked()), m_mode->actionPreditor, SLOT(startPredicting()));
 	connect(ui->loadTrainingResultButton, SIGNAL(clicked()), m_mode->actionPreditor, SLOT(loadTrainingResult()));
 	connect(ui->openActionViewerButton, SIGNAL(clicked()), m_mode, SLOT(openActionViewer()));

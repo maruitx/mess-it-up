@@ -3,6 +3,7 @@
 #include "qglviewer/quaternion.h"
 #include "../Utilities/CustomDrawObjects.h"
 
+QColor colorset[2][2] = { { QColor(255, 0, 0), QColor(0, 255, 0) }, { QColor(220, 0, 220), QColor(0, 220, 220) } };
 
 Skeleton::Skeleton()
 {
@@ -35,9 +36,8 @@ Skeleton::~Skeleton()
 {
 }
 
-void Skeleton::draw()
+void Skeleton::draw(int drawMode/*= 0*/)
 {
-
 	glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_HINT_BIT | GL_LINE_BIT | GL_CURRENT_BIT);
 	glDisable(GL_TEXTURE_2D);
 
@@ -49,12 +49,12 @@ void Skeleton::draw()
 
 	for (int i = 0; i < 19; i++)
 	{
-		drawBone(i);
+		drawBone(i, colorset[drawMode][1]);
 	}
 
 	for (int i = 0; i < m_joints.size(); i++)
 	{
-		drawJoint(i);
+		drawJoint(i, colorset[drawMode][0]);
 	}
 
 	glPopAttrib();
