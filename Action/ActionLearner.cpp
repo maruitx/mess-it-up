@@ -10,6 +10,7 @@ ActionLearner::ActionLearner(QObject *parent)
 	: QObject(parent)
 {
 	m_hasJob = false;
+	m_hasSynthJob = false;
 //	m_showSampledSkeleton = false;
 
 	scanToSceneAxisTransMat << 1.0, 0, 0, 0,
@@ -225,9 +226,10 @@ void ActionLearner::setSkeletonStream()
 
 void ActionLearner::drawSkeleton()
 {
-	m_skeletonStream[m_currFrameId]->draw();
-
-
+	if (!m_skeletonStream.empty())
+	{
+		m_skeletonStream[m_currFrameId]->draw();
+	}
 }
 
 void ActionLearner::updateSkeletonInteract()
@@ -354,31 +356,39 @@ void ActionLearner::extractActionInstances()
 
 void ActionLearner::startLearning()
 {
-	extractActionInstances();
-
-	m_actionFeatures.clear();
-	//m_actionRepSkeletons.clear();  
-
-	m_actionFeatures.resize(ACTION_NUM);
-	//m_actionRepSkeletons.resize(ACTION_NUM);
-
-	for (int i = 0; i < m_actionInstances.size(); i++)
+	if (m_hasJob)
 	{
-		ActionFeature newFeature(this);
-		newFeature.setActionInstance(i);
-		newFeature.extractFeature();
+		extractActionInstances();
 
-		// record action feature for each type of action
-		m_actionFeatures[newFeature.actionID()].push_back(newFeature);
+		m_actionFeatures.clear();
+		//m_actionRepSkeletons.clear();  
 
-		std::vector<Skeleton*> repSkeletons = newFeature.getActionRepSkeletons(ActionFeature::ActionPhase::FullAction);
+		m_actionFeatures.resize(ACTION_NUM);
+		//m_actionRepSkeletons.resize(ACTION_NUM);
 
-		//collect rep skeletons from all instances, need to re-think
-		//m_actionRepSkeletons[newFeature.actionID()].insert(m_actionRepSkeletons[newFeature.actionID()].end(), repSkeletons.begin(), repSkeletons.end());
+		for (int i = 0; i < m_actionInstances.size(); i++)
+		{
+			ActionFeature newFeature(this);
+			newFeature.setActionInstance(i);
+			newFeature.extractFeature();
+
+			// record action feature for each type of action
+			m_actionFeatures[newFeature.actionID()].push_back(newFeature);
+
+			std::vector<Skeleton*> repSkeletons = newFeature.getActionRepSkeletons(ActionFeature::ActionPhase::FullAction);
+
+			//collect rep skeletons from all instances, need to re-think
+			//m_actionRepSkeletons[newFeature.actionID()].insert(m_actionRepSkeletons[newFeature.actionID()].end(), repSkeletons.begin(), repSkeletons.end());
+		}
+
+		saveExtractedFeatures();
+		saveActionRepSkels();
 	}
 
-	saveExtractedFeatures();
-	saveActionRepSkels();
+	else if (m_hasSynthJob)
+	{
+		computeFeaturesForSyntheticData();
+	}
 
 	Simple_Message_Box("Action learning done");
 }
@@ -436,7 +446,7 @@ void ActionLearner::saveExtractedFeatures(int currentActionPhase)
 	{
 		if (m_actionFeatures[i].size() > 0)
 		{
-			QString filename = featureFilePath + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".txt";
+			QString filename = featureFilePath + m_sceneFileName + "_" + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".feat";
 
 			labels.push_back(Action_Labels[i]); // collect the available labels for weka output
 
@@ -466,6 +476,7 @@ void ActionLearner::saveExtractedFeatures(int currentActionPhase)
 		}
 	}
 
+	// need to modify to collect features from differenct scenes
 	// save to arff format for weka
 	QString filename = featureFilePath + "actions.arff";
 
@@ -557,7 +568,7 @@ void ActionLearner::saveActionRepSkels(int currentActionPhase)
 	{
 		if (m_actionFeatures[i].size() > 0)
 		{
-			QString filename = featureFilePath + m_sceneFileName + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".skel";
+			QString filename = featureFilePath + m_sceneFileName + "_" + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".skel";
 			QFile outFile(filename);
 			QTextStream out(&outFile);
 
@@ -567,13 +578,12 @@ void ActionLearner::saveActionRepSkels(int currentActionPhase)
 				std::vector<Skeleton*> repSkeletons = m_actionFeatures[i][j].getActionRepSkeletons((ActionFeature::ActionPhase)currentActionPhase);
 
 				int modelID = m_actionFeatures[i][j].centerModelID();
-				out << "M "<<modelID << "\n";
+				out << "M " << modelID << " " << repSkeletons.size() <<"\n";
 
 				for (int si = 0; si < repSkeletons.size(); si++)
 				{
 					std::vector<MathLib::Vector3> joints = repSkeletons[si]->getNormalizedJoints();
 
-					out << "S\n";
 					for (int jt = 0; jt < joints.size(); jt++)
 					{
 						out << joints[jt].x << " " << joints[jt].y << " " << joints[jt].z << " ";
@@ -593,7 +603,210 @@ void ActionLearner::updateDrawArea()
 	m_drawArea->updateGL();
 }
 
-void ActionLearner::loadSavedActionSkels()
+bool ActionLearner::loadSyntheticJob(const QString &filename)
+{
+	// load synthetic scene
+
+	QFile inFile(filename);
+	QFileInfo inFileInfo(inFile.fileName());
+
+	if (!inFile.open(QIODevice::ReadWrite | QIODevice::Text))
+	{
+		Simple_Message_Box("Cannot open Job file");
+		return false;
+	}
+
+	QTextStream ifs(&inFile);
+
+	QString optionNameStr;
+	int optionValue;
+
+	ifs >> optionNameStr;
+
+	if (optionNameStr != "SynthData")
+	{
+		Simple_Message_Box("Not a synthetic job file");
+		return false;
+	}
+
+	ifs >> optionNameStr;
+
+	while (!optionNameStr.isEmpty())
+	{
+		if (optionNameStr == "Scene")
+		{
+			ifs >> m_sceneFileName;
+		}
+
+		ifs >> optionNameStr;
+	}
+
+	inFile.close();
+
+	m_jobFilePath = inFileInfo.absolutePath() + "/";
+
+	m_scene->loadScene(m_jobFilePath + "Scene/" + m_sceneFileName + "/" + m_sceneFileName + "/" + m_sceneFileName + ".txt");
+	m_scene->setSceneDrawArea(m_drawArea);
+
+	// load pre-processed skeleton from 3ds max
+	loadSynthActionSkels();
+
+	m_hasSynthJob = true;
+
+	return true;
+
+}
+
+void ActionLearner::loadSynthActionSkels()
+{
+	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+	QString filename;
+
+	QString actionPhaseStr[] = {"start", "end", "inbetween", "full"};
+
+	std::vector<SkeletonPtrList > tempSkeletonLists;
+	QString optionStr;
+	QString modelName;
+	QString dummyStr;
+	int modelID;
+	int skeletonNum;
+	int skeletonListID = 0;
+	
+	// map<modelID, <id in tempSkeletonLists, <phaseId, actionID>>>
+	std::map<int, std::pair<int, std::pair<int, int>>> modelPhaseActionTypeMap;
+
+	for (int phaseID = 0; phaseID < ACTION_PHASE_NUM; phaseID++)
+	{
+		for (int actionID = 0; actionID < ACTION_NUM; actionID++)
+		{
+			filename = featureFilePath + "synth_" + m_sceneFileName + "_" + actionPhaseStr[phaseID] + "_" + QString(Action_Labels[actionID]) + ".skel";
+
+			QFile inFile(filename);
+			QTextStream ifs(&inFile);
+			
+			if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
+				continue;
+
+			ifs >> optionStr;
+			if (optionStr!="M")
+			{
+				Simple_Message_Box("No center model found");
+				return;
+			}
+
+			ifs >> modelName;
+			modelID = m_scene->getModelIdByName(modelName);
+
+			ifs >> skeletonNum;
+			dummyStr = ifs.readLine();  // eat up the rest of line
+
+			SkeletonPtrList onePhraseOneTypeList;
+
+			for (int i = 0; i < skeletonNum; i++)
+			{
+				QString skeletonString = ifs.readLine();
+
+				QStringList skeletonJointsList = skeletonString.split(" ");
+
+				QVector<Eigen::Vector4d> joints(skeletonJointsList.size() / 3, Eigen::Vector4d(0, 0, 0, 1));
+
+				for (int id = 0; id < skeletonJointsList.size() / 3; id++)
+				{
+					joints[id][0] = skeletonJointsList[3 * id].toDouble();
+					joints[id][1] = skeletonJointsList[3 * id + 1].toDouble();
+					joints[id][2] = skeletonJointsList[3 * id + 2].toDouble();
+				}
+
+				Skeleton *newSkel = new Skeleton(joints);
+				onePhraseOneTypeList.push_back(newSkel);
+			}
+
+			// record the phrase id, action type id, to generate the ModelRelatedSkeletonList structure later
+
+			tempSkeletonLists.push_back(onePhraseOneTypeList);
+				
+			inFile.close();
+			modelPhaseActionTypeMap[modelID] =std::pair<int, std::pair<int, int>>(skeletonListID, std::pair<int, int>(phaseID, actionID));
+			skeletonListID++;
+		}		
+	}
+
+	// convert skeleton list to ModelRelatedSkeletonList structure
+	std::map<int, std::pair<int, std::pair<int, int>>>::iterator it;
+
+	for (it = modelPhaseActionTypeMap.begin(); it != modelPhaseActionTypeMap.end(); it++)
+	{
+		int model_id = it->first;
+		m_loadedSkeletonsForTrain[model_id].resize(ACTION_PHASE_NUM);
+
+		for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+		{
+			m_loadedSkeletonsForTrain[model_id][phase_id].resize(ACTION_NUM);
+		}
+	}
+
+	for (it = modelPhaseActionTypeMap.begin(); it != modelPhaseActionTypeMap.end(); it++)
+	{
+		int model_id = it->first;
+		int skeletonList_id = (it->second).first;
+		int phase_id = ((it->second).second).first;
+		int action_id = ((it->second).second).second;
+
+		m_loadedSkeletonsForTrain[model_id][phase_id][action_id] = tempSkeletonLists[skeletonList_id];
+	}
+}
+
+void ActionLearner::collectFeaturesFromAllScenes()
 {
 
 }
+
+void ActionLearner::collectSkeletonsFromAllScenes()
+{
+
+}
+
+void ActionLearner::computeFeaturesForSyntheticData()
+{
+	std::vector<std::vector<std::vector<double>>> synthFeatures(ACTION_PHASE_NUM);
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		synthFeatures[phase_id].resize(ACTION_NUM);
+	}
+
+	// extract features for loaded skeletons
+	ModelRelatedSkeletonList::iterator it;
+
+	for (it = m_loadedSkeletonsForTrain.begin(); it != m_loadedSkeletonsForTrain.end(); it++)
+	{
+		int modelID = it->first;
+		
+		for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+		{
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+			{
+				if (!m_loadedSkeletonsForTrain[modelID][phase_id][action_id].empty())
+				{
+					SkeletonPtrList currSkelList = m_loadedSkeletonsForTrain[modelID][phase_id][action_id];
+
+					for (int skel_id = 0; skel_id < currSkelList.size(); skel_id++)
+					{
+						ActionFeature newFeature(this);
+
+						std::vector<double> actionFeature;
+						Skeleton *currSkel = m_loadedSkeletonsForTrain[modelID][phase_id][action_id][skel_id];
+
+						newFeature.computeActionFeatureForSkel(currSkel, modelID, actionFeature);
+						synthFeatures[phase_id][action_id] = actionFeature;
+					}
+				}
+			}
+		}
+	}
+
+
+	// save features for prediction
+}
+
+

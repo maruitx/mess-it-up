@@ -19,7 +19,22 @@ struct ActionInstance
 	bool isCompleted;
 };
 
+
 typedef std::vector<Skeleton*> SkeletonPtrList;
+
+// 1st layer: for each phase of current action
+// 2nd layer: for each action type: move, sit etc.
+typedef std::vector<std::vector<SkeletonPtrList>> MultiPhaseMultiTypeSkeletonList;
+
+// 1st layer: for some model 
+// 2nd layer: for each phase of current action
+// 3rd layer: for each action type: move, sit etc.
+// SkeletonPtrList: each phase may correspond several skeletons
+typedef std::map<int, MultiPhaseMultiTypeSkeletonList> ModelRelatedSkeletonList;
+
+// 1st layer: feature for each phase of current action
+// 2nd layer: feature for each action type: move, sit etc.
+typedef std::vector<std::vector<ActionFeature>> MultiPhaseMultiTypeFeatures;
 
 class ActionLearner : public QObject
 {
@@ -38,7 +53,9 @@ public:
 
 	bool loadJob(const QString &filename);
 	bool hasJob() { return m_hasJob; };
+	bool hasSynthJob() { return m_hasSynthJob; };
 	void setJobStatus(bool s) { m_hasJob = s; };
+
 
 	void setSkeletonStream();
 	void setTrackingObj();
@@ -58,16 +75,23 @@ public:
 
 	void extractActionInstances();    // extract action instances from frame labels
 	
+	// features is not constraint to scenes
+	// same feature used for both training and testing
 	void saveExtractedFeatures(int currentActionPhase);
 	void saveExtractedFeatures();
+	void collectFeaturesFromAllScenes();
 
-	// skeleton is only meaningful when giving the scene and its corresponding center model
+	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model
+	// in test: all skeletons representing one action are used for prediction, and not constraint to scene and center model
+	// save both kinds of skeleton
+	*/
 	void saveActionRepSkels(int currentActionPhase);
 	void saveActionRepSkels();
+	void collectSkeletonsFromAllScenes();
 
-	//void loadActionRepSkels();
-
-	void loadSavedActionSkels();
+	bool loadSyntheticJob(const QString &filename);
+	void loadSynthActionSkels();
+	void computeFeaturesForSyntheticData();
 	
 	//					       z  y
 	//				  	       | /
@@ -93,6 +117,8 @@ private:
 	Starlab::DrawArea *m_drawArea;
 
 	bool m_hasJob;
+	bool m_hasSynthJob; // good data are synthesized just for testing algorithm
+
 	QString m_jobFilePath;
 	QString m_sceneFileName;
 	QString m_scanFileName;
@@ -105,22 +131,22 @@ private:
 	std::vector<Skeleton*> m_skeletonStream;
 	SkeletonSampler *m_skeletonSampler;
 
+	/*
 	// pre-processed skeletons 
 	// to replace the sampled skeletons from recorded skeleton stream
-	// 1st layer: for some model 
-	// 2nd layer: for each phase of current action
-	// 3rd layer: for each action type: move, sit etc.
-	// SkeletonPtrList: each phase may correspond several skeletons
-	std::map<int, std::vector<std::vector<SkeletonPtrList>>> m_savedSkeletons;
+	// load skeleton built for different scenes
+	*/
+	ModelRelatedSkeletonList m_loadedSkeletonsForTrain;
 
 	std::vector<int> m_trackingObjID;
 
 	int m_currFrameId;
 
-	// actions
+	// actions instances from labeled data
 	std::vector<ActionInstance> m_actionInstances;
-	// each type of action has a set of instances/features
-	std::vector<std::vector<ActionFeature>> m_actionFeatures;
+
+	// features from different scenes
+	MultiPhaseMultiTypeFeatures m_actionFeatures;
 
 	//std::vector<SkeletonPtrList> m_actionRepSkeletons;
 };

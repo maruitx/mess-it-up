@@ -6,6 +6,8 @@
 #include "../mess_mode.h"
 #include "ActionLearner.h"
 
+typedef std::map<int, std::vector<std::vector<std::vector<int>>>> ModelRelatedSkeletonIdList;
+
 class ActionPredictor : public QObject
 {
 	Q_OBJECT
@@ -16,7 +18,7 @@ public:
 
 	void init(mess_mode *m);
 
-	bool loadTestScene(const QString &filename);
+	bool loadTestJob(const QString &filename);
 
 	void loadActionRepSkels();
 	void loadActionRepSkels(int currentActionPhase);
@@ -37,8 +39,6 @@ public:
 	bool isShowStartPose() { return m_showStartPose; };
 	bool isShowEndPose() { return m_showEndPose; };
 
-
-
 	CScene* getScene() { return m_scene; };
 
 	void updateDrawArea();
@@ -57,19 +57,26 @@ private:
 
 	QString m_jobFilePath;
 	QString m_sceneFileName;
+	QString m_useFeatureType;
 
 	SkeletonSampler *m_skeletonSampler;
 
+
+	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model
+	// in test: all skeletons representing one action are used for prediction, and not constraint to scene and center model
 	// 1st layer: for each phase of current action
 	// 2nd layer: for each action type: move, sit etc.
-	std::vector<std::vector<SkeletonPtrList>> m_loadedActionSkeletons;
+	*/
+	MultiPhaseMultiTypeSkeletonList m_loadedSkeletonsForTest;
 	
+	/*
 	// 1st layer: for some model 
 	// 2nd layer: for each phase of current action
 	// 3rd layer: for each action type: move, sit etc.
 	// SkeletonPtrList: each phase may correspond several skeletons
-	std::map<int, std::vector<std::vector<SkeletonPtrList>>> m_sampledSkeletonsForActions;
-	std::map<int, std::vector<std::vector<std::vector<int>>>> m_randomSkeletonIdList;
+	*/
+	ModelRelatedSkeletonList m_sampledSkeletonsForActions;
+	ModelRelatedSkeletonIdList m_randomSkeletonIdList;
 
 	bool m_showSampledSkeleton;
 	bool m_showSampeRegion;

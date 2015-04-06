@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>271</width>
+    <width>334</width>
     <height>524</height>
    </rect>
   </property>
@@ -22,11 +22,8 @@
      <property name="title">
       <string>Scene</string>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <item row="0" column="0">
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
        <widget class="QPushButton" name="load3DScanButton">
         <property name="enabled">
          <bool>true</bool>
@@ -39,34 +36,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="openRgbdViewerButton">
-        <property name="text">
-         <string>Rgbd Viewer</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0">
-       <widget class="QCheckBox" name="isShowRGBox">
-        <property name="text">
-         <string>Show RG</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="isShowModelBox">
-        <property name="text">
-         <string>Show Model</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
        <widget class="QCheckBox" name="isShowOBBBox">
         <property name="text">
          <string>Show OBB</string>
@@ -76,7 +46,34 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="openRgbdViewerButton">
+        <property name="text">
+         <string>Rgbd Viewer</string>
+        </property>
+       </widget>
+      </item>
       <item row="3" column="1">
+       <widget class="QCheckBox" name="isShowRGBox">
+        <property name="text">
+         <string>Show RG</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="isShowModelBox">
+        <property name="text">
+         <string>Show Model</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
        <widget class="QCheckBox" name="isShowModelNameBox">
         <property name="text">
          <string>Show Model Name</string>
@@ -92,17 +89,17 @@
       <string>Action</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="8" column="0">
+       <widget class="QPushButton" name="loadSyntheticJobButton">
+        <property name="text">
+         <string>Load Synth Job</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
        <widget class="QPushButton" name="resetAlignButton">
         <property name="text">
          <string>Reset View</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="openActionLabelerButton">
-        <property name="text">
-         <string>Action Labeler</string>
         </property>
        </widget>
       </item>
@@ -114,20 +111,27 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QPushButton" name="extractFeatureButton">
-        <property name="text">
-         <string>Extract Feature</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
        <widget class="QPushButton" name="collectSkelButton">
         <property name="text">
          <string>Collect Skeleton</string>
         </property>
        </widget>
       </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QPushButton" name="openActionLabelerButton">
+        <property name="text">
+         <string>Action Labeler</string>
+        </property>
+       </widget>
+      </item>
       <item row="4" column="1">
+       <widget class="QPushButton" name="extractFeatureButton">
+        <property name="text">
+         <string>Extract Feature</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0" colspan="2">
        <widget class="QPushButton" name="startLearnButton">
         <property name="text">
          <string>Start Learning</string>
@@ -143,24 +147,17 @@
       <string>Arrange</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="1">
-       <widget class="QPushButton" name="openActionViewerButton">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="loadTestJobButton">
         <property name="text">
-         <string>Action Viewer</string>
+         <string>Load Test Job</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0" colspan="2">
        <widget class="QPushButton" name="startPredictButton">
         <property name="text">
          <string>Start Predicting</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="loadTestSceneButton">
-        <property name="text">
-         <string>Load Test Scene</string>
         </property>
        </widget>
       </item>
@@ -168,6 +165,13 @@
        <widget class="QPushButton" name="loadTrainingResultButton">
         <property name="text">
          <string>Load Training Result</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QPushButton" name="openActionViewerButton">
+        <property name="text">
+         <string>Action Viewer</string>
         </property>
        </widget>
       </item>

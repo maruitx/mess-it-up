@@ -146,7 +146,25 @@ void mess_mode::loadActionJob()
 }
 
 
-void mess_mode::loadTestScene()
+void mess_mode::loadSynthDataJob()
+{
+	if (m_scene)
+	{
+		delete m_scene;
+	}
+
+	m_scene = new CScene();
+	actionLearner->init(this);
+
+	if (actionLearner->loadSyntheticJob(m_widget->loadSynthJobName()))
+	{
+		// set scene bounds after action learner load the scene
+		setSceneBounds();
+	}
+}
+
+
+void mess_mode::loadTestJob()
 {
 	if (m_scene)
 	{
@@ -156,7 +174,7 @@ void mess_mode::loadTestScene()
 	m_scene = new CScene();
 	actionPreditor->init(this);
 
-	if (actionPreditor->loadTestScene(m_widget->loadSceneName()));
+	if (actionPreditor->loadTestJob(m_widget->loadSceneName()));
 	{
 		setSceneBounds();
 	}

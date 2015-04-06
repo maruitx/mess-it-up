@@ -41,7 +41,7 @@ public:
 	MathLib::Vector3 getUprightVec() { return m_uprightVec; };
 
 	CModel* getModel(int id) { return m_modelList[id]; };
-	int getModelIdByName(QString s) { return m_modelNameIdMap[s]; };
+	int getModelIdByName(const QString &s) { return m_modelNameIdMap[s]; };
 	QVector<QString> getModelNameList();
 	int getModelNum() { return m_modelNum; };
 

@@ -26,7 +26,7 @@ void ActionPredictor::init(mess_mode *m)
 	m_drawArea = m->drawArea();
 }
 
-bool ActionPredictor::loadTestScene(const QString &filename)
+bool ActionPredictor::loadTestJob(const QString &filename)
 {
 	//load job file
 	QFile inFile(filename);
@@ -41,6 +41,7 @@ bool ActionPredictor::loadTestScene(const QString &filename)
 	QTextStream ifs(&inFile);
 
 	ifs >> m_sceneFileName;
+	ifs >> m_useFeatureType;
 
 	inFile.close();
 
@@ -62,7 +63,7 @@ void ActionPredictor::loadTrainingResult()
 
 void ActionPredictor::startPredicting()
 {
-	if (m_loadedActionSkeletons.size() == 0)
+	if (m_loadedSkeletonsForTest.size() == 0)
 	{
 		Simple_Message_Box("Please load training data first");
 		return;
@@ -80,7 +81,7 @@ void ActionPredictor::startPredicting()
 	
 	sampleSkeletons();
 
-	genRandomSkeletonList(10);
+	genRandomSkeletonList(5);
 
 	m_showSampledSkeleton = true;
 	m_showStartPose = true;
@@ -94,7 +95,7 @@ void ActionPredictor::startPredicting()
 
 void ActionPredictor::loadActionRepSkels()
 {
-	m_loadedActionSkeletons.resize(ACTION_PHASE_NUM);
+	m_loadedSkeletonsForTest.resize(ACTION_PHASE_NUM);
 
 	loadActionRepSkels(ActionFeature::ActionPhase::StartAction);
 	loadActionRepSkels(ActionFeature::ActionPhase::EndAction);
@@ -103,8 +104,8 @@ void ActionPredictor::loadActionRepSkels()
 // for action predictor, skeleton is not constraint to scenes now
 void ActionPredictor::loadActionRepSkels(int currentActionPhase)
 {
-	m_loadedActionSkeletons[currentActionPhase].clear();
-	m_loadedActionSkeletons[currentActionPhase].resize(ACTION_NUM);
+	m_loadedSkeletonsForTest[currentActionPhase].clear();
+	m_loadedSkeletonsForTest[currentActionPhase].resize(ACTION_NUM);
 
 	QString actionPhaseStr;
 	if (currentActionPhase == ActionFeature::ActionPhase::StartAction)
@@ -131,7 +132,7 @@ void ActionPredictor::loadActionRepSkels(int currentActionPhase)
 
 	for (int actionID = 0; actionID < ACTION_NUM; actionID++)
 	{
-		QString filename = featureFilePath + actionPhaseStr + "_" + QString(Action_Labels[actionID]) + ".skel";
+		QString filename = featureFilePath + m_useFeatureType + "_" + actionPhaseStr + "_" + QString(Action_Labels[actionID]) + ".skel";
 		QFile inFile(filename);
 		QTextStream ifs(&inFile);
 
@@ -154,7 +155,7 @@ void ActionPredictor::loadActionRepSkels(int currentActionPhase)
 			}
 
 			Skeleton *newSkel = new Skeleton(joints);
-			m_loadedActionSkeletons[currentActionPhase][actionID].push_back(newSkel);
+			m_loadedSkeletonsForTest[currentActionPhase][actionID].push_back(newSkel);
 		}
 
 		inFile.close();
@@ -163,7 +164,7 @@ void ActionPredictor::loadActionRepSkels(int currentActionPhase)
 
 void ActionPredictor::genRandomSkeletonList(int num)
 {
-	std::map<int, std::vector<std::vector<SkeletonPtrList>>>::iterator it;
+	ModelRelatedSkeletonList::iterator it;
 
 	for (it = m_sampledSkeletonsForActions.begin(); it != m_sampledSkeletonsForActions.end(); it++)
 	{
@@ -275,7 +276,6 @@ void ActionPredictor::resampleSkeleton(int num)
 	genRandomSkeletonList(num);
 }
 
-
 void ActionPredictor::sampleSkeletons()
 {
 	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
@@ -291,7 +291,6 @@ void ActionPredictor::sampleSkeletons()
 	sampleSkeletonsForActionPhrase(ActionFeature::ActionPhase::FullAction);
 }
 
-
 void ActionPredictor::sampleSkeletonsForActionPhrase(int currentActionPhase)
 {
 	// predict possible action for each model
@@ -299,12 +298,12 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int currentActionPhase)
 	{
 		// test for each action
 		// random sample an/several actions from the action library
-		for (int actionID = 0; actionID < m_loadedActionSkeletons[currentActionPhase].size(); actionID++)
+		for (int actionID = 0; actionID < m_loadedSkeletonsForTest[currentActionPhase].size(); actionID++)
 		{
-			if (m_loadedActionSkeletons[currentActionPhase][actionID].size() > 0)
+			if (m_loadedSkeletonsForTest[currentActionPhase][actionID].size() > 0)
 			{
-				int k = std::rand() % m_loadedActionSkeletons[currentActionPhase][actionID].size(); // random select
-				m_skeletonSampler->setSkeleton(m_loadedActionSkeletons[currentActionPhase][actionID][k]);
+				int k = std::rand() % m_loadedSkeletonsForTest[currentActionPhase][actionID].size(); // random select
+				m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[currentActionPhase][actionID][k]);
 				m_skeletonSampler->sampleSkeletonAroundModel(modelID);
 
 				SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();

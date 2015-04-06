@@ -58,7 +58,8 @@ public slots:
 	void setSceneShowModelName(int state);
 
 	void loadActionJob();
-	void loadTestScene();
+	void loadSynthDataJob();
+	void loadTestJob();
 	void openActionLabeler();
 	void openActionViewer();
 

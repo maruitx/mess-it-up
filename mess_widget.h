@@ -20,6 +20,7 @@ public:
 
 	QString loadSceneName();
 	QString loadActionJobName();
+	QString loadSynthJobName();
 
 public slots:
 
