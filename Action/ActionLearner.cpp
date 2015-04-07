@@ -182,7 +182,6 @@ bool ActionLearner::loadJob(const QString &filename)
 	}
 
 	m_actionFeatures.resize(ACTION_NUM);
-//	m_actionRepSkeletons.resize(ACTION_NUM);
 
 	m_hasJob = true;
 
@@ -354,6 +353,36 @@ void ActionLearner::extractActionInstances()
 	}
 }
 
+void ActionLearner::collectFeatureVecsFromLabeledData()
+{
+	m_collectedFeatureVecs.clear();
+	m_collectedFeatureVecs.resize(ACTION_PHASE_NUM);
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		m_collectedFeatureVecs[phase_id].resize(ACTION_NUM);
+
+		for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+		{
+			for (int instance_id = 0; instance_id < m_actionFeatures[action_id].size(); instance_id++)
+			{
+				std::map<int, std::vector<double>>& features = m_actionFeatures[action_id][instance_id].getFeatureVector((ActionFeature::ActionPhase)phase_id);
+
+				if (!features.empty())
+				{
+					std::map<int, std::vector<double>>::iterator it;
+					for (it = features.begin(); it != features.end(); it++)
+					{
+						m_collectedFeatureVecs[phase_id][action_id].push_back(it->second);
+					}
+				}	
+			}
+		}
+	}
+
+	saveCollectedFeatures();
+	saveCollectedFeaturesForWeka();
+}
 void ActionLearner::startLearning()
 {
 	if (m_hasJob)
@@ -361,10 +390,8 @@ void ActionLearner::startLearning()
 		extractActionInstances();
 
 		m_actionFeatures.clear();
-		//m_actionRepSkeletons.clear();  
 
 		m_actionFeatures.resize(ACTION_NUM);
-		//m_actionRepSkeletons.resize(ACTION_NUM);
 
 		for (int i = 0; i < m_actionInstances.size(); i++)
 		{
@@ -374,14 +401,11 @@ void ActionLearner::startLearning()
 
 			// record action feature for each type of action
 			m_actionFeatures[newFeature.actionID()].push_back(newFeature);
-
-			std::vector<Skeleton*> repSkeletons = newFeature.getActionRepSkeletons(ActionFeature::ActionPhase::FullAction);
-
-			//collect rep skeletons from all instances, need to re-think
-			//m_actionRepSkeletons[newFeature.actionID()].insert(m_actionRepSkeletons[newFeature.actionID()].end(), repSkeletons.begin(), repSkeletons.end());
 		}
 
-		saveExtractedFeatures();
+		collectFeatureVecsFromLabeledData();
+
+		//saveExtractedFeatures();
 		saveActionRepSkels();
 	}
 
@@ -414,129 +438,116 @@ QVector<QPair<int, Eigen::Matrix4d>> ActionLearner::getModelTrackMat(int frame_i
 	return trackMats;
 }
 
-void ActionLearner::saveExtractedFeatures()
-{
-	saveExtractedFeatures(ActionFeature::ActionPhase::StartAction);
-	saveExtractedFeatures(ActionFeature::ActionPhase::EndAction);
-}
-
-void ActionLearner::saveExtractedFeatures(int currentActionPhase)
-{
-	QString actionPhaseStr;
-	if (currentActionPhase == ActionFeature::ActionPhase::StartAction)
-	{
-		actionPhaseStr = "start";
-	}
-	
-	if (currentActionPhase == ActionFeature::ActionPhase::EndAction)
-	{
-		actionPhaseStr = "end";
-	}
-
-	if (currentActionPhase == ActionFeature::ActionPhase::FullAction)
-	{
-		actionPhaseStr = "full";
-	}
-
-	QString featureFilePath = m_jobFilePath + "Feature/Train/";
-	QVector<QString> labels;
-
-	// for each action
-	for (int i = 0; i < m_actionFeatures.size(); i++)
-	{
-		if (m_actionFeatures[i].size() > 0)
-		{
-			QString filename = featureFilePath + m_sceneFileName + "_" + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".feat";
-
-			labels.push_back(Action_Labels[i]); // collect the available labels for weka output
-
-			QFile outFile(filename);
-			QTextStream out(&outFile);
-
-			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
-
-			// save action features for each instance
-			for (int j = 0; j < m_actionFeatures[i].size(); j++)
-			{
-				std::map<int, std::vector<double>>& features = m_actionFeatures[i][j].getFeatureVector((ActionFeature::ActionPhase)currentActionPhase);
-
-				std::map<int, std::vector<double>>::iterator it;
-				for (it = features.begin(); it != features.end(); it++)
-				{
-					foreach(double d, it->second)
-					{
-						out << d << " ";
-					}
-
-					out << "\n";
-				}
-			}
-
-			outFile.close();
-		}
-	}
-
-	// need to modify to collect features from differenct scenes
-	// save to arff format for weka
-	QString filename = featureFilePath + "actions.arff";
-
-	QFile outFile(filename);
-	QTextStream out(&outFile);
-
-	if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
-
-	out << "@Relation " << m_scanFileName << "\n";
-
-	// fill in the attribute
-	for (int i = 0; i < m_actionFeatures.size(); i++)
-	{
-		if (m_actionFeatures[i].size() > 0)
-		{
-			for (int j = 0; j < m_actionFeatures[i][0].featureDim(); j++)
-			{
-				out << "@ATTRIBUTE " << j << " REAL" << "\n";
-			}
-
-			out << "@ATTRIBUTE class " << "{";
-
-			for (int k = 0; k < labels.size() - 1; k++)
-			{
-				out << labels[k] << ",";
-			}
-
-			out << labels[labels.size() - 1] << "}\n";
-		}
-
-		break;
-	}
-
-	// fill in the data
-	out << "@DATA\n";
-	for (int i = 0; i < m_actionFeatures.size(); i++)
-	{
-		if (m_actionFeatures[i].size() > 0)
-		{
-			// for each instance
-			for (int j = 0; j < m_actionFeatures[i].size(); j++)
-			{
-				std::map<int, std::vector<double>>& features = m_actionFeatures[i][j].getFeatureVector((ActionFeature::ActionPhase)currentActionPhase);
-
-				std::map<int, std::vector<double>>::iterator it;
-				for (it = features.begin(); it != features.end(); it++)
-				{
-					foreach(double d, it->second)
-					{
-						out << d << ",";
-					}
-
-					out << QString(Action_Labels[i]) << "\n";
-				}
-			}
-		}
-	}
-
-	outFile.close();
-}
+//void ActionLearner::saveExtractedFeatures()
+//{
+//	m_collectedFeatureLabels.clear();
+//	m_collectedFeatureLabels.resize(ACTION_PHASE_NUM);
+//
+//	saveExtractedFeatures(ActionFeature::ActionPhase::StartAction);
+//	saveExtractedFeatures(ActionFeature::ActionPhase::EndAction);
+//}
+//
+//void ActionLearner::saveExtractedFeatures(int phaseID)
+//{
+//	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+//	
+//	// for each action
+//	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+//	{
+//		if (m_actionFeatures[action_id].size() > 0)
+//		{
+//			QString filename = featureFilePath + m_sceneFileName + "_" + QString(Action_Phase_Names[phaseID]) + "_" + QString(Action_Labels[action_id]) + ".feat";
+//
+//			m_collectedFeatureLabels[phaseID].push_back(Action_Labels[action_id]); // collect the available labels for weka output
+//
+//			QFile outFile(filename);
+//			QTextStream out(&outFile);
+//
+//			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
+//
+//			// save action features for each instance
+//			for (int instance_id = 0; instance_id < m_actionFeatures[action_id].size(); instance_id++)
+//			{
+//				std::map<int, std::vector<double>>& features = m_actionFeatures[action_id][instance_id].getFeatureVector((ActionFeature::ActionPhase)phaseID);
+//
+//				std::map<int, std::vector<double>>::iterator it;
+//				for (it = features.begin(); it != features.end(); it++)
+//				{
+//					foreach(double d, it->second)
+//					{
+//						out << d << " ";
+//					}
+//
+//					out << "\n";
+//				}
+//			}
+//
+//			outFile.close();
+//		}
+//	}
+//
+//	// need to modify to collect features from differenct scenes
+//	// save to arff format for weka
+//	QString filename = featureFilePath + QString(Action_Phase_Names[phaseID]) + "_actions.arff";
+//
+//	QFile outFile(filename);
+//	QTextStream out(&outFile);
+//
+//	if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
+//
+//	out << "@Relation " << m_scanFileName << "\n";
+//
+//	// fill in the attribute
+//	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+//	{
+//		if (m_actionFeatures[action_id].size() > 0)
+//		{
+//			for (int featureComp_id = 0; featureComp_id < m_actionFeatures[action_id][0].featureDim(); featureComp_id++)
+//			{
+//				out << "@ATTRIBUTE " << featureComp_id << " REAL" << "\n";
+//			}
+//
+//			out << "@ATTRIBUTE class " << "{";
+//
+//			int featNum = m_collectedFeatureLabels[phaseID].size();
+//			for (int k = 0; k < featNum - 1; k++)
+//			{
+//				out << m_collectedFeatureLabels[phaseID][k] << ",";
+//			}
+//
+//			out << m_collectedFeatureLabels[phaseID][featNum - 1] << "}\n";
+//		}
+//
+//		break;
+//	}
+//
+//	// fill in the data
+//	out << "@DATA\n";
+//	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+//	{
+//		if (m_actionFeatures[action_id].size() > 0)
+//		{
+//			// for each instance
+//			for (int instance_id = 0; instance_id < m_actionFeatures[action_id].size(); instance_id++)
+//			{
+//				std::map<int, std::vector<double>>& features = m_actionFeatures[action_id][instance_id].getFeatureVector((ActionFeature::ActionPhase)phaseID);
+//
+//				std::map<int, std::vector<double>>::iterator it;
+//				for (it = features.begin(); it != features.end(); it++)
+//				{
+//					foreach(double d, it->second)
+//					{
+//						out << d << ",";
+//					}
+//
+//					out << QString(Action_Labels[action_id]) << "\n";
+//				}
+//			}
+//		}
+//	}
+//
+//	outFile.close();
+//}
 
 void ActionLearner::saveActionRepSkels()
 {
@@ -544,38 +555,22 @@ void ActionLearner::saveActionRepSkels()
 	saveActionRepSkels(ActionFeature::ActionPhase::EndAction);
 }
 
-void ActionLearner::saveActionRepSkels(int currentActionPhase)
+void ActionLearner::saveActionRepSkels(int phaseID)
 {
-	QString actionPhaseStr;
-	if (currentActionPhase == ActionFeature::ActionPhase::StartAction)
-	{
-		actionPhaseStr = "start";
-	}
-
-	if (currentActionPhase == ActionFeature::ActionPhase::EndAction)
-	{
-		actionPhaseStr = "end";
-	}
-
-	if (currentActionPhase == ActionFeature::ActionPhase::FullAction)
-	{
-		actionPhaseStr = "full";
-	}
-
 	QString featureFilePath = m_jobFilePath + "Feature/Train/";
 
-	for (int i = 0; i < m_actionFeatures.size(); i++)
+	for (int i = 0; i < ACTION_NUM; i++)
 	{
 		if (m_actionFeatures[i].size() > 0)
 		{
-			QString filename = featureFilePath + m_sceneFileName + "_" + actionPhaseStr + "_" + QString(Action_Labels[i]) + ".skel";
+			QString filename = featureFilePath + m_sceneFileName + "_" + QString(Action_Phase_Names[phaseID]) + "_" + QString(Action_Labels[i]) + ".skel";
 			QFile outFile(filename);
 			QTextStream out(&outFile);
 
 			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
 			for (int j = 0; j < m_actionFeatures[i].size(); j++)
 			{
-				std::vector<Skeleton*> repSkeletons = m_actionFeatures[i][j].getActionRepSkeletons((ActionFeature::ActionPhase)currentActionPhase);
+				std::vector<Skeleton*> repSkeletons = m_actionFeatures[i][j].getActionRepSkeletons((ActionFeature::ActionPhase)phaseID);
 
 				int modelID = m_actionFeatures[i][j].centerModelID();
 				out << "M " << modelID << " " << repSkeletons.size() <<"\n";
@@ -768,11 +763,12 @@ void ActionLearner::collectSkeletonsFromAllScenes()
 
 void ActionLearner::computeFeaturesForSyntheticData()
 {
-	std::vector<std::vector<std::vector<double>>> synthFeatures(ACTION_PHASE_NUM);
+	m_collectedFeatureVecs.clear();
+	m_collectedFeatureVecs.resize(ACTION_PHASE_NUM);
 
 	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
 	{
-		synthFeatures[phase_id].resize(ACTION_NUM);
+		m_collectedFeatureVecs[phase_id].resize(ACTION_NUM);
 	}
 
 	// extract features for loaded skeletons
@@ -798,15 +794,145 @@ void ActionLearner::computeFeaturesForSyntheticData()
 						Skeleton *currSkel = m_loadedSkeletonsForTrain[modelID][phase_id][action_id][skel_id];
 
 						newFeature.computeActionFeatureForSkel(currSkel, modelID, actionFeature);
-						synthFeatures[phase_id][action_id] = actionFeature;
+						m_collectedFeatureVecs[phase_id][action_id].push_back(actionFeature);
 					}
 				}
 			}
 		}
 	}
 
-
-	// save features for prediction
+	saveCollectedFeatures();
+	saveCollectedFeaturesForWeka();
 }
+
+void ActionLearner::saveCollectedFeatures()
+{
+	// save features for prediction
+	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+		{
+			if (!m_collectedFeatureVecs[phase_id][action_id].empty())
+			{
+				QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_" + QString(Action_Labels[action_id]) + ".feat";
+				QFile outFile(filename);
+				QTextStream out(&outFile);
+
+				if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
+
+				for (int feat_id = 0; feat_id < m_collectedFeatureVecs[phase_id][action_id].size(); feat_id++)
+				{					
+					foreach(double d, m_collectedFeatureVecs[phase_id][action_id][feat_id])
+					{
+						out << d << " ";
+					}
+
+					out << "\n";
+				}
+
+				outFile.close();
+			}
+		}
+	}
+}
+
+void ActionLearner::collectClassLabelForWeka()
+{
+	m_collectedFeatureLabels.clear();
+	m_collectedFeatureLabels.resize(ACTION_PHASE_NUM);
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+		{
+			if (!m_collectedFeatureVecs[phase_id][action_id].empty())
+			{
+				m_collectedFeatureLabels[phase_id].push_back(Action_Labels[action_id]);
+			}
+		}
+	}
+}
+
+void ActionLearner::saveCollectedFeaturesForWeka()
+{
+	collectClassLabelForWeka();
+
+	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		if (isPhaseConsidered(phase_id))
+		{
+			QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_actions.arff";
+
+			QFile outFile(filename);
+			QTextStream out(&outFile);
+
+			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) return;
+
+			out << "@Relation " << m_scanFileName << "\n";
+
+			// fill in the attribute
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+			{
+				if (m_collectedFeatureVecs[phase_id][action_id].size() > 0)
+				{
+					for (int j = 0; j < m_collectedFeatureVecs[phase_id][action_id][0].size(); j++)
+					{
+						out << "@ATTRIBUTE " << j << " REAL" << "\n";
+					}
+
+					out << "@ATTRIBUTE class " << "{";
+
+					int featNum = m_collectedFeatureLabels[phase_id].size();
+					for (int k = 0; k < featNum - 1; k++)
+					{
+						out << m_collectedFeatureLabels[phase_id][k] << ",";
+					}
+
+					out << m_collectedFeatureLabels[phase_id][featNum - 1] << "}\n";
+
+				}
+			}
+
+			// fill in the data
+			out << "@DATA\n";
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+			{
+				if (m_collectedFeatureVecs[phase_id][action_id].size() > 0)
+				{
+					// for each instance
+					for (int feat_id = 0; feat_id < m_collectedFeatureVecs[phase_id][action_id].size(); feat_id++)
+					{
+						foreach(double d, m_collectedFeatureVecs[phase_id][action_id][feat_id])
+						{
+							out << d << ",";
+						}
+
+						out << QString(Action_Labels[action_id]) << "\n";
+					}
+				}
+			}
+
+			outFile.close();
+		}
+	}	
+}
+
+bool ActionLearner::isPhaseConsidered(int phaseID)
+{
+	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+	{
+		if (m_collectedFeatureVecs[phaseID][action_id].size()>0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 

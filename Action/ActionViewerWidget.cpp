@@ -92,7 +92,7 @@ void ActionViewerWidget::resampleSkeleton()
 {
 	int newSkelNum = ui.showSkelNumSlider->value();
 
-	m_viewer->actionPredictor->resampleSkeleton(newSkelNum);
+	m_viewer->actionPredictor->resampleSkeletonForDisplay(newSkelNum);
 
 	m_showSampledSkelNum = newSkelNum;
 	updateShowSkelNumLabel();

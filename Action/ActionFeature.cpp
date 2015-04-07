@@ -8,7 +8,14 @@ ActionFeature::ActionFeature()
 ActionFeature::ActionFeature(ActionLearner *learner):
 m_actionLearner(learner)
 {
+	m_scene = m_actionLearner->getScene();
 	m_repSkeletons.resize(ACTION_PHASE_NUM);
+}
+
+ActionFeature::ActionFeature(CScene *scene):
+m_scene(scene)
+{
+
 }
 
 ActionFeature::~ActionFeature()
@@ -25,8 +32,7 @@ void ActionFeature::setActionInstance(int id)
 
 void ActionFeature::extractFeature()
 {
-	CScene *scene = m_actionLearner->getScene();
-	scene->buildSupportHierarchy();
+	m_scene->buildSupportHierarchy();
 
 	double FrameRate = 20;
 	double samplingTimeIntv = 0.25;
@@ -68,17 +74,15 @@ void ActionFeature::extractFeature()
 }
 
 void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &actionFeature, ActionPhase actionPhaseType)
-{
-	CScene *scene = m_actionLearner->getScene();
-
+{	
 	Skeleton *skeleton = m_actionLearner->getSkeleton(frame_id);
 
 	m_repSkeletons[actionPhaseType].push_back(skeleton);	
 
 	QVector<QPair<int, Eigen::Matrix4d>> modelTrackMats = m_actionLearner->getModelTrackMat(frame_id);
 
-	CModel *model = scene->getModel(m_actionInstance.modelID);
-	CSceneRG &rg = scene->getSceneRG();
+	CModel *model = m_scene->getModel(m_actionInstance.modelID);
+	CSceneRG &rg = m_scene->getSceneRG();
 
 	std::vector<double> skeletonShapeFeature, objectGeoFeature, objectStructFeature, skeletonObjectFeature;
 
@@ -179,8 +183,7 @@ void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &o
 
 void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature)
 {
-	CScene *scene = m_actionLearner->getScene();
-	CModel *model = scene->getModel(model_id);
+	CModel *model = m_scene->getModel(model_id);
 
 	std::vector<double> skeletonShapeFeature, objectGeoFeature, objectStructFeature, skeletonObjectFeature;
 
@@ -203,6 +206,8 @@ void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id
 
 std::map<int, std::vector<double>>& ActionFeature::getFeatureVector(ActionPhase actionFeatureType)
 {
+	std::map<int, std::vector<double>> tempFeatures;
+
 	if (actionFeatureType == ActionPhase::StartAction)
 	{
 		return m_startActionFeatures;
@@ -217,4 +222,10 @@ std::map<int, std::vector<double>>& ActionFeature::getFeatureVector(ActionPhase 
 	{
 		return m_actionFeatures;
 	}
+
+	else
+	{
+		return tempFeatures;
+	}
+	
 }

@@ -34,7 +34,10 @@ typedef std::map<int, MultiPhaseMultiTypeSkeletonList> ModelRelatedSkeletonList;
 
 // 1st layer: feature for each phase of current action
 // 2nd layer: feature for each action type: move, sit etc.
-typedef std::vector<std::vector<ActionFeature>> MultiPhaseMultiTypeFeatures;
+typedef std::vector<std::vector<ActionFeature>> MultiTypeMultiInstanceFeatures;
+
+typedef std::vector<double> FeatureVector;
+typedef std::vector<FeatureVector> FeatureVectorList;
 
 class ActionLearner : public QObject
 {
@@ -74,24 +77,30 @@ public:
 	QVector<QPair<int, Eigen::Matrix4d>> getModelTrackMat(int frame_id);
 
 	void extractActionInstances();    // extract action instances from frame labels
+	void collectFeatureVecsFromLabeledData();
 	
 	// features is not constraint to scenes
 	// same feature used for both training and testing
-	void saveExtractedFeatures(int currentActionPhase);
-	void saveExtractedFeatures();
+	//void saveExtractedFeatures(int phaseID);
+	//void saveExtractedFeatures();
 	void collectFeaturesFromAllScenes();
 
 	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model
 	// in test: all skeletons representing one action are used for prediction, and not constraint to scene and center model
 	// save both kinds of skeleton
 	*/
-	void saveActionRepSkels(int currentActionPhase);
+	void saveActionRepSkels(int phaseID);
 	void saveActionRepSkels();
 	void collectSkeletonsFromAllScenes();
 
 	bool loadSyntheticJob(const QString &filename);
 	void loadSynthActionSkels();
 	void computeFeaturesForSyntheticData();
+
+	void saveCollectedFeatures();
+	void collectClassLabelForWeka();
+	void saveCollectedFeaturesForWeka();
+	bool isPhaseConsidered(int phaseID);
 	
 	//					       z  y
 	//				  	       | /
@@ -146,9 +155,10 @@ private:
 	std::vector<ActionInstance> m_actionInstances;
 
 	// features from different scenes
-	MultiPhaseMultiTypeFeatures m_actionFeatures;
+	MultiTypeMultiInstanceFeatures m_actionFeatures;
+	std::vector<std::vector<FeatureVectorList>> m_collectedFeatureVecs;
+	std::vector<std::vector<QString>> m_collectedFeatureLabels;
 
-	//std::vector<SkeletonPtrList> m_actionRepSkeletons;
 };
 
 #endif // ACTIONLEARNER_H

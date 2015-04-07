@@ -17,17 +17,13 @@
 // for every frame which the action starts, create a feature; there may be multiple features for one frame since it may contain several labels
 // each action may last for many frames, and it will be represented by one feature; problem: how to represent the skeletons, object structures within these frames; naive solution: random sampling
 
+class CScene;
 class ActionLearner;
 struct ActionInstance;
-
-static int ACTION_PHASE_NUM = 4;
 
 class ActionFeature
 {
 public:
-	ActionFeature();
-	~ActionFeature();
-
 	enum ActionPhase
 	{
 		StartAction,
@@ -36,7 +32,11 @@ public:
 		FullAction
 	};
 
+	ActionFeature();
+	~ActionFeature();
+
 	ActionFeature(ActionLearner *learner);
+	ActionFeature(CScene *scene);
 	void setActionInstance(int id);
 
 	void extractFeature();
@@ -69,6 +69,7 @@ public:
 
 private:
 	ActionLearner *m_actionLearner;
+	CScene *m_scene;
 
 	ActionInstance m_actionInstance;
 	int m_instanceID;

@@ -21,13 +21,15 @@ public:
 	bool loadTestJob(const QString &filename);
 
 	void loadActionRepSkels();
-	void loadActionRepSkels(int currentActionPhase);
+	void loadActionRepSkels(int phaseID);
 
 	void sampleSkeletons();
-	void sampleSkeletonsForActionPhrase(int currentActionPhase);
+	void sampleSkeletonsForActionPhrase(int phaseID);
+	void testForSkeletons(int modelID, int phaseID, int actionID);
+
 	
-	void genRandomSkeletonList(int num);
-	void resampleSkeleton(int num);
+	void genRandomSkeletonListForDisplay(int num);
+	void resampleSkeletonForDisplay(int num);
 	int getSampledSkelNum(int modelID, int actionID);
 
 	void drawSampledSkeletons(int modelID, int phaseID, int actionID);

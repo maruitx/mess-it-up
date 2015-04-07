@@ -8,7 +8,9 @@
 #include <QPainter>
 
 static const unsigned int ACTION_NUM = 5;
+static const int ACTION_PHASE_NUM = 4;
 static const char *Action_Labels[ACTION_NUM] = { "move", "sit", "read", "use computer", "eat" };
+static const char *Action_Phase_Names[ACTION_PHASE_NUM] = {"start", "end", "inbetween", "full" };
 
 #define SAFE_DELETE( ptr ) \
 	if(ptr) \
