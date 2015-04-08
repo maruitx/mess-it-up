@@ -379,9 +379,6 @@ void ActionLearner::collectFeatureVecsFromLabeledData()
 			}
 		}
 	}
-
-	saveCollectedFeatures();
-	saveCollectedFeaturesForWeka();
 }
 void ActionLearner::startLearning()
 {
@@ -414,8 +411,38 @@ void ActionLearner::startLearning()
 		computeFeaturesForSyntheticData();
 	}
 
+	saveCollectedFeatures();
+	saveCollectedFeaturesForWeka();
+	saveCollectedFeaturesForOpenCVClassifier();
+
+	trainRandomForestClassifier();
+
 	Simple_Message_Box("Action learning done");
 }
+
+
+void ActionLearner::trainRandomForestClassifier()
+{
+	m_classifiers.resize(ACTION_PHASE_NUM);
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		if (isPhaseConsidered(phase_id))
+		{
+			m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
+
+			QString dataFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_actions.data";
+			QString classifierFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_actions.RFClassifier";
+
+			if (m_classifiers[phase_id]->read_train_data(dataFN.toStdString(), getFeatureDimForPhase(phase_id)))
+			{
+				m_classifiers[phase_id]->buildClassifier(classifierFN.toStdString());
+				m_classifiers[phase_id]->save_classifier(classifierFN.toStdString());
+			}
+		}
+	}
+}
+
 
 QVector<QPair<int, Eigen::Matrix4d>> ActionLearner::getModelTrackMat(int frame_id)
 {
@@ -800,9 +827,6 @@ void ActionLearner::computeFeaturesForSyntheticData()
 			}
 		}
 	}
-
-	saveCollectedFeatures();
-	saveCollectedFeaturesForWeka();
 }
 
 void ActionLearner::saveCollectedFeatures()
@@ -932,6 +956,57 @@ bool ActionLearner::isPhaseConsidered(int phaseID)
 	}
 
 	return false;
+}
+
+void ActionLearner::saveCollectedFeaturesForOpenCVClassifier()
+{
+	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		if (isPhaseConsidered(phase_id))
+		{
+			QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_actions.data";
+
+			QFile outFile(filename);
+			QTextStream out(&outFile);
+
+			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) return;
+
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+			{
+				if (m_collectedFeatureVecs[phase_id][action_id].size() > 0)
+				{
+					// for each instance
+					for (int feat_id = 0; feat_id < m_collectedFeatureVecs[phase_id][action_id].size(); feat_id++)
+					{
+						out << action_id << ",";
+
+						int featureDim = m_collectedFeatureVecs[phase_id][action_id][feat_id].size();
+						for (int i = 0; i < featureDim-1; i++)
+						{
+							out << m_collectedFeatureVecs[phase_id][action_id][feat_id][i] << ",";
+						}
+
+						out << m_collectedFeatureVecs[phase_id][action_id][feat_id][featureDim-1] << "\n";
+					}
+				}
+			}
+
+			outFile.close();
+		}
+	}
+}
+
+int ActionLearner::getFeatureDimForPhase(int phaseID)
+{
+	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+	{
+		if (m_collectedFeatureVecs[phaseID][action_id].size() > 0)
+		{
+			return m_collectedFeatureVecs[phaseID][action_id][0].size();
+		}
+	}
 }
 
 

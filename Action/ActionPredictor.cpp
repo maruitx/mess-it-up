@@ -4,6 +4,8 @@
 #include "../Geometry/SkeletonSampler.h"
 #include "ActionFeature.h"
 
+double LABEL_DIFF_TH = 0.1;
+
 ActionPredictor::ActionPredictor(QObject *parent)
 	: QObject(parent)
 {
@@ -55,10 +57,30 @@ bool ActionPredictor::loadTestJob(const QString &filename)
 void ActionPredictor::loadTrainingResult()
 {
 	loadActionRepSkels();
-
-	// load learned classifiers
+	loadClassifiers();
 
 	Simple_Message_Box("Training result loaded");
+}
+
+void ActionPredictor::loadClassifiers()
+{
+	m_classifiers.resize(ACTION_PHASE_NUM);
+	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		if (isPhaseConsidered(phase_id))
+		{
+			QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_actions.RFClassifier";
+			QFile classifierFile(filename);
+			
+			if (classifierFile.exists())
+			{
+				m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
+				m_classifiers[phase_id]->load_classifier(filename.toStdString());
+			}
+		}
+	}
 }
 
 void ActionPredictor::startPredicting()
@@ -97,8 +119,10 @@ void ActionPredictor::loadActionRepSkels()
 {
 	m_loadedSkeletonsForTest.resize(ACTION_PHASE_NUM);
 
-	loadActionRepSkels(ActionFeature::ActionPhase::StartAction);
-	loadActionRepSkels(ActionFeature::ActionPhase::EndAction);
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		loadActionRepSkels(phase_id);
+	}
 }
 
 // for action predictor, skeleton is not constraint to scenes now
@@ -279,20 +303,32 @@ void ActionPredictor::sampleSkeletons()
 void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 {
 	// predict possible action for each model
-	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
+	for (int model_id = 0; model_id < m_scene->getModelNum(); model_id++)
 	{
 		// test for each action
 		// random sample an/several actions from the action library
-		for (int actionID = 0; actionID < m_loadedSkeletonsForTest[phaseID].size(); actionID++)
+		for (int action_id = 0; action_id < m_loadedSkeletonsForTest[phaseID].size(); action_id++)
 		{
-			if (m_loadedSkeletonsForTest[phaseID][actionID].size() > 0)
+			if (m_loadedSkeletonsForTest[phaseID][action_id].size() > 0)
 			{
-				int k = std::rand() % m_loadedSkeletonsForTest[phaseID][actionID].size(); // random select
-				m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[phaseID][actionID][k]);
-				m_skeletonSampler->sampleSkeletonAroundModel(modelID);
+				int k = std::rand() % m_loadedSkeletonsForTest[phaseID][action_id].size(); // random select
+				m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[phaseID][action_id][k]);
+				m_skeletonSampler->sampleSkeletonAroundModel(model_id);
 
 				SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();
-				m_sampledSkeletonsForActions[modelID][phaseID][actionID] = sampledSkeletons;
+				SkeletonPtrList classifiedSkeletons;
+
+				// test with classifier
+				for (int skel_id = 0; skel_id < sampledSkeletons.size(); skel_id++)
+				{
+					Skeleton *currSkel = sampledSkeletons[skel_id];
+					if (m_classifiers[phaseID]!=nullptr && testForSkeletons(model_id, phaseID, action_id, currSkel))
+					{
+						classifiedSkeletons.push_back(currSkel);
+					}									
+				}
+
+				m_sampledSkeletonsForActions[model_id][phaseID][action_id] = classifiedSkeletons;
 			}
 		}
 	}
@@ -310,22 +346,41 @@ void ActionPredictor::setShowEndPose(int state)
 	updateDrawArea();
 }
 
-void ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID)
+bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel)
 {
-	SkeletonPtrList currSkelList = m_sampledSkeletonsForActions[modelID][phaseID][actionID];
-
-	for (int skel_id = 0; skel_id < currSkelList.size(); skel_id++)
-	{
 		ActionFeature newFeature(m_scene);
 
 		std::vector<double> actionFeature;
-		Skeleton *currSkel = m_sampledSkeletonsForActions[modelID][phaseID][actionID][skel_id];
 
-		newFeature.computeActionFeatureForSkel(currSkel, modelID, actionFeature);
+		newFeature.computeActionFeatureForSkel(skel, modelID, actionFeature);
 
-		// test feature
+		// test feature with classifier
+		cv::Mat testFeatureMat;
+		convertToMat(actionFeature, testFeatureMat);
 
+		float predicted_id = m_classifiers[phaseID]->predict(testFeatureMat);
 
+		if (std::abs(predicted_id - actionID) < LABEL_DIFF_TH)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
+}
+
+bool ActionPredictor::isPhaseConsidered(int phaseID)
+{
+	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+	{
+		if (m_loadedSkeletonsForTest[phaseID][action_id].size() > 0)
+		{
+			return true;
+		}
 	}
+
+	return false;
 }
 

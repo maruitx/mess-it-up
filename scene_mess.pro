@@ -59,6 +59,7 @@ HEADERS += \
 	Action/ActionFeature.h \
 	Action/ActionViewerWidget.h \
 	Action/ActionViewer.h \
+	Classifier/OpenCVClassifier.h \
 	Utilities/utility.h \
 	Utilities/CustomDrawObjects.h \
 	Math/MatrixType.h \
@@ -108,8 +109,8 @@ SOURCES += \
     INCLUDEPATH *= C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\include
     LIBS *= -L"C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib"
     OpenCV_VERSION = 300
-    Debug:LIBS *= -lopencv_core$${OpenCV_VERSION}d -lopencv_highgui$${OpenCV_VERSION}d -lopencv_features2d$${OpenCV_VERSION}d  -lopencv_flann$${OpenCV_VERSION}d -lopencv_imgproc$${OpenCV_VERSION}d -lopencv_video$${OpenCV_VERSION}d -lopencv_imgcodecs$${OpenCV_VERSION}d -lopencv_videoio$${OpenCV_VERSION}d -lopencv_surface_matching$${OpenCV_VERSION}d
-    Release:LIBS *= -lopencv_core$${OpenCV_VERSION} -lopencv_highgui$${OpenCV_VERSION} -lopencv_features2d$${OpenCV_VERSION}  -lopencv_flann$${OpenCV_VERSION} -lopencv_imgproc$${OpenCV_VERSION} -lopencv_video$${OpenCV_VERSION} -lopencv_imgcodecs$${OpenCV_VERSION} -lopencv_videoio$${OpenCV_VERSION} -lopencv_surface_matching$${OpenCV_VERSION}
+    Debug:LIBS *= -lopencv_core$${OpenCV_VERSION}d -lopencv_highgui$${OpenCV_VERSION}d -lopencv_features2d$${OpenCV_VERSION}d  -lopencv_flann$${OpenCV_VERSION}d -lopencv_imgproc$${OpenCV_VERSION}d -lopencv_video$${OpenCV_VERSION}d -lopencv_imgcodecs$${OpenCV_VERSION}d -lopencv_videoio$${OpenCV_VERSION}d -lopencv_surface_matching$${OpenCV_VERSION}d -lopencv_ml$${OpenCV_VERSION}d
+    Release:LIBS *= -lopencv_core$${OpenCV_VERSION} -lopencv_highgui$${OpenCV_VERSION} -lopencv_features2d$${OpenCV_VERSION}  -lopencv_flann$${OpenCV_VERSION} -lopencv_imgproc$${OpenCV_VERSION} -lopencv_video$${OpenCV_VERSION} -lopencv_imgcodecs$${OpenCV_VERSION} -lopencv_videoio$${OpenCV_VERSION} -lopencv_surface_matching$${OpenCV_VERSION} -lopencv_ml$${OpenCV_VERSION}
 }
 
 # Kinect SDK

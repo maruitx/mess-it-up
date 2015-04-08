@@ -3,6 +3,7 @@
 
 #include "../Utilities/utility.h"
 #include "../mess_mode.h"
+#include "../Classifier/OpenCVClassifier.h"
 
 class CScene;
 class Skeleton;
@@ -98,9 +99,14 @@ public:
 	void computeFeaturesForSyntheticData();
 
 	void saveCollectedFeatures();
+	void saveCollectedFeaturesForOpenCVClassifier();
+
+	bool isPhaseConsidered(int phaseID);
 	void collectClassLabelForWeka();
 	void saveCollectedFeaturesForWeka();
-	bool isPhaseConsidered(int phaseID);
+
+	void trainRandomForestClassifier();
+	int getFeatureDimForPhase(int phaseID);
 	
 	//					       z  y
 	//				  	       | /
@@ -139,6 +145,8 @@ private:
 
 	std::vector<Skeleton*> m_skeletonStream;
 	SkeletonSampler *m_skeletonSampler;
+
+	std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
 
 	/*
 	// pre-processed skeletons 

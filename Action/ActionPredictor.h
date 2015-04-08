@@ -20,12 +20,15 @@ public:
 
 	bool loadTestJob(const QString &filename);
 
+	void loadClassifiers();
+	bool isPhaseConsidered(int phaseID);
+
 	void loadActionRepSkels();
 	void loadActionRepSkels(int phaseID);
 
 	void sampleSkeletons();
 	void sampleSkeletonsForActionPhrase(int phaseID);
-	void testForSkeletons(int modelID, int phaseID, int actionID);
+	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
 
 	
 	void genRandomSkeletonListForDisplay(int num);
@@ -62,6 +65,8 @@ private:
 	QString m_useFeatureType;
 
 	SkeletonSampler *m_skeletonSampler;
+
+	std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
 
 
 	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model

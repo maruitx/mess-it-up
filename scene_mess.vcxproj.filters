@@ -46,12 +46,12 @@
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{18d161c8-d23b-4d1a-98d6-a532141a5c41}</UniqueIdentifier>
+      <UniqueIdentifier>{6f46cc23-ff82-44e8-b3f0-04fb37b9c61b}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{1bee7ef9-f0f0-4305-b099-4257cab466c5}</UniqueIdentifier>
+      <UniqueIdentifier>{a8a725a3-6ec3-4aca-b2b8-ebd5e06170a6}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
@@ -70,6 +70,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Action\ActionLearner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Action\ActionPredictor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Action\ActionViewer.cpp">
@@ -177,6 +180,18 @@
     <ClCompile Include="Release\moc_ActionLearner.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="Debug\moc_ActionPredictor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ActionPredictor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ActionViewer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ActionViewer.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
     <ClCompile Include="Debug\moc_ActionViewerWidget.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -239,9 +254,12 @@
     <CustomBuild Include="Action\ActionLearner.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="Action\ActionViewer.h">
+    <CustomBuild Include="Action\ActionPredictor.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
+    </CustomBuild>
+    <CustomBuild Include="Action\ActionViewer.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="Action\ActionViewerWidget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -288,6 +306,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\OBBOBBIntersect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Classifier\OpenCVClassifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Kinect\OpenCVHelper.h">
