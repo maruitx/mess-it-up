@@ -454,9 +454,6 @@ void ActionLearner::trainRandomForestClassifier()
 	}
 }
 
-	Simple_Message_Box("Action learning done");
-}
-
 QVector<QPair<int, Eigen::Matrix4d>> ActionLearner::getModelTrackMat(int frame_id)
 {
 	QVector<QPair<int, Eigen::Matrix4d>> trackMats;

@@ -55,6 +55,8 @@ bool ActionPredictor::loadTestJob(const QString &filename)
 void ActionPredictor::loadTrainingResult()
 {
 	loadActionRepSkels();
+	loadClassifiers();
+}
 
 	// load learned classifiers
 void ActionPredictor::loadClassifiers()
@@ -391,14 +393,27 @@ void ActionPredictor::sampleSkeletons()
 	}
 }
 
+bool ActionPredictor::isPhaseConsidered(int phaseID)
+{
+	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+	{
+		if (m_loadedSkeletonsForTest[phaseID].size() > 0 && m_loadedSkeletonsForTest[phaseID][action_id].size() > 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 {
 	// predict possible action for each model
-	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
+	for (int model_id = 0; model_id < m_scene->getModelNum(); model_id++)
 	{
 		// test for each action
 		// random sample an/several actions from the action library
-		for (int actionID = 0; actionID < m_loadedSkeletonsForTest[phaseID].size(); actionID++)
+		for (int action_id = 0; action_id < m_loadedSkeletonsForTest[phaseID].size(); action_id++)
 		{
 			if (!m_scene->isModelFixed(model_id))
 			{
@@ -423,17 +438,8 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 						}
 					}
 
-					m_predictedSkeletonsForActions[model_id][phaseID][action_id] = classifiedSkeletons;					
+					m_predictedSkeletonsForActions[model_id][phaseID][action_id] = classifiedSkeletons;
 				}
-
-			if (m_loadedSkeletonsForTest[phaseID][actionID].size() > 0)
-			{
-				int k = std::rand() % m_loadedSkeletonsForTest[phaseID][actionID].size(); // random select
-				m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[phaseID][actionID][k]);
-				m_skeletonSampler->sampleSkeletonAroundModel(modelID);
-
-				SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();
-				m_sampledSkeletonsForActions[modelID][phaseID][actionID] = sampledSkeletons;
 			}
 		}
 	}
@@ -451,7 +457,7 @@ void ActionPredictor::setShowEndPose(int state)
 	updateDrawArea();
 }
 
-void ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID)
+bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID)
 {
 	SkeletonPtrList currSkelList = m_sampledSkeletonsForActions[modelID][phaseID][actionID];
 
@@ -482,9 +488,34 @@ void ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID)
 		{
 			return false;
 		}
-
-		return true;	
+	}
 }
+
+bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel)
+{
+	ActionFeature newFeature(m_scene);
+
+	std::vector<double> actionFeature;
+
+	newFeature.computeActionFeatureForSkel(skel, modelID, actionFeature);
+
+	//// test feature with classifier
+	//cv::Mat testFeatureMat;
+	//convertToMat(actionFeature, testFeatureMat);
+
+	CvMat* testFeatureMat = 0;
+	testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
+	convertStdVecToCvMat(actionFeature, testFeatureMat);
+
+	float predicted_id = m_classifiers[phaseID]->predict(testFeatureMat);
+
+	if (std::abs(predicted_id - actionID) < LABEL_DIFF_TH)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

@@ -101,6 +101,7 @@ public:
 	void saveCollectedFeatures();
 	void saveCollectedFeaturesForOpenCVClassifier();
 
+	int ActionLearner::getFeatureDimForPhase(int phaseID);
 	bool isPhaseConsidered(int phaseID, int &featureDim);
 	void trainRandomForestClassifier();
 

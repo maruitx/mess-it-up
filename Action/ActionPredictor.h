@@ -6,6 +6,8 @@
 #include "../mess_mode.h"
 #include "ActionLearner.h"
 
+const double LABEL_DIFF_TH = 0.1;
+
 typedef std::map<int, std::vector<std::vector<std::vector<int>>>> ModelRelatedSkeletonIdList;
 
 class ActionPredictor : public QObject
@@ -26,10 +28,11 @@ public:
 	void sampleSkeletons();
 	void sampleSkeletonsForActionPhrase(int phaseID);
 
-	void trainRandomForestClassifier();
+	void loadClassifiers();
+	bool isPhaseConsidered(int phaseID);
 
 	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
-	void testForSkeletons(int modelID, int phaseID, int actionID);
+	bool testForSkeletons(int modelID, int phaseID, int actionID);
 	
 	void genRandomSkeletonListForDisplay(int num);
 	void resampleSkeletonForDisplay(int num);

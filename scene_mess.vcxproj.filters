@@ -46,12 +46,12 @@
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{6f46cc23-ff82-44e8-b3f0-04fb37b9c61b}</UniqueIdentifier>
+      <UniqueIdentifier>{39bf3759-3a02-4b08-8348-6addb6ec6bc1}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{a8a725a3-6ec3-4aca-b2b8-ebd5e06170a6}</UniqueIdentifier>
+      <UniqueIdentifier>{a8a1ff5c-969a-44c3-bbf8-f23eacfba754}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
@@ -109,6 +109,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Geometry\OBBOBBIntersect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Classifier\OpenCVClassifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Kinect\OpenCVHelper.cpp">
