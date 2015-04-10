@@ -379,15 +379,22 @@ void ActionLearner::collectFeatureVecsFromLabeledData()
 			}
 		}
 	}
+
+	saveCollectedFeatures();
+	saveCollectedFeaturesForWeka();
 }
 void ActionLearner::startLearning()
 {
+	if (!m_scene->hasSupportHierarchy())
+	{
+		m_scene->buildSupportHierarchy();
+	}
+
 	if (m_hasJob)
 	{
 		extractActionInstances();
 
 		m_actionFeatures.clear();
-
 		m_actionFeatures.resize(ACTION_NUM);
 
 		for (int i = 0; i < m_actionInstances.size(); i++)
@@ -411,8 +418,9 @@ void ActionLearner::startLearning()
 		computeFeaturesForSyntheticData();
 	}
 
-	saveCollectedFeatures();
-	saveCollectedFeaturesForWeka();
+	//saveCollectedFeatures();
+
+	//saveCollectedFeaturesForWeka();
 	saveCollectedFeaturesForOpenCVClassifier();
 
 	trainRandomForestClassifier();
@@ -420,29 +428,34 @@ void ActionLearner::startLearning()
 	Simple_Message_Box("Action learning done");
 }
 
-
 void ActionLearner::trainRandomForestClassifier()
 {
 	m_classifiers.resize(ACTION_PHASE_NUM);
 
 	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
 	{
-		if (isPhaseConsidered(phase_id))
+		int featureDim;
+
+		if (isPhaseConsidered(phase_id, featureDim))
 		{
-			m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
+			//m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
+			m_classifiers[phase_id] = new OpenCVClassifier();
 
 			QString dataFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_actions.data";
-			QString classifierFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_actions.RFClassifier";
+			QString classifierFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_classifier.xml";
 
-			if (m_classifiers[phase_id]->read_train_data(dataFN.toStdString(), getFeatureDimForPhase(phase_id)))
-			{
-				m_classifiers[phase_id]->buildClassifier(classifierFN.toStdString());
-				m_classifiers[phase_id]->save_classifier(classifierFN.toStdString());
-			}
+			//if (m_classifiers[phase_id]->read_train_data(dataFN.toStdString(), getFeatureDimForPhase(phase_id)))
+			//{
+			//	m_classifiers[phase_id]->buildClassifier(classifierFN.toStdString());
+			//	m_classifiers[phase_id]->save_classifier(classifierFN.toStdString());
+			//}
+			m_classifiers[phase_id]->buildClassifier(OpenCVClassifier::RandomTrees, featureDim, dataFN, classifierFN);
 		}
 	}
 }
 
+	Simple_Message_Box("Action learning done");
+}
 
 QVector<QPair<int, Eigen::Matrix4d>> ActionLearner::getModelTrackMat(int frame_id)
 {
@@ -594,7 +607,7 @@ void ActionLearner::saveActionRepSkels(int phaseID)
 			QFile outFile(filename);
 			QTextStream out(&outFile);
 
-			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text)) return;
+			if (!outFile.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) return;
 			for (int j = 0; j < m_actionFeatures[i].size(); j++)
 			{
 				std::vector<Skeleton*> repSkeletons = m_actionFeatures[i][j].getActionRepSkeletons((ActionFeature::ActionPhase)phaseID);
@@ -827,6 +840,9 @@ void ActionLearner::computeFeaturesForSyntheticData()
 			}
 		}
 	}
+
+	saveCollectedFeatures();
+	saveCollectedFeaturesForWeka();
 }
 
 void ActionLearner::saveCollectedFeatures()
@@ -887,7 +903,9 @@ void ActionLearner::saveCollectedFeaturesForWeka()
 
 	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
 	{
-		if (isPhaseConsidered(phase_id))
+		int featureDim;
+
+		if (isPhaseConsidered(phase_id, featureDim))
 		{
 			QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_actions.arff";
 
@@ -903,7 +921,7 @@ void ActionLearner::saveCollectedFeaturesForWeka()
 			{
 				if (m_collectedFeatureVecs[phase_id][action_id].size() > 0)
 				{
-					for (int j = 0; j < m_collectedFeatureVecs[phase_id][action_id][0].size(); j++)
+					for (int j = 0; j < featureDim; j++)
 					{
 						out << "@ATTRIBUTE " << j << " REAL" << "\n";
 					}
@@ -945,12 +963,13 @@ void ActionLearner::saveCollectedFeaturesForWeka()
 	}	
 }
 
-bool ActionLearner::isPhaseConsidered(int phaseID)
+bool ActionLearner::isPhaseConsidered(int phaseID, int &featureDim)
 {
 	for (int action_id = 0; action_id < ACTION_NUM; action_id++)
 	{
 		if (m_collectedFeatureVecs[phaseID][action_id].size()>0)
 		{
+			featureDim = m_collectedFeatureVecs[phaseID][action_id][0].size();
 			return true;
 		}
 	}
@@ -964,7 +983,9 @@ void ActionLearner::saveCollectedFeaturesForOpenCVClassifier()
 
 	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
 	{
-		if (isPhaseConsidered(phase_id))
+		int featureDim;
+
+		if (isPhaseConsidered(phase_id, featureDim))
 		{
 			QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_actions.data";
 
@@ -982,7 +1003,7 @@ void ActionLearner::saveCollectedFeaturesForOpenCVClassifier()
 					{
 						out << action_id << ",";
 
-						int featureDim = m_collectedFeatureVecs[phase_id][action_id][feat_id].size();
+						//int featureDim = m_collectedFeatureVecs[phase_id][action_id][feat_id].size();
 						for (int i = 0; i < featureDim-1; i++)
 						{
 							out << m_collectedFeatureVecs[phase_id][action_id][feat_id][i] << ",";
@@ -1008,6 +1029,5 @@ int ActionLearner::getFeatureDimForPhase(int phaseID)
 		}
 	}
 }
-
 
 

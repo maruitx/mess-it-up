@@ -32,6 +32,8 @@ public:
 	void destory();
 	void decorate();
 
+	void drawPredictedSkeletons();
+
 	CScene *getScene() { return m_scene; };
 	void setSceneBounds();
 

@@ -32,10 +32,8 @@ void ActionFeature::setActionInstance(int id)
 
 void ActionFeature::extractFeature()
 {
-	m_scene->buildSupportHierarchy();
-
 	double FrameRate = 20;
-	double samplingTimeIntv = 0.25;
+	double samplingTimeIntv = 0.1;
 	
 	int FrameIntv = FrameRate*samplingTimeIntv;
 
@@ -43,6 +41,9 @@ void ActionFeature::extractFeature()
 	double lastTimeLength = totalFrameNum / FrameRate;
 
 	std::vector<double> actionFeature;
+	
+	computeActionFeatureAt(0, actionFeature, ActionPhase::StartAction);
+	m_startActionFeatures[0] = actionFeature;
 
 	if (lastTimeLength > 2)
 	{
@@ -103,6 +104,7 @@ void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &ac
 	actionFeature.insert(actionFeature.end(), skeletonObjectFeature.begin(), skeletonObjectFeature.end());
 }
 
+// 11dim
 void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<double> &skeletonShapeFeature)
 {
 	// compute upper body to head distance features
@@ -119,14 +121,15 @@ void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<
 		skeletonShapeFeature.push_back(to_head.magnitude());
 	}
 
-	// compute hand position features
-	MathLib::Vector3 to_head = joints[Skeleton::HAND_LEFT] - joints[Skeleton::HEAD];
-	skeletonShapeFeature.push_back(to_head.magnitude());
+	//// compute hand position features
+	//MathLib::Vector3 to_head = joints[Skeleton::HAND_LEFT] - joints[Skeleton::HEAD];
+	//skeletonShapeFeature.push_back(to_head.magnitude());
 
-	to_head = joints[Skeleton::HAND_RIGHT] - joints[Skeleton::HEAD];
-	skeletonShapeFeature.push_back(to_head.magnitude());
+	//to_head = joints[Skeleton::HAND_RIGHT] - joints[Skeleton::HEAD];
+	//skeletonShapeFeature.push_back(to_head.magnitude());
 }
 
+// 3 + 3*8 = 27dim
 void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &objectGeoFeature)
 {
 	SurfaceMesh::Vector3 center = m->getTransformedOBBCenter();
@@ -148,22 +151,7 @@ void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &obj
 	}
 }
 
-void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature)
-{
-	SurfaceMesh::Vector3 center = m->getTransformedOBBCenter();
-
-	std::vector<MathLib::Vector3> joints = skeleton->getJoints();
-
-	for (int i = 0; i < joints.size(); i++)
-	{
-		double dist = (joints[i].x - center[0])*(joints[i].x - center[0]) +
-			(joints[i].y - center[1])*(joints[i].y - center[1]) +
-			(joints[i].z - center[2])*(joints[i].z - center[2]);
-		dist = std::sqrt(dist);
-		skeletonObjectFeature.push_back(dist);
-	}
-}
-
+// 2dim
 void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature)
 {
 	int modelID = m->getID();
@@ -179,6 +167,23 @@ void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &o
 
 	objectStructFeature.push_back(supportLevel);
 	objectStructFeature.push_back(supportChindrenNum);
+}
+
+// 20dim
+void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature)
+{
+	SurfaceMesh::Vector3 center = m->getTransformedOBBCenter();
+
+	std::vector<MathLib::Vector3> joints = skeleton->getJoints();
+
+	for (int i = 0; i < joints.size(); i++)
+	{
+		double dist = (joints[i].x - center[0])*(joints[i].x - center[0]) +
+			(joints[i].y - center[1])*(joints[i].y - center[1]) +
+			(joints[i].z - center[2])*(joints[i].z - center[2]);
+		dist = std::sqrt(dist);
+		skeletonObjectFeature.push_back(dist);
+	}
 }
 
 void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature)

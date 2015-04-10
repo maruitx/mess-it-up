@@ -66,17 +66,9 @@ void mess_mode::decorate()
 		actionLearner->drawSkeleton();
 	}
 
-	if (actionPreditor->isShowSampledSkeletons() && m_actionViewerWidgetCreated)
+	if (actionViewer)
 	{
-		if (actionPreditor->isShowStartPose())
-		{
-			actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), 0, actionViewer->getSelectActionID());
-		}
-
-		if (actionPreditor->isShowEndPose())
-		{
-			actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), 1, actionViewer->getSelectActionID());
-		}		
+		drawPredictedSkeletons();
 	}
 }
 
@@ -245,15 +237,12 @@ void mess_mode::openActionViewer()
 	//	actionViewer = new ActionViewer(actionLearner);
 	//	actionViewer->createWidget();
 
-	//	m_actionViewerWidgetCreated = true;
 	//}
 
 	if (actionPreditor != NULL && actionPreditor->isFinishPredict())
 	{
 		actionViewer = new ActionViewer(actionPreditor);
 		actionViewer->createWidget();
-
-		m_actionViewerWidgetCreated = true;
 	}
 
 	else
@@ -316,5 +305,34 @@ bool mess_mode::mousePressEvent(QMouseEvent* event)
 	}
 
 	return false;
+}
+
+void mess_mode::drawPredictedSkeletons()
+{
+	if (actionViewer->isShowSampledSkeletons() && actionViewer->hasWidget())
+	{
+		if (actionPreditor->isShowStartPose())
+		{
+			actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), 0, actionViewer->getSelectActionID());
+		}
+
+		if (actionPreditor->isShowEndPose())
+		{
+			actionPreditor->drawSampledSkeletons(actionViewer->getSelectModelID(), 1, actionViewer->getSelectActionID());
+		}
+	}
+
+	if (actionViewer->isShowPredictedSkeletons() && actionViewer->hasWidget())
+	{
+		if (actionPreditor->isShowStartPose())
+		{
+			actionPreditor->drawPredictedSkeletons(actionViewer->getSelectModelID(), 0, actionViewer->getSelectActionID());
+		}
+
+		if (actionPreditor->isShowEndPose())
+		{
+			actionPreditor->drawPredictedSkeletons(actionViewer->getSelectModelID(), 1, actionViewer->getSelectActionID());
+		}
+	}
 }
 

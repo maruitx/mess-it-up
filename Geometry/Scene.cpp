@@ -12,6 +12,7 @@
 CScene::CScene() :
 m_SuppThresh(0.1),
 m_ContactThresh(0.1),
+m_hasSupportHierarchy(false),
 m_isShowModel(true),
 m_isShowOBB(true),
 m_isShowRG(true),
@@ -923,6 +924,8 @@ void CScene::buildSupportHierarchy()
 			setChildrenSupportLevel(m_modelList[i]);
 		}
 	}
+
+	m_hasSupportHierarchy = true;
 }
 
 void CScene::setChildrenSupportLevel(CModel *m)
@@ -963,7 +966,20 @@ bool CScene::isInsideModel(SurfaceMesh::Vector3 &point, int modelID)
 
 bool CScene::isIntersectModel(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt, int modelID)
 {
-	return m_modelList[modelID]->isSegmentIntersect(startPt, endPt);
+	SurfaceMesh::Vector3 tempEndPt = endPt;
+
+	if (startPt == endPt)
+	{
+		tempEndPt = startPt + 0.05*SurfaceMesh::Vector3(0,0,1);
+	}
+
+	return m_modelList[modelID]->isSegmentIntersect(startPt, tempEndPt);
+}
+
+std::vector<double> CScene::getFloorXYRange()
+{
+	int floorID = getModelIdByName("floor");
+	return m_modelList[floorID]->getAABBXYRange();
 }
 
 /*

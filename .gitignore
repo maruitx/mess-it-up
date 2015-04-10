@@ -223,6 +223,7 @@ pip-log.txt
 .mr.developer.cfg
 Code Note.docx
 scene_mess - Copy.pro
-/*.sln
+/scene_mess.vcxproj.filters
 /*.vcxproj
-/*.filters
+/scene_mess - opencv300.pro
+/scene_mess.sln

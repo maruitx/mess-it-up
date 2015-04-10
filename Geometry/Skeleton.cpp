@@ -156,5 +156,18 @@ MathLib::Vector3 Skeleton::getJoint(int id)
 	return MathLib::Vector3(m_joints[id][0], m_joints[id][1], m_joints[id][2]);
 }
 
+// align hip center to z axis
+void Skeleton::AlignToOrigin()
+{
+	double transX = m_joints[0][0];
+	double transY = m_joints[0][1];
+
+	for (int i = 0; i < m_joints.size(); i++)
+	{
+		m_joints[i][0] -= transX;
+		m_joints[i][1] -= transY;
+	}
+}
+
 
 

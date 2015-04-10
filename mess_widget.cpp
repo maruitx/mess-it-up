@@ -42,7 +42,7 @@ mess_widget::mess_widget(mess_mode * m) :
 
 mess_widget::~mess_widget()
 {
-    delete ui;
+    delete ui;	
 }
 
 QString mess_widget::loadSceneName()

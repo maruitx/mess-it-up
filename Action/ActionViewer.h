@@ -21,7 +21,11 @@ public:
 	int getSelectModelID();
 	int getSelectActionID();
 
+	void setWigetStatus(bool s) { m_hasWidget = s; };
 	bool hasWidget() { return m_hasWidget; };
+
+	bool isShowSampledSkeletons();
+	bool isShowPredictedSkeletons();
 
 public slots:
 	void setShowModelVoxel(int state);

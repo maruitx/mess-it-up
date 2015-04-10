@@ -77,3 +77,13 @@ void ActionViewer::setShowModelVoxel(int state)
 {
 	m_scene->setShowModelVoxel(state);
 }
+
+bool ActionViewer::isShowSampledSkeletons()
+{
+	return m_widget->ui.showSampledSkelButton->isChecked();
+}
+
+bool ActionViewer::isShowPredictedSkeletons()
+{
+	return m_widget->ui.showPredictedSkelButton->isChecked();
+}

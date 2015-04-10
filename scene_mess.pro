@@ -101,16 +101,17 @@ SOURCES += \
 	Action/ActionFeature.cpp \
 	Action/ActionViewerWidget.cpp \
 	Action/ActionViewer.cpp \
+	Classifier/OpenCVClassifier.cpp \
 	Math/mathlib.cpp 
 
 
 # OpenCV
 	win32{
-    INCLUDEPATH *= C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\include
-    LIBS *= -L"C:\Graphics\opencv\opencv-3.0.0\opencv\build\install\x86\vc12\lib"
-    OpenCV_VERSION = 300
-    Debug:LIBS *= -lopencv_core$${OpenCV_VERSION}d -lopencv_highgui$${OpenCV_VERSION}d -lopencv_features2d$${OpenCV_VERSION}d  -lopencv_flann$${OpenCV_VERSION}d -lopencv_imgproc$${OpenCV_VERSION}d -lopencv_video$${OpenCV_VERSION}d -lopencv_imgcodecs$${OpenCV_VERSION}d -lopencv_videoio$${OpenCV_VERSION}d -lopencv_surface_matching$${OpenCV_VERSION}d -lopencv_ml$${OpenCV_VERSION}d
-    Release:LIBS *= -lopencv_core$${OpenCV_VERSION} -lopencv_highgui$${OpenCV_VERSION} -lopencv_features2d$${OpenCV_VERSION}  -lopencv_flann$${OpenCV_VERSION} -lopencv_imgproc$${OpenCV_VERSION} -lopencv_video$${OpenCV_VERSION} -lopencv_imgcodecs$${OpenCV_VERSION} -lopencv_videoio$${OpenCV_VERSION} -lopencv_surface_matching$${OpenCV_VERSION} -lopencv_ml$${OpenCV_VERSION}
+    INCLUDEPATH *= C:\Graphics\opencv\opencv-2.4.9\opencv\build\include
+    LIBS *= -L"C:\Graphics\opencv\opencv-2.4.9\opencv\build\x86\vc12\lib"
+    OpenCV_VERSION = 249
+    Debug:LIBS *= -lopencv_core$${OpenCV_VERSION}d -lopencv_highgui$${OpenCV_VERSION}d -lopencv_features2d$${OpenCV_VERSION}d  -lopencv_flann$${OpenCV_VERSION}d -lopencv_imgproc$${OpenCV_VERSION}d -lopencv_video$${OpenCV_VERSION}d -lopencv_ml$${OpenCV_VERSION}d
+    Release:LIBS *= -lopencv_core$${OpenCV_VERSION} -lopencv_highgui$${OpenCV_VERSION} -lopencv_features2d$${OpenCV_VERSION}  -lopencv_flann$${OpenCV_VERSION} -lopencv_imgproc$${OpenCV_VERSION} -lopencv_video$${OpenCV_VERSION} -lopencv_ml$${OpenCV_VERSION}
 }
 
 # Kinect SDK

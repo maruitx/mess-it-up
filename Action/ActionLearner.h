@@ -101,12 +101,12 @@ public:
 	void saveCollectedFeatures();
 	void saveCollectedFeaturesForOpenCVClassifier();
 
-	bool isPhaseConsidered(int phaseID);
+	bool isPhaseConsidered(int phaseID, int &featureDim);
+	void trainRandomForestClassifier();
+
 	void collectClassLabelForWeka();
 	void saveCollectedFeaturesForWeka();
-
-	void trainRandomForestClassifier();
-	int getFeatureDimForPhase(int phaseID);
+	bool isPhaseConsidered(int phaseID);
 	
 	//					       z  y
 	//				  	       | /
@@ -146,7 +146,8 @@ private:
 	std::vector<Skeleton*> m_skeletonStream;
 	SkeletonSampler *m_skeletonSampler;
 
-	std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
+	//std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
+	std::vector<OpenCVClassifier*> m_classifiers;
 
 	/*
 	// pre-processed skeletons 

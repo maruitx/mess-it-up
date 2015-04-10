@@ -20,23 +20,25 @@ public:
 
 	bool loadTestJob(const QString &filename);
 
-	void loadClassifiers();
-	bool isPhaseConsidered(int phaseID);
-
 	void loadActionRepSkels();
 	void loadActionRepSkels(int phaseID);
 
 	void sampleSkeletons();
 	void sampleSkeletonsForActionPhrase(int phaseID);
-	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
 
+	void trainRandomForestClassifier();
+
+	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
+	void testForSkeletons(int modelID, int phaseID, int actionID);
 	
 	void genRandomSkeletonListForDisplay(int num);
 	void resampleSkeletonForDisplay(int num);
 	int getSampledSkelNum(int modelID, int actionID);
+	int getPredictedSkelNum(int modelID, int actionID);
 
 	void drawSampledSkeletons(int modelID, int phaseID, int actionID);
 	void drawSampleRange(int modelID);
+	void drawPredictedSkeletons(int modelID, int phaseID, int actionID);
 
 	bool isShowSampledSkeletons() { return m_showSampledSkeleton; };
 	bool isFinishPredict() { return m_finishPredict; };
@@ -54,6 +56,7 @@ public slots:
 
 	void setShowStartPose(int state);
 	void setShowEndPose(int state);
+	void setDrawSampleRegionStatus(int s);
 
 
 private:
@@ -66,8 +69,8 @@ private:
 
 	SkeletonSampler *m_skeletonSampler;
 
-	std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
-
+	//std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
+	std::vector<OpenCVClassifier*> m_classifiers;
 
 	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model
 	// in test: all skeletons representing one action are used for prediction, and not constraint to scene and center model
@@ -83,7 +86,10 @@ private:
 	// SkeletonPtrList: each phase may correspond several skeletons
 	*/
 	ModelRelatedSkeletonList m_sampledSkeletonsForActions;
-	ModelRelatedSkeletonIdList m_randomSkeletonIdList;
+	ModelRelatedSkeletonList m_predictedSkeletonsForActions;
+
+	ModelRelatedSkeletonIdList m_randomSampledSkeletonIdList;
+	ModelRelatedSkeletonIdList m_randomPredictedSkeletonIdList;
 
 	bool m_showSampledSkeleton;
 	bool m_showSampeRegion;

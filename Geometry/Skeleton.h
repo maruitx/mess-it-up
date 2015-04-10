@@ -74,6 +74,8 @@ public:
 	void drawJoint(int id, QColor c = QColor(255,0,0));
 	void drawBone(int id, QColor c = QColor(0,255,0));
 
+	void AlignToOrigin();
+
 	int jointNum() { return m_joints.size(); };
 	MathLib::Vector3 getJoint(int id);
 	std::vector<MathLib::Vector3> getJoints();

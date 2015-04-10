@@ -41,9 +41,11 @@ public:
 	MathLib::Vector3 getUprightVec() { return m_uprightVec; };
 
 	CModel* getModel(int id) { return m_modelList[id]; };
+	QString getModelName(int modelID) { return m_modelList[modelID]->label(); };
 	int getModelIdByName(const QString &s) { return m_modelNameIdMap[s]; };
 	QVector<QString> getModelNameList();
 	int getModelNum() { return m_modelNum; };
+	std::vector<double> getFloorXYRange();
 
 	Eigen::AlignedBox3d bbox() { return m_bbox; }
 
@@ -77,6 +79,7 @@ public:
 
 	void buildSupportHierarchy();
 	void setChildrenSupportLevel(CModel *m);
+	bool hasSupportHierarchy() { return m_hasSupportHierarchy; };
 
 	// skeleton
 	void testInteractSkeleton(Skeleton *sk);
@@ -154,6 +157,8 @@ private:
 	QString m_sceneFilePath;
 
 	int m_centerModelID;
+
+	bool m_hasSupportHierarchy;
 
 	bool m_isShowModel;
 	bool m_isShowOBB;
