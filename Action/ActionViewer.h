@@ -29,6 +29,7 @@ public:
 
 public slots:
 	void setShowModelVoxel(int state);
+	void setShowVoxelOctree(int state);
 	void setCenterModelID();
 
 public:

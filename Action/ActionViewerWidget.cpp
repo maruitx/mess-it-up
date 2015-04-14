@@ -42,6 +42,8 @@ ActionViewerWidget::ActionViewerWidget(ActionViewer *viewer, QWidget *parent)
 
 	connect(ui.showSampleRangeBox, SIGNAL(stateChanged(int)), m_viewer->actionPredictor, SLOT(setDrawSampleRegionStatus(int)));
 	connect(ui.showCenterModelVoxelBox, SIGNAL(stateChanged(int)), m_viewer, SLOT(setShowModelVoxel(int)));	
+	connect(ui.showCenterModelOctreeBox, SIGNAL(stateChanged(int)), m_viewer, SLOT(setShowVoxelOctree(int)));
+
 }
 
 ActionViewerWidget::~ActionViewerWidget()

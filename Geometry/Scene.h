@@ -89,6 +89,7 @@ public:
 	bool isInsideModel(SurfaceMesh::Vector3 &point, int modelID);
 	bool isIntersectModel(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt, int modelID);
 	void setShowModelVoxel(int state) { m_isShowModelVoxel = state; };
+	void setShowVoxelOctree(int state) { m_isShowModelVoxelOctree = state; };
 
 	// arrangement
 	bool isModelFixed(int modelID) {return m_modelList[modelID]->isFixed(); };
@@ -165,6 +166,7 @@ private:
 	bool m_isShowRG;
 	bool m_isShowModelName;
 	bool m_isShowModelVoxel;
+	bool m_isShowModelVoxelOctree;
 
 	bool m_isPickModelMode;
 };

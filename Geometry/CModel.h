@@ -63,6 +63,7 @@ public:
 	void computeOBB(int fixAxis = -1);
 	void updateOBBTransMat() { m_GOBB.transMat = m_transMat; };
 	double getOBBBottomHeight(MathLib::Vector3 &uprightVec);
+	std::vector<double> getOBBSize();
 
 	std::vector<double> getAABBXYRange();
 
@@ -82,6 +83,7 @@ public:
 	bool isSegmentIntersect(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt);
 
 	bool loadVoxelData(const QString &filename, std::vector<VoxelerLibrary::Voxel> &voxels);
+	double getClosestDistToVoxel(SurfaceMesh::Vector3 &pt);
 
 	// interaction
 	void setPicked(bool state) { m_isPicked = state; };

@@ -13,8 +13,11 @@ public:
 
 	void setFloorRange(const std::vector<double> &floorXY);
 	void setSkeleton(Skeleton *skel) { m_inputSkeleton = skel; };
+	void setSkeletonList(std::vector<Skeleton*> skelList) { m_inputSkeletonList = skelList; };
 
 	void sampleSkeletonAroundModel(int modelID);
+	void sampleSkeletonAroundModelFromSkelList(int modelID, const QString &method);
+
 	std::vector<Skeleton*> getSampledSkeletons() { return m_sampledSkeletons; };
 	
 	std::vector<double> getSampleRange(int modelID) { return m_sampleRegions[modelID]; };
@@ -24,6 +27,8 @@ public:
 
 private:
 	Skeleton *m_inputSkeleton;
+	std::vector<Skeleton*> m_inputSkeletonList;
+
 	std::vector<Skeleton*> m_sampledSkeletons;
 	CScene *m_scene;
 

@@ -21,7 +21,8 @@ BoundingBox::BoundingBox( const Vector3d& c, double x, double y, double z )
 	this->yExtent = y;
 	this->zExtent = z;
 
-	Vector3d corner(x/2, y/2, z/2);
+	//Vector3d corner(x/2, y/2, z/2);
+	Vector3d corner(x, y, z);
 
 	vmin = center - corner;
 	vmax = center + corner;
@@ -331,8 +332,8 @@ void BoundingBox::computeFromBoundingBoxes(const std::vector<BoundingBox> &boxes
 		if (bvmin[2] < minz) minz = bvmin[2];
 
 		if (bvmax[0] > maxx) maxx = bvmax[0];
-		if (bvmax[0] > maxy) maxy = bvmax[1];
-		if (bvmax[0] > maxz) maxz = bvmax[2];
+		if (bvmax[1] > maxy) maxy = bvmax[1];
+		if (bvmax[2] > maxz) maxz = bvmax[2];
 	}
 
 	vmax = Vec3d(maxx, maxy, maxz);
@@ -348,8 +349,9 @@ void BoundingBox::computeFromBoundingBoxes(const std::vector<BoundingBox> &boxes
 bool BoundingBox::intersectSegment(const Vector3d &startPt, const Vector3d &endPt)
 {
 	Vector3d segmentCenter = 0.5*(startPt + endPt);
-	Vector3d segmentDirection = endPt - startPt;
+	Vector3d segmentDirection = (endPt - startPt);
 	double segmentExtent = ((double)0.5)*segmentDirection.norm();
+	segmentDirection = segmentDirection.normalized();
 
 	double AWdU[3], ADdU[3], AWxDdU[3], RHS;
 
@@ -401,6 +403,46 @@ bool BoundingBox::intersectSegment(const Vector3d &startPt, const Vector3d &endP
 	{
 		return false;
 	}
+
+	return true;
+}
+
+bool BoundingBox::intersectWithSegment(const Vector3d &startPt, const Vector3d &endPt, double EPSILON)
+{
+	Vector3d segExtent = (endPt - startPt) * 0.5f; // segment extent
+
+	Vector3d boxExtent = (vmax - vmin) * 0.5f;  // box extent
+
+	Vector3d centerDiff = startPt + segExtent - (vmin + vmax) * 0.5f;  // center diff
+
+	Vector3d segExtentProj = Vector3d(std::fabs(segExtent[0]), std::fabs(segExtent[1]), std::fabs(segExtent[2])); // Returns same vector with all components positive
+
+	if (fabsf(centerDiff[0]) > boxExtent[0] + segExtentProj[0])
+
+		return false;
+
+	if (fabsf(centerDiff[1]) > boxExtent[1] + segExtentProj[1])
+
+		return false;
+
+	if (fabsf(centerDiff[2]) > boxExtent[2] + segExtentProj[2])
+
+		return false;
+
+
+
+	if (fabsf(segExtent[1] * centerDiff[2] - segExtent[2] * centerDiff[1]) > boxExtent[1] * segExtentProj[2] + boxExtent[2] * segExtentProj[1] + EPSILON)
+
+		return false;
+
+	if (fabsf(segExtent[2] * centerDiff[0] - segExtent[0] * centerDiff[2]) > boxExtent[2] * segExtentProj[0] + boxExtent[0] * segExtentProj[2] + EPSILON)
+
+		return false;
+
+	if (fabsf(segExtent[0] * centerDiff[1] - segExtent[1] * centerDiff[0]) > boxExtent[0] * segExtentProj[1] + boxExtent[1] * segExtentProj[0] + EPSILON)
+
+		return false;
+
 
 	return true;
 }

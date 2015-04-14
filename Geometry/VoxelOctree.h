@@ -28,6 +28,7 @@ public:
 	void DrawBox(const Vec3d& center, float width, float length, float height, float r, float g, float b, float lineWidth);
 
 	bool intersectSegment(const Vec3d &startPt, const Vec3d &endPt);
+	void setIntersected(bool state) { m_isIntersected = state; };
 
 public:
 	VoxelerLibrary::Voxeler *m_voxeler;
@@ -38,6 +39,8 @@ public:
 	int m_voxelPerNode;
 
 	std::vector<BoundingBox> m_voxelBoundingBoxData;
+
+	bool m_isIntersected;
 
 
 };

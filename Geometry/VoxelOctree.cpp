@@ -1,11 +1,13 @@
 #include "qgl.h"
 #include "VoxelOctree.h"
 
-VoxelOctree::VoxelOctree()
+VoxelOctree::VoxelOctree():
+m_isIntersected(false)
 {
 }
 
-VoxelOctree::VoxelOctree(int voxPerNode, VoxelerLibrary::Voxeler *voxeler)
+VoxelOctree::VoxelOctree(int voxPerNode, VoxelerLibrary::Voxeler *voxeler):
+m_isIntersected(false)
 {
 	m_voxelPerNode = voxPerNode;
 	m_voxeler = voxeler;
@@ -13,13 +15,16 @@ VoxelOctree::VoxelOctree(int voxPerNode, VoxelerLibrary::Voxeler *voxeler)
 	// convert voxeler to bounding boxes
 	int voxelNum = m_voxeler->voxels.size();
 	m_voxelBoundingBoxData.resize(voxelNum);
+	
+	double voxelSize = m_voxeler->voxelSize;
 
 	for (int i = 0; i < voxelNum; i++)
 	{
-		double voxelSize = m_voxeler->voxelSize;
+		
 		Vector3d c = m_voxeler->voxels[i];	c *= voxelSize;
 
 		BoundingBox bb(c, 0.5*voxelSize, 0.5*voxelSize, 0.5*voxelSize);
+		//BoundingBox bb(c, voxelSize, voxelSize, voxelSize);
 
 		m_voxelBoundingBoxData[i] = bb;
 	}
@@ -66,15 +71,17 @@ void VoxelOctree::initBuild()
 
 void VoxelOctree::newNode(int depth, double x, double y, double z)
 {
-	double newExtent = m_boundingBox.xExtent / 2.0;
+	double newExtent_x = m_boundingBox.xExtent / 2.0;
+	double newExtent_y = m_boundingBox.yExtent / 2.0;
+	double newExtent_z = m_boundingBox.zExtent / 2.0;
 
 	Vec3d center;
 
-	center.x() = m_boundingBox.center.x() + (newExtent * x);
-	center.y() = m_boundingBox.center.y() + (newExtent * y);
-	center.z() = m_boundingBox.center.z() + (newExtent * z);
+	center.x() = m_boundingBox.center.x() + (newExtent_x * x);
+	center.y() = m_boundingBox.center.y() + (newExtent_y * y);
+	center.z() = m_boundingBox.center.z() + (newExtent_z * z);
 
-	BoundingBox bb(center, newExtent, newExtent, newExtent);
+	BoundingBox bb(center, newExtent_x, newExtent_y, newExtent_z);
 
 	// Add child
 	m_children.push_back(VoxelOctree());
@@ -100,7 +107,7 @@ void VoxelOctree::build(int depth /*= 0*/)
 {
 	if (m_voxelBoundingBoxData.size() > m_voxelPerNode)
 	{
-		if (depth < 8)
+		if (depth < 10)
 		{
 			// Subdivide to 8 nodes
 			newNode(depth, -1, -1, -1);
@@ -117,6 +124,17 @@ void VoxelOctree::build(int depth /*= 0*/)
 
 void VoxelOctree::draw(double r, double g, double b, double lineWidth /*= 1.0*/)
 {
+	GLfloat red[] = { 1.0f, 0.3f, 0.3f, 1.0f };
+
+	if (m_isIntersected)
+	{
+		r = red[0];
+		g = red[1];
+		b = red[2];
+
+		//DrawBox(m_boundingBox.center, m_boundingBox.xExtent, m_boundingBox.yExtent, m_boundingBox.zExtent, r, g, b, lineWidth);
+	}
+
 	DrawBox(m_boundingBox.center, m_boundingBox.xExtent, m_boundingBox.yExtent, m_boundingBox.zExtent, r, g, b, lineWidth);
 
 	for (std::vector<VoxelOctree>::iterator child = m_children.begin(); child != m_children.end(); child++)
@@ -174,10 +192,20 @@ bool VoxelOctree::intersectSegment(const Vec3d &startPt, const Vec3d &endPt)
 
 			if (curTree->m_children.size() == 0)
 			{
-				for (int bid = 0; bid < m_voxelBoundingBoxData.size(); bid++)
+				//for (int bid = 0; bid < m_voxelBoundingBoxData.size(); bid++)
+				//{
+				//	if (m_voxelBoundingBoxData[bid].intersectSegment(startPt, endPt))
+				//	{
+				//		return true;
+				//	}
+				//}
+
+				for (int bid = 0; bid < curTree->m_voxelBoundingBoxData.size(); bid++)
 				{
-					if (m_voxelBoundingBoxData[bid].intersectSegment(startPt, endPt))
+					//if (curTree->m_voxelBoundingBoxData[bid].intersectSegment(startPt, endPt))
+					if (curTree->m_voxelBoundingBoxData[bid].intersectWithSegment(startPt, endPt, 0.01))
 					{
+						curTree->setIntersected(true);
 						return true;
 					}
 				}
@@ -186,7 +214,8 @@ bool VoxelOctree::intersectSegment(const Vec3d &startPt, const Vec3d &endPt)
 			// Do following if child size > 0
 			for (std::vector<VoxelOctree>::iterator child = curTree->m_children.begin(); child != curTree->m_children.end(); child++)
 			{
-				if (child->m_boundingBox.intersectSegment(startPt, endPt))
+				//if (child->m_boundingBox.intersectSegment(startPt, endPt))
+				if (child->m_boundingBox.intersectWithSegment(startPt, endPt, 0.01))
 				{
 					s.push(&(*child));
 				}

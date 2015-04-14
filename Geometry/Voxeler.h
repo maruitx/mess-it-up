@@ -62,6 +62,8 @@ public:
 	int getClosestVoxel(Vector3d point);
 	int getEnclosingVoxel( Vector3d point );
 
+	double getClosestDistToVoxle(Vector3d point);
+
 	std::vector< SurfaceMesh::Point > getVoxelCenters();
 
 	std::vector< Voxel > voxels;

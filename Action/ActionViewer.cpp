@@ -76,7 +76,16 @@ void ActionViewer::setCenterModelID()
 void ActionViewer::setShowModelVoxel(int state)
 {
 	m_scene->setShowModelVoxel(state);
+	actionPredictor->updateDrawArea();
+	
 }
+
+void ActionViewer::setShowVoxelOctree(int state)
+{
+	m_scene->setShowVoxelOctree(state);
+	actionPredictor->updateDrawArea();
+}
+
 
 bool ActionViewer::isShowSampledSkeletons()
 {
@@ -87,3 +96,4 @@ bool ActionViewer::isShowPredictedSkeletons()
 {
 	return m_widget->ui.showPredictedSkelButton->isChecked();
 }
+

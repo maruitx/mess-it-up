@@ -40,6 +40,8 @@ public:
 	bool intersectsBoundingBox(const BoundingBox& bb) const;
 	bool intersectsSphere(const Vector3d& sphere_center, double radius);
 
+	bool intersectWithSegment(const Vector3d &startPt, const Vector3d &endPt, double EPSILON);
+
     std::vector<Vector3d> getCorners();
 
 	Vector3d Center();

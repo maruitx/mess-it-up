@@ -18,6 +18,7 @@ m_isShowOBB(true),
 m_isShowRG(true),
 m_isShowModelName(false),
 m_isShowModelVoxel(false),
+m_isShowModelVoxelOctree(false),
 m_isPickModelMode(false)
 {
 	m_modelNum = 0;
@@ -88,6 +89,8 @@ void CScene::loadScene(const QString filename)
 		buildRelationshipGraph();
 		writeRG(silentMode);
 	}
+
+	voxelizeModels();
 }
 
 void CScene::extractToPointCloud()
@@ -137,10 +140,17 @@ void CScene::draw()
 			}
 			else
 			{
-				if (m->isVoxelized() && m_isShowModelVoxel && m_centerModelID == m->getID())
+				if (m->isVoxelized() && m_centerModelID == m->getID())
 				{
-					m->drawVoxel();
-					//m->drawVoxelOctree();
+					if (m_isShowModelVoxel)
+					{
+						m->drawVoxel();
+					}
+					
+					if (m_isShowModelVoxelOctree)
+					{
+						m->drawVoxelOctree();
+					}
 				}
 			}
 					
@@ -693,6 +703,7 @@ int CScene::writeRG(bool bSilent)
 	return 0;
 }
 
+// test whether the skeleton is interacting the models
 void CScene::testInteractSkeleton(Skeleton *sk)
 {
 	for (int i = 0; i < m_modelNum; i++)

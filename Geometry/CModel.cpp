@@ -687,10 +687,10 @@ void CModel::setLabel(QString &l)
 void CModel::drawVoxelOctree()
 {
 	//debug
-	if (m_label == "table")
+	//if (m_label == "box")
 	{
 		m_voxeler->drawOctree();
-	}
+	}	
 }
 
 bool CModel::isSegmentIntersect(SurfaceMesh::Vector3 &startPt, SurfaceMesh::Vector3 &endPt)
@@ -720,4 +720,25 @@ bool CModel::loadVoxelData(const QString &filename, std::vector<VoxelerLibrary::
 	inFile.close();
 
 	return true;
+}
+
+std::vector<double> CModel::getOBBSize()
+{
+	std::vector<double> obbSize;
+
+	obbSize.push_back(m_GOBB.size.x);
+	obbSize.push_back(m_GOBB.size.y);
+	obbSize.push_back(m_GOBB.size.z);
+
+	return obbSize;
+}
+
+double CModel::getClosestDistToVoxel(SurfaceMesh::Vector3 &pt)
+{
+	if (!m_isVoxelized)
+	{
+		voxelize();
+	}
+
+	return m_voxeler->getClosestDistToVoxle(pt);
 }

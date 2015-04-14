@@ -1,5 +1,7 @@
 #include "ActionFeature.h"
 
+const double Interact_Dist = 0.1;
+
 ActionFeature::ActionFeature()
 {
 
@@ -107,7 +109,12 @@ void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &ac
 // 11dim
 void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<double> &skeletonShapeFeature)
 {
-	// compute upper body to head distance features
+	// body pose feature from Sung et al. ICRA12
+
+	
+
+	// upper body feature from Koppula et al. IJRR13
+	// compute upper body to head distance
 	std::vector<MathLib::Vector3> joints = skeleton->getJoints();
 	for (int i = 0; i < 3; i++)
 	{
@@ -137,18 +144,21 @@ void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &obj
 
 	objectGeoFeature.resize(3 * (vps.size() + 1));
 
-	for (int i = 0; i < 3; i++)
-	{
-		objectGeoFeature[i] = center[i];
-	}
+	//for (int i = 0; i < 3; i++)
+	//{
+	//	objectGeoFeature[i] = center[i];
+	//}
 
-	for (int i = 0; i < vps.size(); i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			objectGeoFeature[3 * (i + 1) + j] = vps[i][j];
-		}
-	}
+	//for (int i = 0; i < vps.size(); i++)
+	//{
+	//	for (int j = 0; j < 3; j++)
+	//	{
+	//		objectGeoFeature[3 * (i + 1) + j] = vps[i][j];
+	//	}
+	//}
+
+	std::vector<double> objectOBBSize = m->getOBBSize();
+	objectGeoFeature.insert(objectGeoFeature.end(), objectOBBSize.begin(), objectOBBSize.end());
 }
 
 // 2dim
@@ -165,8 +175,12 @@ void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &o
 	supportLevel = m->supportLevel;
 	supportChindrenNum = m->suppChindrenList.size();
 
+
+	objectStructFeature.push_back(m->getOBBBottomHeight(MathLib::Vector3(0,0,1)));
 	objectStructFeature.push_back(supportLevel);
 	objectStructFeature.push_back(supportChindrenNum);
+	
+	// surrounding objects
 }
 
 // 20dim
@@ -176,14 +190,46 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 
 	std::vector<MathLib::Vector3> joints = skeleton->getJoints();
 
+	//for (int i = 0; i < joints.size(); i++)
+	//{
+	//	double dist = (joints[i].x - center[0])*(joints[i].x - center[0]) +
+	//		(joints[i].y - center[1])*(joints[i].y - center[1]) +
+	//		(joints[i].z - center[2])*(joints[i].z - center[2]);
+	//	dist = std::sqrt(dist);
+	//	skeletonObjectFeature.push_back(dist);
+	//}
+
+	// joint interacting state, 20-dim binary, from SceneGrok
+	std::vector<double> interStateVec(joints.size(), 0);
 	for (int i = 0; i < joints.size(); i++)
 	{
-		double dist = (joints[i].x - center[0])*(joints[i].x - center[0]) +
-			(joints[i].y - center[1])*(joints[i].y - center[1]) +
-			(joints[i].z - center[2])*(joints[i].z - center[2]);
-		dist = std::sqrt(dist);
-		skeletonObjectFeature.push_back(dist);
+		SurfaceMesh::Vector3 pt(joints[i][0], joints[i][1], joints[i][2]);
+		if (m->getClosestDistToVoxel(pt) < Interact_Dist)
+		{
+			interStateVec[i] = 1;
+		}
 	}
+
+	skeletonObjectFeature.insert(skeletonObjectFeature.end(), interStateVec.begin(), interStateVec.end());
+
+
+	// orientation
+	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_LEFT] - joints[Skeleton::SHOULDER_RIGHT];
+	MathLib::Vector3 torsoDirection = joints[Skeleton::SPINE] - joints[Skeleton::SHOULDER_CENTER];
+
+	MathLib::Vector3 torsoNormal = shoulderDirection.cross(torsoDirection);
+	MathLib::Vector3 shoulderCenterToObjCenterVec = MathLib::Vector3(center[0], center[1], center[2]) - joints[Skeleton::SHOULDER_CENTER];
+
+	// horizontal angle diff
+	double thetaInXY = std::atan2(shoulderCenterToObjCenterVec[1], shoulderCenterToObjCenterVec[0]) - std::atan2(torsoNormal[1], torsoNormal[0]);
+
+	// vertical angle diff
+	double thetaInYZ = std::atan2(shoulderCenterToObjCenterVec[2], shoulderCenterToObjCenterVec[1]) - std::atan2(torsoNormal[2], torsoNormal[1]);
+
+	skeletonObjectFeature.push_back(thetaInXY);
+	skeletonObjectFeature.push_back(thetaInYZ);
+
+
 }
 
 void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature)

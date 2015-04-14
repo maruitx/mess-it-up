@@ -100,7 +100,7 @@ void ActionPredictor::startPredicting()
 	m_sampledSkeletonsForActions.clear();
 	m_predictedSkeletonsForActions.clear();
 
-	m_scene->voxelizeModels();  // voxelize model and build octree
+	//m_scene->voxelizeModels();  // voxelize model and build octree
 
 	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
 	{
@@ -274,7 +274,6 @@ void ActionPredictor::drawSampledSkeletons(int modelID, int phaseID, int actionI
 	}
 }
 
-
 void ActionPredictor::drawPredictedSkeletons(int modelID, int phaseID, int actionID)
 {
 	if (m_predictedSkeletonsForActions[modelID][phaseID][actionID].size() > 0)
@@ -292,7 +291,6 @@ void ActionPredictor::drawPredictedSkeletons(int modelID, int phaseID, int actio
 		}
 	}
 }
-
 
 void ActionPredictor::updateDrawArea()
 {
@@ -419,9 +417,12 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 			{
 				if (m_loadedSkeletonsForTest[phaseID][action_id].size() > 0)
 				{
-					int k = std::rand() % m_loadedSkeletonsForTest[phaseID][action_id].size(); // random select
-					m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[phaseID][action_id][k]);
-					m_skeletonSampler->sampleSkeletonAroundModel(model_id);
+					//int k = std::rand() % m_loadedSkeletonsForTest[phaseID][action_id].size(); // random select
+					//m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[phaseID][action_id][k]);
+					//m_skeletonSampler->sampleSkeletonAroundModel(model_id);
+
+					m_skeletonSampler->setSkeletonList(m_loadedSkeletonsForTest[phaseID][action_id]);
+					m_skeletonSampler->sampleSkeletonAroundModelFromSkelList(model_id, "random");
 
 					SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();
 					m_sampledSkeletonsForActions[model_id][phaseID][action_id] = sampledSkeletons;

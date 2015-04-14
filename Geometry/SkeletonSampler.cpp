@@ -1,7 +1,7 @@
 #include "SkeletonSampler.h"
 #include "Scene.h"
 
-const double DistanceThreshold = 0.8;
+const double DistanceThreshold = 0.6;
 const double SampleGridSize = 0.4;
 
 SkeletonSampler::SkeletonSampler()
@@ -60,11 +60,81 @@ void SkeletonSampler::sampleSkeletonAroundModel(int modelID)
 				Skeleton *sampledSkeleton = new Skeleton(joints);
 
 				if (!isHardConflictWithScene(sampledSkeleton))
+				//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
 				{
 					m_sampledSkeletons.push_back(sampledSkeleton);
+				}			
+			}
+		}
+	}
+}
+
+
+void SkeletonSampler::sampleSkeletonAroundModelFromSkelList(int modelID, const QString &method)
+{
+	m_sampledSkeletons.clear();
+
+	CModel *m = m_scene->getModel(modelID);
+
+	std::vector<double> sampleRange = m->getAABBXYRange();
+
+	sampleRange[0] -= DistanceThreshold; // xmin
+	sampleRange[1] += DistanceThreshold; // xmax
+	sampleRange[2] -= DistanceThreshold; // ymin
+	sampleRange[3] += DistanceThreshold; // ymax
+
+	sampleRange[0] = std::max(sampleRange[0], m_floorXYRange[0]);
+	sampleRange[1] = std::min(sampleRange[1], m_floorXYRange[1]);
+	sampleRange[2] = std::max(sampleRange[2], m_floorXYRange[2]);
+	sampleRange[3] = std::min(sampleRange[3], m_floorXYRange[3]);
+
+	m_sampleRegions[modelID] = sampleRange;
+
+	int xGridNum, yGridNum;
+
+	xGridNum = (int)((sampleRange[1] - sampleRange[0]) / SampleGridSize);
+	yGridNum = (int)((sampleRange[3] - sampleRange[2]) / SampleGridSize);
+
+	for (int i = 0; i < xGridNum + 1; i++)
+	{
+		for (int j = 0; j < yGridNum + 1; j++)
+		{
+			MathLib::Vector3 samplePos = MathLib::Vector3(sampleRange[0] + i*SampleGridSize, sampleRange[2] + j*SampleGridSize, 0);
+
+			m_samplePositions[modelID].push_back(samplePos);
+
+			for (int k = 0; k < 8; k++)
+			{
+				if (method == "random")
+				{
+					int id = std::rand() % m_inputSkeletonList.size(); // random select
+
+					std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, k*MathLib::ML_PI_4, m_scene->getUprightVec());
+
+					Skeleton *sampledSkeleton = new Skeleton(joints);
+
+					if (!isHardConflictWithScene(sampledSkeleton))
+						//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
+					{
+						m_sampledSkeletons.push_back(sampledSkeleton);
+					}
 				}
 
-				
+				if (method == "all")
+				{
+					for (int id = 0; id < m_inputSkeletonList.size(); id++)
+					{
+						std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, k*MathLib::ML_PI_4, m_scene->getUprightVec());
+
+						Skeleton *sampledSkeleton = new Skeleton(joints);
+
+						if (!isHardConflictWithScene(sampledSkeleton))
+							//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
+						{
+							m_sampledSkeletons.push_back(sampledSkeleton);
+						}
+					}
+				}
 			}
 		}
 	}

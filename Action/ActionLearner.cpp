@@ -705,7 +705,7 @@ void ActionLearner::loadSynthActionSkels()
 	int skeletonListID = 0;
 	
 	// map<modelID, <id in tempSkeletonLists, <phaseId, actionID>>>
-	std::map<int, std::pair<int, std::pair<int, int>>> modelPhaseActionTypeMap;
+	std::map<int, std::vector<std::pair<int, std::pair<int, int>>>> modelPhaseActionTypeMap;
 
 	for (int phaseID = 0; phaseID < ACTION_PHASE_NUM; phaseID++)
 	{
@@ -758,13 +758,13 @@ void ActionLearner::loadSynthActionSkels()
 			tempSkeletonLists.push_back(onePhraseOneTypeList);
 				
 			inFile.close();
-			modelPhaseActionTypeMap[modelID] =std::pair<int, std::pair<int, int>>(skeletonListID, std::pair<int, int>(phaseID, actionID));
+			modelPhaseActionTypeMap[modelID].push_back(std::pair<int, std::pair<int, int>>(skeletonListID, std::pair<int, int>(phaseID, actionID)));
 			skeletonListID++;
 		}		
 	}
 
 	// convert skeleton list to ModelRelatedSkeletonList structure
-	std::map<int, std::pair<int, std::pair<int, int>>>::iterator it;
+	std::map<int, std::vector<std::pair<int, std::pair<int, int>>>>::iterator it;
 
 	for (it = modelPhaseActionTypeMap.begin(); it != modelPhaseActionTypeMap.end(); it++)
 	{
@@ -780,11 +780,15 @@ void ActionLearner::loadSynthActionSkels()
 	for (it = modelPhaseActionTypeMap.begin(); it != modelPhaseActionTypeMap.end(); it++)
 	{
 		int model_id = it->first;
-		int skeletonList_id = (it->second).first;
-		int phase_id = ((it->second).second).first;
-		int action_id = ((it->second).second).second;
 
-		m_loadedSkeletonsForTrain[model_id][phase_id][action_id] = tempSkeletonLists[skeletonList_id];
+		for each(std::pair<int, std::pair<int, int>> phaseActionTypeID in it->second)
+		{
+			int skeletonList_id = phaseActionTypeID.first;
+			int phase_id = (phaseActionTypeID.second).first;
+			int action_id = (phaseActionTypeID.second).second;
+
+			m_loadedSkeletonsForTrain[model_id][phase_id][action_id] = tempSkeletonLists[skeletonList_id];
+		}
 	}
 }
 

@@ -580,8 +580,18 @@ void VoxelerLibrary::Voxeler::saveVoxelData(const QString &filename)
 
 	foreach(Voxel v, voxels)
 	{
-		out << v.x << " " << v.y << " " << v.z << " ";
+		out << v.x << " " << v.y << " " << v.z << "\n";
 	}
 
 	outFile.close();
+}
+
+double VoxelerLibrary::Voxeler::getClosestDistToVoxle(Vector3d point)
+{
+	int v_id = cornerCorrespond[corner_kd.closest(point)];
+
+	Vector3d c = voxels[v_id];	c *= voxelSize;
+	
+	double dist = (point - c).norm();
+	return dist;
 }
