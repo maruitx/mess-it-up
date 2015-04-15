@@ -109,9 +109,6 @@ void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &ac
 // 11dim
 void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<double> &skeletonShapeFeature)
 {
-	// body pose feature from Sung et al. ICRA12
-
-	
 
 	// upper body feature from Koppula et al. IJRR13
 	// compute upper body to head distance
@@ -128,6 +125,36 @@ void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<
 		skeletonShapeFeature.push_back(to_head.magnitude());
 	}
 
+	// body pose feature similar to Sung et al. ICRA12
+	// compute relative distance from hand to head
+	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_RIGHT] - joints[Skeleton::SHOULDER_LEFT];
+	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::HIP_CENTER];
+
+	shoulderDirection.normalize();
+	torsoDirection.normalize();
+	MathLib::Vector3 torsoNormal = shoulderDirection.cross(torsoDirection);
+
+	MathLib::Vector3 headToHandVec;
+	int handID[2] = { Skeleton::HAND_LEFT, Skeleton::HAND_RIGHT };
+	for (int i = 0; i < 2; i++)
+	{
+		headToHandVec = joints[handID[i]] - joints[Skeleton::HEAD];
+		skeletonShapeFeature.push_back(headToHandVec.dot(shoulderDirection));
+		skeletonShapeFeature.push_back(headToHandVec.dot(torsoDirection));
+		skeletonShapeFeature.push_back(headToHandVec.dot(torsoNormal));
+	}
+
+	// compute relative distance from foot to hip center
+	MathLib::Vector3 hipToFootVec;
+	int footID[2] = { Skeleton::FOOT_LEFT, Skeleton::FOOT_RIGHT };
+	for (int i = 0; i < 2; i++)
+	{
+		hipToFootVec = joints[footID[i]] - joints[Skeleton::HIP_CENTER];
+		skeletonShapeFeature.push_back(headToHandVec.dot(shoulderDirection));
+		skeletonShapeFeature.push_back(headToHandVec.dot(torsoDirection));
+		skeletonShapeFeature.push_back(headToHandVec.dot(torsoNormal));
+	}
+
 	//// compute hand position features
 	//MathLib::Vector3 to_head = joints[Skeleton::HAND_LEFT] - joints[Skeleton::HEAD];
 	//skeletonShapeFeature.push_back(to_head.magnitude());
@@ -142,7 +169,7 @@ void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &obj
 	SurfaceMesh::Vector3 center = m->getTransformedOBBCenter();
 	QVector<SurfaceMesh::Vector3> vps = m->getTransformedOBBVertices();
 
-	objectGeoFeature.resize(3 * (vps.size() + 1));
+	//objectGeoFeature.resize(3 * (vps.size() + 1));
 
 	//for (int i = 0; i < 3; i++)
 	//{
@@ -212,23 +239,28 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 
 	skeletonObjectFeature.insert(skeletonObjectFeature.end(), interStateVec.begin(), interStateVec.end());
 
-
 	// orientation
-	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_LEFT] - joints[Skeleton::SHOULDER_RIGHT];
-	MathLib::Vector3 torsoDirection = joints[Skeleton::SPINE] - joints[Skeleton::SHOULDER_CENTER];
+	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_RIGHT] - joints[Skeleton::SHOULDER_LEFT];
+	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::HIP_CENTER];
 
+	shoulderDirection.normalize();
+	torsoDirection.normalize();
 	MathLib::Vector3 torsoNormal = shoulderDirection.cross(torsoDirection);
+
 	MathLib::Vector3 shoulderCenterToObjCenterVec = MathLib::Vector3(center[0], center[1], center[2]) - joints[Skeleton::SHOULDER_CENTER];
 
-	// horizontal angle diff
-	double thetaInXY = std::atan2(shoulderCenterToObjCenterVec[1], shoulderCenterToObjCenterVec[0]) - std::atan2(torsoNormal[1], torsoNormal[0]);
+	//// horizontal angle diff
+	//double thetaInXY = std::atan2(shoulderCenterToObjCenterVec[1], shoulderCenterToObjCenterVec[0]) - std::atan2(torsoNormal[1], torsoNormal[0]);
 
-	// vertical angle diff
-	double thetaInYZ = std::atan2(shoulderCenterToObjCenterVec[2], shoulderCenterToObjCenterVec[1]) - std::atan2(torsoNormal[2], torsoNormal[1]);
+	//// vertical angle diff
+	//double thetaInYZ = std::atan2(shoulderCenterToObjCenterVec[2], shoulderCenterToObjCenterVec[1]) - std::atan2(torsoNormal[2], torsoNormal[1]);
 
-	skeletonObjectFeature.push_back(thetaInXY);
-	skeletonObjectFeature.push_back(thetaInYZ);
+	//skeletonObjectFeature.push_back(thetaInXY);
+	//skeletonObjectFeature.push_back(thetaInYZ);
 
+	skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.dot(shoulderDirection));
+	skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.dot(torsoDirection));
+	skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.dot(torsoNormal));
 
 }
 

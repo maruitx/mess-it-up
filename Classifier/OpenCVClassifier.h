@@ -21,6 +21,7 @@ public:
 
 	int build_rtrees_classifier(const char* data_filenameconst, const char* filename_to_save);
 	float predict(CvMat* testSample);
+	float predict_prob(CvMat* testSample);
 
 private:
 	CvRTrees m_forest;

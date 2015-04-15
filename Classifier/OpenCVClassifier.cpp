@@ -105,6 +105,12 @@ float OpenCVClassifier::predict(CvMat* testSample)
 	return m_forest.predict(testSample);
 }
 
+
+float OpenCVClassifier::predict_prob(CvMat* testSample)
+{
+	return m_forest.predict_prob(testSample);
+}
+
 void OpenCVClassifier::load_classifier(const char* filename)
 {
 	m_forest.load(filename);

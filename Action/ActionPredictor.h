@@ -32,8 +32,10 @@ public:
 	bool isPhaseConsidered(int phaseID);
 
 	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
-	bool testForSkeletons(int modelID, int phaseID, int actionID);
+	bool testForSkeletonsFuzzy(int modelID, int phaseID, Skeleton *skel);
 	
+	void repredicting(double prob, int showSkelNum);
+
 	void genRandomSkeletonListForDisplay(int num);
 	void resampleSkeletonForDisplay(int num);
 	int getSampledSkelNum(int modelID, int actionID);
@@ -74,6 +76,7 @@ private:
 
 	//std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
 	std::vector<OpenCVClassifier*> m_classifiers;
+	double m_classProbThreshold;
 
 	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model
 	// in test: all skeletons representing one action are used for prediction, and not constraint to scene and center model

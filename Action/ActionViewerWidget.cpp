@@ -38,7 +38,9 @@ ActionViewerWidget::ActionViewerWidget(ActionViewer *viewer, QWidget *parent)
 	connect(ui.showEndPoseBox, SIGNAL(stateChanged(int)), m_viewer->actionPredictor, SLOT(setShowEndPose(int)));
 
 	connect(ui.showSkelNumSlider, SIGNAL(valueChanged(int)), this, SLOT(updateShowSkelNumLabel(int)));
-	connect(ui.resampleSkelButton, SIGNAL(clicked()), this, SLOT(resampleSkeleton()));
+	connect(ui.refreshSkelButton, SIGNAL(clicked()), this, SLOT(refreshSkeleton()));
+
+	connect(ui.repredictingButton, SIGNAL(clicked()), this, SLOT(repredicting()));
 
 	connect(ui.showSampleRangeBox, SIGNAL(stateChanged(int)), m_viewer->actionPredictor, SLOT(setDrawSampleRegionStatus(int)));
 	connect(ui.showCenterModelVoxelBox, SIGNAL(stateChanged(int)), m_viewer, SLOT(setShowModelVoxel(int)));	
@@ -105,13 +107,24 @@ void ActionViewerWidget::updateShowSkelNumLabel(int displayValue)
 	ui.sliderSkelNumLabel->setText(str);
 }
 
-void ActionViewerWidget::resampleSkeleton()
+void ActionViewerWidget::refreshSkeleton()
 {
-	int newSkelNum = ui.showSkelNumSlider->value();
+	int skelNum = ui.showSkelNumSlider->value();
 
-	m_viewer->actionPredictor->resampleSkeletonForDisplay(newSkelNum);
+	m_viewer->actionPredictor->resampleSkeletonForDisplay(skelNum);
 
-	m_showSampledSkelNum = newSkelNum;
+	m_showSampledSkelNum = skelNum;
 	updateShowSkelNumLabel();
 
+}
+
+void ActionViewerWidget::repredicting()
+{
+	QString probText = ui.classProbThresholdEdit->text();
+	double probTh = probText.toDouble();
+
+	int skelNum = ui.showSkelNumSlider->value();
+
+	m_viewer->actionPredictor->repredicting(probTh, skelNum);
+	updateShowSkelNumLabel();
 }

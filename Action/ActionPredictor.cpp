@@ -7,6 +7,8 @@
 ActionPredictor::ActionPredictor(QObject *parent)
 	: QObject(parent)
 {
+	m_classProbThreshold = 0.8;
+
 	m_showSampledSkeleton = false;
 	m_showStartPose = false;
 	m_showEndPose = false;
@@ -97,19 +99,8 @@ void ActionPredictor::startPredicting()
 	}
 
 	m_skeletonSampler = new SkeletonSampler(m_scene);
-	m_sampledSkeletonsForActions.clear();
-	m_predictedSkeletonsForActions.clear();
-
-	//m_scene->voxelizeModels();  // voxelize model and build octree
-
-	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
-	{
-		m_sampledSkeletonsForActions[modelID].resize(ACTION_PHASE_NUM);
-		m_predictedSkeletonsForActions[modelID].resize(ACTION_PHASE_NUM);
-	}
 	
 	sampleSkeletons();
-
 	genRandomSkeletonListForDisplay(5);
 
 	m_showSampledSkeleton = true;
@@ -254,6 +245,8 @@ void ActionPredictor::genRandomSkeletonListForDisplay(int num)
 			}
 		}
 	}
+
+	updateDrawArea();
 }
 
 void ActionPredictor::drawSampledSkeletons(int modelID, int phaseID, int actionID)
@@ -367,12 +360,19 @@ void ActionPredictor::resampleSkeletonForDisplay(int num)
 {
 	m_randomSampledSkeletonIdList.clear();
 	genRandomSkeletonListForDisplay(num);
-
-	updateDrawArea();
 }
 
 void ActionPredictor::sampleSkeletons()
 {
+	m_sampledSkeletonsForActions.clear();
+	m_predictedSkeletonsForActions.clear();
+
+	for (int modelID = 0; modelID < m_scene->getModelNum(); modelID++)
+	{
+		m_sampledSkeletonsForActions[modelID].resize(ACTION_PHASE_NUM);
+		m_predictedSkeletonsForActions[modelID].resize(ACTION_PHASE_NUM);
+	}
+
 	// sample within the floor range
 	m_skeletonSampler->setFloorRange(m_scene->getFloorXYRange());
 
@@ -434,6 +434,7 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 					{
 						Skeleton *currSkel = sampledSkeletons[skel_id];
 						if (m_classifiers[phaseID] != nullptr && testForSkeletons(model_id, phaseID, action_id, currSkel))
+						//if (m_classifiers[phaseID] != nullptr && testForSkeletonsFuzzy(model_id, phaseID, currSkel))
 						{
 							classifiedSkeletons.push_back(currSkel);
 						}
@@ -456,40 +457,6 @@ void ActionPredictor::setShowEndPose(int state)
 {
 	m_showEndPose = state;
 	updateDrawArea();
-}
-
-bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID)
-{
-	SkeletonPtrList currSkelList = m_sampledSkeletonsForActions[modelID][phaseID][actionID];
-
-	for (int skel_id = 0; skel_id < currSkelList.size(); skel_id++)
-	{
-		ActionFeature newFeature(m_scene);
-
-		std::vector<double> actionFeature;
-		Skeleton *currSkel = m_sampledSkeletonsForActions[modelID][phaseID][actionID][skel_id];
-
-		newFeature.computeActionFeatureForSkel(currSkel, modelID, actionFeature);
-
-		//// test feature with classifier
-		//cv::Mat testFeatureMat;
-		//convertToMat(actionFeature, testFeatureMat);
-
-		CvMat* testFeatureMat = 0;
-		testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
-		convertStdVecToCvMat(actionFeature, testFeatureMat);
-
-		float predicted_id = m_classifiers[phaseID]->predict(testFeatureMat);
-
-		if (std::abs(predicted_id - actionID) < LABEL_DIFF_TH)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
 }
 
 bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel)
@@ -524,5 +491,45 @@ void ActionPredictor::setDrawSampleRegionStatus(int s)
 {
 	m_showSampeRegion = s;
 	updateDrawArea();
+}
+
+// works for binary classification problems only
+// return probability or confidence of the sample belonging to the second class
+// It is calculated as the proportion of decision trees that classified the sample to the second class
+bool ActionPredictor::testForSkeletonsFuzzy(int modelID, int phaseID, Skeleton *skel)
+{
+	ActionFeature newFeature(m_scene);
+
+	std::vector<double> actionFeature;
+
+	newFeature.computeActionFeatureForSkel(skel, modelID, actionFeature);
+
+	//// test feature with classifier
+	//cv::Mat testFeatureMat;
+	//convertToMat(actionFeature, testFeatureMat);
+
+	CvMat* testFeatureMat = 0;
+	testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
+	convertStdVecToCvMat(actionFeature, testFeatureMat);
+
+	float probVal = m_classifiers[phaseID]->predict_prob(testFeatureMat);
+
+	if (probVal > m_classProbThreshold)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void ActionPredictor::repredicting(double prob, int showSkelNum)
+{
+	m_classProbThreshold = prob;
+
+	sampleSkeletons();
+	genRandomSkeletonListForDisplay(showSkelNum);
+
 }
 

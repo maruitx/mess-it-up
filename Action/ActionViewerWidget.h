@@ -23,7 +23,8 @@ public:
 public slots:
 	void updateShowSkelNumLabel();
 	void updateShowSkelNumLabel(int displayNum);
-	void resampleSkeleton();
+	void refreshSkeleton();
+	void repredicting();
 
 private:
 	ActionViewer *m_viewer;

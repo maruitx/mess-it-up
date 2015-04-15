@@ -379,9 +379,6 @@ void ActionLearner::collectFeatureVecsFromLabeledData()
 			}
 		}
 	}
-
-	saveCollectedFeatures();
-	saveCollectedFeaturesForWeka();
 }
 void ActionLearner::startLearning()
 {
@@ -419,8 +416,8 @@ void ActionLearner::startLearning()
 	}
 
 	//saveCollectedFeatures();
+	saveCollectedFeaturesForWeka();
 
-	//saveCollectedFeaturesForWeka();
 	saveCollectedFeaturesForOpenCVClassifier();
 
 	trainRandomForestClassifier();
@@ -841,9 +838,6 @@ void ActionLearner::computeFeaturesForSyntheticData()
 			}
 		}
 	}
-
-	saveCollectedFeatures();
-	saveCollectedFeaturesForWeka();
 }
 
 void ActionLearner::saveCollectedFeatures()
@@ -937,6 +931,7 @@ void ActionLearner::saveCollectedFeaturesForWeka()
 
 					out << m_collectedFeatureLabels[phase_id][featNum - 1] << "}\n";
 
+					break;
 				}
 			}
 
