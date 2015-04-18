@@ -82,11 +82,15 @@ public:
 	std::vector<SurfaceMesh::Vector3> getSurfaceMeshJoints();
 	std::vector<MathLib::Vector3> getNormalizedJoints();
 
-	std::vector<MathLib::Vector3> getTransformedJoints(double newHipX, double newHipY, double thetaZ, MathLib::Vector3 upright);
+	std::vector<MathLib::Vector3> getTransformedJoints(double transX, double transY, double transZ, double thetaZ, MathLib::Vector3 upright);
 
 	std::vector<int> states; // whether a joint interact with object
 
+	void setSampledPos(const MathLib::Vector3 &pos) { m_sampledPos = pos; };
+	MathLib::Vector3 getSamplePos() { return m_sampledPos; };
+
 private:
 	QVector<Eigen::Vector4d> m_joints;
+	MathLib::Vector3 m_sampledPos;
 };
 

@@ -35,8 +35,10 @@ public:
 
 	Eigen::AlignedBox3d bbox() { return m_mesh->bbox(); };
 	SurfaceMesh::SurfaceMeshModel* meshData() { return m_mesh; };
+	SurfaceMesh::Vector3 getOBBCenter();
 	SurfaceMesh::Vector3 getTransformedOBBCenter();
 	QVector<SurfaceMesh::Vector3> getTransformedOBBVertices();
+	std::vector<MathLib::Vector3> getOBBAxis() { return m_GOBB.axis; };
 
 	void readScanObj(SurfaceMesh::SurfaceMeshModel *mesh, std::string filename);
 
@@ -69,6 +71,9 @@ public:
 
 	// Support plane
 	void buildSuppPlane();
+	void drawSuppPlane();
+	std::vector<SuppPlane*> getAllSuppPlanes() { return m_suppPlaneBuilder->getAllSuppPlanes(); };
+	SuppPlane* getLargestAreaSuppPlane() { return m_suppPlaneBuilder->getLargestAreaSuppPlane(); };
 
 	// skeleton
 	void testInteractSkeleton(Skeleton *sk);
@@ -112,8 +117,8 @@ private:
 
 	SurfaceMesh::SurfaceMeshModel *m_mesh;
 	SimplePointCloud m_pts;
-	QVector<SuppPlane*> m_suppPlanes;
 	SuppPlaneBuilder *m_suppPlaneBuilder;
+	bool m_hasSuppPlane;
 
 	VoxelerLibrary::Voxeler *m_voxeler;
 	bool m_isVoxelized;

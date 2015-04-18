@@ -100,10 +100,14 @@ public:
 
 	void saveCollectedFeatures();
 	void saveCollectedFeaturesForOpenCVClassifier();
+	void saveCollectedFeaturesForBinaryOpenCVClassifier();
 
 	int ActionLearner::getFeatureDimForPhase(int phaseID);
 	bool isPhaseConsidered(int phaseID, int &featureDim);
+	bool isPhaseActionConsidered(int phaseID, int actionID);
+
 	void trainRandomForestClassifier();
+	void trainBinaryRandomForestClassifier();
 
 	void collectClassLabelForWeka();
 	void saveCollectedFeaturesForWeka();
@@ -148,7 +152,7 @@ private:
 	SkeletonSampler *m_skeletonSampler;
 
 	//std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
-	std::vector<OpenCVClassifier*> m_classifiers;
+	std::vector<std::vector<OpenCVClassifier*>> m_classifiers;
 
 	/*
 	// pre-processed skeletons 

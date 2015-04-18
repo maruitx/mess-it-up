@@ -192,6 +192,8 @@ private:
 	DepthCloud *m_depthCloud;
 	QVector<SimplePointCloud> m_trackRefCloud;
 
+	// 1 dim: for each tracked model
+	// 2 dim: for each frame
 	QVector<QVector<Eigen::Matrix4d>> m_trackTransMat;
 	bool m_hasTrackedTransMat;
 

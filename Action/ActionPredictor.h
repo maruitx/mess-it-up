@@ -5,10 +5,25 @@
 #include "../Utilities/utility.h"
 #include "../mess_mode.h"
 #include "ActionLearner.h"
+#include "../Math/mathlib.h"
 
 const double LABEL_DIFF_TH = 0.1;
 
 typedef std::map<int, std::vector<std::vector<std::vector<int>>>> ModelRelatedSkeletonIdList;
+
+class SuppPlane;
+
+// potiential object target locations
+struct ObjPotentialPlacement
+{
+	MathLib::Vector3 pos;
+
+	std::vector<SuppPlane*> potentialSuppPlanesToPlace;
+
+	std::vector<std::vector<double>> accessPlanesToPlace;
+
+	bool hasAccessiblePlanes() { return accessPlanesToPlace.size(); };
+};
 
 class ActionPredictor : public QObject
 {
@@ -28,11 +43,13 @@ public:
 	void sampleSkeletons();
 	void sampleSkeletonsForActionPhrase(int phaseID);
 
+	void computePotentialObjPlacement();
+
 	void loadClassifiers();
 	bool isPhaseConsidered(int phaseID);
 
 	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
-	bool testForSkeletonsFuzzy(int modelID, int phaseID, Skeleton *skel);
+	bool testForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel);
 	
 	void repredicting(double prob, int showSkelNum);
 
@@ -74,8 +91,7 @@ private:
 
 	SkeletonSampler *m_skeletonSampler;
 
-	//std::vector<OpenCVClassifier<cv::ml::RTrees>*> m_classifiers;
-	std::vector<OpenCVClassifier*> m_classifiers;
+	std::vector<std::vector<OpenCVClassifier*>> m_classifiers;
 	double m_classProbThreshold;
 
 	/* in training: skeleton is only meaningful when giving the scene and its corresponding center model
@@ -96,6 +112,8 @@ private:
 
 	ModelRelatedSkeletonIdList m_randomSampledSkeletonIdList;
 	ModelRelatedSkeletonIdList m_randomPredictedSkeletonIdList;
+
+	std::vector<ObjPotentialPlacement> m_potentialObjPlacement;  // each end skeleton corresponds to one potential placement 
 
 	bool m_showSampledSkeleton;
 	bool m_showSampeRegion;

@@ -418,14 +418,39 @@ void ActionLearner::startLearning()
 	//saveCollectedFeatures();
 	saveCollectedFeaturesForWeka();
 
-	saveCollectedFeaturesForOpenCVClassifier();
+	//saveCollectedFeaturesForOpenCVClassifier();
+	saveCollectedFeaturesForBinaryOpenCVClassifier();
 
-	trainRandomForestClassifier();
+	//trainRandomForestClassifier();
+	trainBinaryRandomForestClassifier();
 
 	Simple_Message_Box("Action learning done");
 }
 
+
 void ActionLearner::trainRandomForestClassifier()
+{
+	//m_classifiers.resize(ACTION_PHASE_NUM);
+
+	//for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	//{
+	//	int featureDim;
+
+	//	if (isPhaseConsidered(phase_id, featureDim))
+	//	{
+	//		//m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
+	//		m_classifiers[phase_id] = new OpenCVClassifier();
+
+	//		QString dataFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_actions.data";
+	//		QString classifierFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_classifier.xml";
+
+	//		m_classifiers[phase_id]->buildClassifier(OpenCVClassifier::RandomTrees, featureDim, dataFN, classifierFN);
+	//	}
+	//}
+}
+
+
+void ActionLearner::trainBinaryRandomForestClassifier()
 {
 	m_classifiers.resize(ACTION_PHASE_NUM);
 
@@ -435,18 +460,20 @@ void ActionLearner::trainRandomForestClassifier()
 
 		if (isPhaseConsidered(phase_id, featureDim))
 		{
-			//m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
-			m_classifiers[phase_id] = new OpenCVClassifier();
+			m_classifiers[phase_id].resize(ACTION_NUM);
 
-			QString dataFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_actions.data";
-			QString classifierFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_classifier.xml";
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+			{
+				if (isPhaseActionConsidered(phase_id, action_id))
+				{
+					m_classifiers[phase_id][action_id] = new OpenCVClassifier();
 
-			//if (m_classifiers[phase_id]->read_train_data(dataFN.toStdString(), getFeatureDimForPhase(phase_id)))
-			//{
-			//	m_classifiers[phase_id]->buildClassifier(classifierFN.toStdString());
-			//	m_classifiers[phase_id]->save_classifier(classifierFN.toStdString());
-			//}
-			m_classifiers[phase_id]->buildClassifier(OpenCVClassifier::RandomTrees, featureDim, dataFN, classifierFN);
+					QString dataFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_" + QString(Action_Labels[action_id]) + ".data";
+					QString classifierFN = m_jobFilePath + "Feature/Train/" + QString(Action_Phase_Names[phase_id]) + "_" + QString(Action_Labels[action_id]) + "_classifier.xml";
+
+					m_classifiers[phase_id][action_id]->buildClassifier(OpenCVClassifier::RandomTrees, featureDim, dataFN, classifierFN);
+				}
+			}
 		}
 	}
 }
@@ -973,6 +1000,18 @@ bool ActionLearner::isPhaseConsidered(int phaseID, int &featureDim)
 	return false;
 }
 
+
+bool ActionLearner::isPhaseActionConsidered(int phaseID, int actionID)
+{
+	if (m_collectedFeatureVecs[phaseID][actionID].size() > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
 void ActionLearner::saveCollectedFeaturesForOpenCVClassifier()
 {
 	QString featureFilePath = m_jobFilePath + "Feature/Train/";
@@ -1011,6 +1050,68 @@ void ActionLearner::saveCollectedFeaturesForOpenCVClassifier()
 			}
 
 			outFile.close();
+		}
+	}
+}
+
+void ActionLearner::saveCollectedFeaturesForBinaryOpenCVClassifier()
+{
+	QString featureFilePath = m_jobFilePath + "Feature/Train/";
+
+
+	for (int phase_id = 0; phase_id < ACTION_PHASE_NUM; phase_id++)
+	{
+		int featureDim;
+
+		if (isPhaseConsidered(phase_id, featureDim))
+		{
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+			{
+				if (isPhaseActionConsidered(phase_id, action_id))
+				{
+					QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_" + QString(Action_Labels[action_id]) + ".data";
+
+					QFile outFile(filename);
+					QTextStream out(&outFile);
+
+					if (!outFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) return;
+
+					// for negative data
+					for (int other_id = 0; other_id < ACTION_NUM; other_id++)
+					{
+						if (other_id != action_id)
+						{
+							// for each instance
+							for (int feat_id = 0; feat_id < m_collectedFeatureVecs[phase_id][other_id].size(); feat_id++)
+							{
+								out << 0 << ",";
+
+								for (int i = 0; i < featureDim - 1; i++)
+								{
+									out << m_collectedFeatureVecs[phase_id][other_id][feat_id][i] << ",";
+								}
+
+								out << m_collectedFeatureVecs[phase_id][other_id][feat_id][featureDim - 1] << "\n";
+							}
+						}
+					}
+
+					// for positive data, save features for current action
+					for (int feat_id = 0; feat_id < m_collectedFeatureVecs[phase_id][action_id].size(); feat_id++)
+					{
+						out << 1 << ",";
+
+						for (int i = 0; i < featureDim - 1; i++)
+						{
+							out << m_collectedFeatureVecs[phase_id][action_id][feat_id][i] << ",";
+						}
+
+						out << m_collectedFeatureVecs[phase_id][action_id][feat_id][featureDim - 1] << "\n";
+					}
+				
+					outFile.close();
+				}
+			}
 		}
 	}
 }

@@ -70,6 +70,8 @@ public:
 	int readModelOBB(bool bSilent);
 	int writeModelOBB(bool bSilent);
 
+	void buildModelSuppPlane();
+
 	// relation graph
 	void buildRelationshipGraph();
 	void drawRelationGraph();

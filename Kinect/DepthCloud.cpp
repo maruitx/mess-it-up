@@ -144,6 +144,7 @@ void DepthCloud::convertRGBDepthToPointXYZRGB(cv::Mat &colorMat, cv::Mat &depthM
 			Vector4 skeletonPoint;
 			mapper->MapDepthPointToSkeletonPoint(NUI_IMAGE_RESOLUTION_640x480, &depthPoint, &skeletonPoint);
 
+			// points from the mapper are 8x of the real scale
 			point.x = skeletonPoint.x/8;
 			point.y = skeletonPoint.y/8;
 			point.z = skeletonPoint.z/8;

@@ -75,14 +75,18 @@ void ActionPredictor::loadClassifiers()
 	{
 		if (isPhaseConsidered(phase_id))
 		{
-			QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_classifier.xml";
-			QFile classifierFile(filename);
-			
-			if (classifierFile.exists())
+			m_classifiers[phase_id].resize(ACTION_NUM);
+
+			for (int action_id = 0; action_id < ACTION_NUM; action_id++)
 			{
-				//m_classifiers[phase_id] = new OpenCVClassifier<cv::ml::RTrees>();
-				m_classifiers[phase_id] = new OpenCVClassifier();
-				m_classifiers[phase_id]->load_classifier(filename.toStdString().c_str());
+				QString filename = featureFilePath + QString(Action_Phase_Names[phase_id]) + "_" + QString(Action_Labels[action_id]) +"_classifier.xml";
+				QFile classifierFile(filename);
+
+				if (classifierFile.exists())
+				{
+					m_classifiers[phase_id][action_id] = new OpenCVClassifier();
+					m_classifiers[phase_id][action_id]->load_classifier(filename.toStdString().c_str());
+				}
 			}
 		}
 	}
@@ -348,6 +352,8 @@ void ActionPredictor::drawSampleRange(int modelID)
 
 int ActionPredictor::getSampledSkelNum(int modelID, int actionID)
 {
+	// need to fix: num of end phase skeleton is different from start phase
+	// each pair is a possible action
 	return m_sampledSkeletonsForActions[modelID][0][actionID].size();
 }
 
@@ -417,15 +423,26 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 			{
 				if (m_loadedSkeletonsForTest[phaseID][action_id].size() > 0)
 				{
-					//int k = std::rand() % m_loadedSkeletonsForTest[phaseID][action_id].size(); // random select
-					//m_skeletonSampler->setSkeleton(m_loadedSkeletonsForTest[phaseID][action_id][k]);
-					//m_skeletonSampler->sampleSkeletonAroundModel(model_id);
-
+					SkeletonPtrList sampledSkeletons;
 					m_skeletonSampler->setSkeletonList(m_loadedSkeletonsForTest[phaseID][action_id]);
-					m_skeletonSampler->sampleSkeletonAroundModelFromSkelList(model_id, "random");
+					
+					if (phaseID == ActionFeature::ActionPhase::StartAction)
+					{
+						m_skeletonSampler->sampleSkeletonAroundModelFromSkelList(model_id, "random");
+						sampledSkeletons = m_skeletonSampler->getSampledStartSkeletons();
+					}
+					 
+					if (phaseID == ActionFeature::ActionPhase::EndAction)
+					{
+						m_skeletonSampler->sampleArrangeSkeletonsInScene("random");
+						sampledSkeletons = m_skeletonSampler->getSampledEndSkeletons();
+					}
 
-					SkeletonPtrList sampledSkeletons = m_skeletonSampler->getSampledSkeletons();
 					m_sampledSkeletonsForActions[model_id][phaseID][action_id] = sampledSkeletons;
+
+					// compute all potential planes to place object
+					// filter out useless skeleton, e.g no place to place object around (may not happen since there is always floor, but still possible)
+					computePotentialObjPlacement(); 
 
 					SkeletonPtrList classifiedSkeletons;
 
@@ -433,8 +450,8 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 					for (int skel_id = 0; skel_id < sampledSkeletons.size(); skel_id++)
 					{
 						Skeleton *currSkel = sampledSkeletons[skel_id];
-						if (m_classifiers[phaseID] != nullptr && testForSkeletons(model_id, phaseID, action_id, currSkel))
-						//if (m_classifiers[phaseID] != nullptr && testForSkeletonsFuzzy(model_id, phaseID, currSkel))
+						//if (m_classifiers[phaseID][action_id] != nullptr && testForSkeletons(model_id, phaseID, action_id, currSkel)) // hard classification
+						//if (m_classifiers[phaseID][action_id] != nullptr && testForSkeletonsFuzzy(model_id, phaseID, action_id, currSkel)) // fuzzy classificaiton
 						{
 							classifiedSkeletons.push_back(currSkel);
 						}
@@ -475,7 +492,7 @@ bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID, S
 	testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
 	convertStdVecToCvMat(actionFeature, testFeatureMat);
 
-	float predicted_id = m_classifiers[phaseID]->predict(testFeatureMat);
+	float predicted_id = m_classifiers[phaseID][actionID]->predict(testFeatureMat);
 
 	if (std::abs(predicted_id - actionID) < LABEL_DIFF_TH)
 	{
@@ -496,7 +513,7 @@ void ActionPredictor::setDrawSampleRegionStatus(int s)
 // works for binary classification problems only
 // return probability or confidence of the sample belonging to the second class
 // It is calculated as the proportion of decision trees that classified the sample to the second class
-bool ActionPredictor::testForSkeletonsFuzzy(int modelID, int phaseID, Skeleton *skel)
+bool ActionPredictor::testForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel)
 {
 	ActionFeature newFeature(m_scene);
 
@@ -512,7 +529,8 @@ bool ActionPredictor::testForSkeletonsFuzzy(int modelID, int phaseID, Skeleton *
 	testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
 	convertStdVecToCvMat(actionFeature, testFeatureMat);
 
-	float probVal = m_classifiers[phaseID]->predict_prob(testFeatureMat);
+	// important need to fix: feature dim doesn't match
+	float probVal = m_classifiers[phaseID][actionID]->predict_prob(testFeatureMat);
 
 	if (probVal > m_classProbThreshold)
 	{
@@ -531,5 +549,21 @@ void ActionPredictor::repredicting(double prob, int showSkelNum)
 	sampleSkeletons();
 	genRandomSkeletonListForDisplay(showSkelNum);
 
+}
+
+void ActionPredictor::computePotentialObjPlacement()
+{
+	for (int model_id = 0; model_id < m_scene->getModelNum(); model_id++)
+	{
+		for (int action_id = 0; action_id < ACTION_NUM; action_id++)
+		{
+			int skelNum = m_sampledSkeletonsForActions[model_id][ActionFeature::ActionPhase::EndAction][action_id].size();
+
+			if (skelNum > 0)
+			{
+				return;
+			}
+		}
+	}
 }
 

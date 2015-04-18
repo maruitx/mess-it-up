@@ -122,7 +122,7 @@ std::vector<MathLib::Vector3> Skeleton::getNormalizedJoints()
 	return joints;
 }
 
-std::vector<MathLib::Vector3> Skeleton::getTransformedJoints(double newHipX, double newHipY, double thetaZ, MathLib::Vector3 upright)
+std::vector<MathLib::Vector3> Skeleton::getTransformedJoints(double transX, double transY, double transZ, double thetaZ, MathLib::Vector3 upright)
 {
 	qglviewer::Quaternion rotQ(qglviewer::Vec(upright.x, upright.y, upright.z), thetaZ);
 
@@ -145,7 +145,7 @@ std::vector<MathLib::Vector3> Skeleton::getTransformedJoints(double newHipX, dou
 	{
 		Eigen::Vector4d joint = rotMat*m_joints[i];
 
-		trans_joints[i] = MathLib::Vector3(joint[0] + newHipX, joint[1] + newHipY, joint[2]);
+		trans_joints[i] = MathLib::Vector3(joint[0] + transX, joint[1] + transY, joint[2] + transZ);
 	}
 
 	return trans_joints;

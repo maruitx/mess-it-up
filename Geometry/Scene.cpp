@@ -90,6 +90,7 @@ void CScene::loadScene(const QString filename)
 		writeRG(silentMode);
 	}
 
+	buildModelSuppPlane();
 	voxelizeModels();
 }
 
@@ -152,6 +153,8 @@ void CScene::draw()
 						m->drawVoxelOctree();
 					}
 				}
+
+				m->drawSuppPlane();
 			}
 					
 			if (m_isShowOBB)
@@ -595,7 +598,10 @@ void CScene::drawRelationGraph()
 	glEnable(GL_COLOR_MATERIAL);
 	glColor4fv(red);
 	for (unsigned int i = 0; i < m_modelList.size(); i++) {
-		MathLib::Vector3 center = m_modelList[i]->m_GOBB.cent;
+		//MathLib::Vector3 center = m_modelList[i]->m_GOBB.cent;
+		SurfaceMesh::Vector3 trans_center = m_modelList[i]->getTransformedOBBCenter();
+		MathLib::Vector3 center = MathLib::Vector3(trans_center[0], trans_center[1], trans_center[2]);
+		
 		//renderSphere(center[0], center[1], center[2], PointSize3D / m_metricConvert);
 	}
 
@@ -638,9 +644,23 @@ void CScene::drawRelationGraph()
 			glColor3f(0.4, 0.4, 0.9); 
 			break;
 		}
+		
+		SurfaceMesh::Vector3 trans_center[2];
+		MathLib::Vector3 center[2];
+		trans_center[0] = m_modelList[e->v1]->getTransformedOBBCenter();
+		trans_center[1] = m_modelList[e->v2]->getTransformedOBBCenter();
+
+		for (int cent_id = 0; cent_id < 2; cent_id++)
+		{
+			center[cent_id] = MathLib::Vector3(trans_center[cent_id][0], trans_center[cent_id][1], trans_center[cent_id][2]);
+		}
+		
+
 		glBegin(GL_LINES);
-		glVertex3dv(m_modelList[e->v1]->m_GOBB.cent.v);
-		glVertex3dv(m_modelList[e->v2]->m_GOBB.cent.v);
+		//glVertex3dv(m_modelList[e->v1]->m_GOBB.cent.v);
+		//glVertex3dv(m_modelList[e->v2]->m_GOBB.cent.v);
+		glVertex3dv(center[0].v);
+		glVertex3dv(center[1].v);
 		glEnd();
 	}
 
@@ -991,6 +1011,14 @@ std::vector<double> CScene::getFloorXYRange()
 {
 	int floorID = getModelIdByName("floor");
 	return m_modelList[floorID]->getAABBXYRange();
+}
+
+void CScene::buildModelSuppPlane()
+{
+	for (int i = 0; i < m_modelNum; i++)
+	{
+		m_modelList[i]->buildSuppPlane();
+	}
 }
 
 /*

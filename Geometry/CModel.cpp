@@ -45,6 +45,7 @@ void CModel::loadModel(QString filename, double metric)
 
 	setAABB();
 	m_GOBB.transMat = m_transMat;
+
 }
 
 void CModel::readScanObj(SurfaceMesh::SurfaceMeshModel *mesh, std::string filename)
@@ -194,7 +195,7 @@ SimplePointCloud& CModel::getPointCloud()
 
 void CModel::draw()
 {
-	glCallList(m_displayListID); 
+	glCallList(m_displayListID);
 }
 
 void CModel::buildDisplayList()
@@ -562,7 +563,9 @@ void CModel::buildSuppPlane()
 {
 	m_suppPlaneBuilder = new SuppPlaneBuilder(this);
 
-	m_suppPlaneBuilder->build(2);
+	m_suppPlaneBuilder->build(SuppPlaneBuilder::BuildMethod::AABB_PLANE);
+
+	m_hasSuppPlane = true;
 
 }
 
@@ -584,6 +587,7 @@ void CModel::testInteractSkeleton(Skeleton *sk)
 void CModel::setTransMat(const Eigen::Matrix4d &m)
 {
 	m_transMat = m;
+	m_GOBB.transMat = m;
 
 	//rebuild display list
 	buildDisplayList();
@@ -594,6 +598,14 @@ SurfaceMesh::Vector3 CModel::getTransformedOBBCenter()
 	MathLib::Vector3 trans_cent = m_GOBB.GetTransformedCenter();
 
 	return SurfaceMesh::Vector3(trans_cent.x, trans_cent.y, trans_cent.z);
+}
+
+
+SurfaceMesh::Vector3 CModel::getOBBCenter()
+{
+	MathLib::Vector3 cent = m_GOBB.cent;
+
+	return SurfaceMesh::Vector3(cent.x, cent.y, cent.z);
 }
 
 QVector<SurfaceMesh::Vector3> CModel::getTransformedOBBVertices()
@@ -740,5 +752,16 @@ double CModel::getClosestDistToVoxel(SurfaceMesh::Vector3 &pt)
 		voxelize();
 	}
 
-	return m_voxeler->getClosestDistToVoxle(pt);
+	Eigen::Vector4d trans_pt = m_transMat*Eigen::Vector4d(pt[0], pt[1], pt[2], 0);
+
+	return m_voxeler->getClosestDistToVoxle(Eigen::Vector3d(trans_pt[0], trans_pt[1], trans_pt[2]));
 }
+
+void CModel::drawSuppPlane()
+{
+	if (m_hasSuppPlane)
+	{
+		m_suppPlaneBuilder->draw();
+	}
+}
+

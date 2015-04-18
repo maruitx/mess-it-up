@@ -46,13 +46,14 @@ public:
 
 	// skeleton shape
 	void computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<double> &skeletonShapeFeature);
+	void computeSkeletonMotionFeature();
 
 	// object shape + structure
-	void computeObjectGeoFeatures(CModel *m, std::vector<double> &objectGeoFeature);
-	void computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature);
+	void computeObjectGeoFeatures(CModel *m, std::vector<double> &objectGeoFeature, ActionPhase actionPhaseType = ActionPhase::StartAction);
+	void computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature, ActionPhase actionPhaseType = ActionPhase::StartAction);
 
 	// skeleton + object
-	void computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature);
+	void computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature, ActionPhase actionPhaseType = ActionPhase::StartAction);
 
 	// for test stage, also could be used for learning synthetic skeletons
 	// simply compute feature for one skeleton at sampled location

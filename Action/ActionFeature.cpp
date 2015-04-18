@@ -82,21 +82,29 @@ void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &ac
 
 	m_repSkeletons[actionPhaseType].push_back(skeleton);	
 
-	QVector<QPair<int, Eigen::Matrix4d>> modelTrackMats = m_actionLearner->getModelTrackMat(frame_id);
-
 	CModel *model = m_scene->getModel(m_actionInstance.modelID);
 	CSceneRG &rg = m_scene->getSceneRG();
 
-	std::vector<double> skeletonShapeFeature, objectGeoFeature, objectStructFeature, skeletonObjectFeature;
+	// update model transform matrix
+	QVector<QPair<int, Eigen::Matrix4d>> modelTrackMats = m_actionLearner->getModelTrackMat(frame_id);
+	for (int i = 0; i < modelTrackMats.size(); i++)
+	{
+		int m_id = modelTrackMats[i].first;
+		if (model->getID() == m_id)
+		{
+			model->setTransMat(modelTrackMats[i].second);
+		}
+	}
 
 	// option: update scene graph
 
+	std::vector<double> skeletonShapeFeature, objectGeoFeature, objectStructFeature, skeletonObjectFeature;
 
 	// compute feature using transformed scene
 	computeSkeletonShapeFeature(skeleton, skeletonShapeFeature);
-	computeObjectGeoFeatures(model, objectGeoFeature);
-	computeObjectStructFeature(model, objectStructFeature);
-	computeSkeletonObjInterFeatures(skeleton, model, skeletonObjectFeature);
+	computeObjectGeoFeatures(model, objectGeoFeature, actionPhaseType);
+	computeObjectStructFeature(model, objectStructFeature, actionPhaseType);
+	computeSkeletonObjInterFeatures(skeleton, model, skeletonObjectFeature, actionPhaseType);
 
 	//
 	actionFeature.clear();
@@ -128,7 +136,7 @@ void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<
 	// body pose feature similar to Sung et al. ICRA12
 	// compute relative distance from hand to head
 	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_RIGHT] - joints[Skeleton::SHOULDER_LEFT];
-	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::HIP_CENTER];
+	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::SPINE];
 
 	shoulderDirection.normalize();
 	torsoDirection.normalize();
@@ -145,11 +153,11 @@ void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<
 	}
 
 	// compute relative distance from foot to hip center
-	MathLib::Vector3 hipToFootVec;
+	MathLib::Vector3 spineToFootVec;
 	int footID[2] = { Skeleton::FOOT_LEFT, Skeleton::FOOT_RIGHT };
 	for (int i = 0; i < 2; i++)
 	{
-		hipToFootVec = joints[footID[i]] - joints[Skeleton::HIP_CENTER];
+		spineToFootVec = joints[footID[i]] - joints[Skeleton::SPINE];
 		skeletonShapeFeature.push_back(headToHandVec.dot(shoulderDirection));
 		skeletonShapeFeature.push_back(headToHandVec.dot(torsoDirection));
 		skeletonShapeFeature.push_back(headToHandVec.dot(torsoNormal));
@@ -164,9 +172,9 @@ void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<
 }
 
 // 3 + 3*8 = 27dim
-void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &objectGeoFeature)
+void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &objectGeoFeature, ActionPhase actionPhaseType /*= ActionPhase::StartAction*/)
 {
-	SurfaceMesh::Vector3 center = m->getTransformedOBBCenter();
+	SurfaceMesh::Vector3 trans_center = m->getTransformedOBBCenter();
 	QVector<SurfaceMesh::Vector3> vps = m->getTransformedOBBVertices();
 
 	//objectGeoFeature.resize(3 * (vps.size() + 1));
@@ -186,10 +194,25 @@ void ActionFeature::computeObjectGeoFeatures(CModel *m, std::vector<double> &obj
 
 	std::vector<double> objectOBBSize = m->getOBBSize();
 	objectGeoFeature.insert(objectGeoFeature.end(), objectOBBSize.begin(), objectOBBSize.end());
+
+	if (actionPhaseType == ActionPhase::EndAction)
+	{
+		SurfaceMesh::Vector3 center = m->getOBBCenter();
+		SurfaceMesh::Vector3 centerMotionVector = trans_center - center;
+
+		// we don't care about the magnitude, but only the orientation of the motion vector
+		// reason: we want to allow large-scale translation, or it will be similar to the Gaussian models again
+		centerMotionVector.normalize();
+
+		for (int i = 0; i < 3; i++)
+		{
+			objectGeoFeature.push_back(centerMotionVector[i]);
+		}
+	}
 }
 
 // 2dim
-void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature)
+void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &objectStructFeature, ActionPhase actionPhaseType /*= ActionPhase::StartAction*/)
 {
 	int modelID = m->getID();
 
@@ -211,9 +234,9 @@ void ActionFeature::computeObjectStructFeature(CModel *m, std::vector<double> &o
 }
 
 // 20dim
-void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature)
+void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *m, std::vector<double> &skeletonObjectFeature, ActionPhase actionPhaseType /*= ActionPhase::StartAction*/)
 {
-	SurfaceMesh::Vector3 center = m->getTransformedOBBCenter();
+	SurfaceMesh::Vector3 trans_center = m->getTransformedOBBCenter();
 
 	std::vector<MathLib::Vector3> joints = skeleton->getJoints();
 
@@ -231,6 +254,8 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 	for (int i = 0; i < joints.size(); i++)
 	{
 		SurfaceMesh::Vector3 pt(joints[i][0], joints[i][1], joints[i][2]);
+		
+		// model may be transformed, so transform pt into the same coord frame with inverse of model trans mat
 		if (m->getClosestDistToVoxel(pt) < Interact_Dist)
 		{
 			interStateVec[i] = 1;
@@ -241,26 +266,37 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 
 	// orientation
 	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_RIGHT] - joints[Skeleton::SHOULDER_LEFT];
-	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::HIP_CENTER];
+	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::SPINE];
 
 	shoulderDirection.normalize();
 	torsoDirection.normalize();
 	MathLib::Vector3 torsoNormal = shoulderDirection.cross(torsoDirection);
 
-	MathLib::Vector3 shoulderCenterToObjCenterVec = MathLib::Vector3(center[0], center[1], center[2]) - joints[Skeleton::SHOULDER_CENTER];
+	MathLib::Vector3 shoulderCenterToObjTransCenterVec = MathLib::Vector3(trans_center[0], trans_center[1], trans_center[2]) - joints[Skeleton::SHOULDER_CENTER];
+    
+	// center distance
+	skeletonObjectFeature.push_back(shoulderCenterToObjTransCenterVec.magnitude());
 
-	//// horizontal angle diff
-	//double thetaInXY = std::atan2(shoulderCenterToObjCenterVec[1], shoulderCenterToObjCenterVec[0]) - std::atan2(torsoNormal[1], torsoNormal[0]);
+	// relative orientation between object and torso
+	skeletonObjectFeature.push_back(shoulderCenterToObjTransCenterVec.dot(shoulderDirection));
+	skeletonObjectFeature.push_back(shoulderCenterToObjTransCenterVec.dot(torsoDirection));
+	skeletonObjectFeature.push_back(shoulderCenterToObjTransCenterVec.dot(torsoNormal));
 
-	//// vertical angle diff
-	//double thetaInYZ = std::atan2(shoulderCenterToObjCenterVec[2], shoulderCenterToObjCenterVec[1]) - std::atan2(torsoNormal[2], torsoNormal[1]);
+	if (actionPhaseType == ActionPhase::EndAction)
+	{
+		SurfaceMesh::Vector3 center = m->getOBBCenter();
+		MathLib::Vector3 shoulderCenterToObjCenterVec = MathLib::Vector3(center[0], center[1], center[2]) - joints[Skeleton::SHOULDER_CENTER];
 
-	//skeletonObjectFeature.push_back(thetaInXY);
-	//skeletonObjectFeature.push_back(thetaInYZ);
+		// horizontal angle diff
+		double thetaInXY = std::atan2(shoulderCenterToObjTransCenterVec[1], shoulderCenterToObjTransCenterVec[0]) - std::atan2(shoulderCenterToObjCenterVec[1], shoulderCenterToObjCenterVec[0]);
 
-	skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.dot(shoulderDirection));
-	skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.dot(torsoDirection));
-	skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.dot(torsoNormal));
+		// vertical angle diff
+		double thetaInYZ = std::atan2(shoulderCenterToObjTransCenterVec[2], shoulderCenterToObjTransCenterVec[1]) - std::atan2(shoulderCenterToObjCenterVec[2], shoulderCenterToObjCenterVec[1]);
+
+		skeletonObjectFeature.push_back(shoulderCenterToObjCenterVec.magnitude());
+		skeletonObjectFeature.push_back(thetaInXY);
+		skeletonObjectFeature.push_back(thetaInYZ);		
+	}
 
 }
 
@@ -311,4 +347,9 @@ std::map<int, std::vector<double>>& ActionFeature::getFeatureVector(ActionPhase 
 		return tempFeatures;
 	}
 	
+}
+
+void ActionFeature::computeSkeletonMotionFeature()
+{
+
 }
