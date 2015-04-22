@@ -4,6 +4,15 @@
 #include "SurfaceMeshHelper.h"
 #include "../Math/mathlib.h"
 
+class CScene;
+class SuppPlane;
+
+const double ReachDistThreshold = 0.6;
+const double SampleGridSize = 0.4;
+const double AroundBodyDistThreshold = 0.3;
+
+const double HeightReachThreshold = 0.5;
+
 const int BoneMap[19][2] =
 {
 	// torso
@@ -16,6 +25,31 @@ const int BoneMap[19][2] =
 	{ 12, 13 }, { 13, 14 }, { 14, 15 },
 	//right leg
 	{ 16, 17 }, { 17, 18 }, { 18, 19 }
+};
+
+const int PosSampleNum = 5;
+const int MaxIterNum = 100;
+
+// potential object target locations
+struct ObjPotentialPlacement
+{
+	std::vector<SuppPlane*> potentialSuppPlanesToPlace; // supp planes from other model
+	std::vector<std::vector<double>> accessPlanesToPlace; // intersection between skeleton access rectangle and other model's supp planes
+	std::vector<MathLib::Vector3> sampledLocation;
+
+	void samplePotentialLocation();
+	bool randomSampleOnAccessPlanes(MathLib::Vector3 &samplePos);
+	bool isPosValid();
+
+	bool hasAccessiblePlanes() { return !accessPlanesToPlace.empty(); };
+	void setScene(CScene *s){ m_scene = s; };
+
+	void drawAccessPlanes(QColor c);
+	void drawSampledLocations(QColor c);
+
+private:
+	CScene *m_scene;
+
 };
 
 class Skeleton
@@ -89,8 +123,19 @@ public:
 	void setSampledPos(const MathLib::Vector3 &pos) { m_sampledPos = pos; };
 	MathLib::Vector3 getSamplePos() { return m_sampledPos; };
 
+	void setScene(CScene *s) { m_scene = s; };
+	void computePlacementRegion();
+	void drawPotentialPlacement();
+
+	void sampleObjPlacementPosNearby();
+
+	bool hasAccessiblePlanes() { return m_potentialObjPlacement.hasAccessiblePlanes(); };
+
 private:
 	QVector<Eigen::Vector4d> m_joints;
 	MathLib::Vector3 m_sampledPos;
+
+	CScene *m_scene;
+	ObjPotentialPlacement m_potentialObjPlacement;
 };
 

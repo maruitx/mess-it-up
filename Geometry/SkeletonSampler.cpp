@@ -1,9 +1,7 @@
 #include "SkeletonSampler.h"
 #include "Scene.h"
 #include "SuppPlane.h"
-
-const double ReachDistThreshold = 0.6;
-const double SampleGridSize = 0.4;
+#include "../Action/ActionFeature.h"
 
 SkeletonSampler::SkeletonSampler()
 {
@@ -63,6 +61,7 @@ void SkeletonSampler::sampleSkeletonAroundModel(int modelID)
 				if (!isHardConflictWithScene(sampledSkeleton))
 				//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
 				{
+					sampledSkeleton->setScene(m_scene);
 					m_sampledStartSkeletons.push_back(sampledSkeleton);
 				}			
 			}
@@ -112,13 +111,7 @@ void SkeletonSampler::sampleSkeletonAroundModelFromSkelList(int modelID, const Q
 					std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 					Skeleton *sampledSkeleton = new Skeleton(joints);
-
-					if (!isHardConflictWithScene(sampledSkeleton))
-						//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
-					{
-						sampledSkeleton->setSampledPos(samplePos);
-						m_sampledStartSkeletons.push_back(sampledSkeleton);
-					}
+					sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::StartAction, samplePos);
 				}
 
 				if (method == "all")
@@ -128,13 +121,7 @@ void SkeletonSampler::sampleSkeletonAroundModelFromSkelList(int modelID, const Q
 						std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 						Skeleton *sampledSkeleton = new Skeleton(joints);
-
-						if (!isHardConflictWithScene(sampledSkeleton))
-							//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
-						{
-							sampledSkeleton->setSampledPos(samplePos);
-							m_sampledStartSkeletons.push_back(sampledSkeleton);
-						}
+						sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::StartAction, samplePos);
 					}
 				}
 			}
@@ -229,12 +216,8 @@ void SkeletonSampler::sampleArrangeSkeletonsInScene(const QString &method)
 								std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 								Skeleton *sampledSkeleton = new Skeleton(joints);
-
-								if (!isHardConflictWithScene(sampledSkeleton))
-									//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
-								{
-									m_sampledEndSkeletons.push_back(sampledSkeleton);
-								}
+								sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::EndAction,samplePos);
+								
 							}
 
 							if (method == "all")
@@ -244,17 +227,42 @@ void SkeletonSampler::sampleArrangeSkeletonsInScene(const QString &method)
 									std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 									Skeleton *sampledSkeleton = new Skeleton(joints);
-
-									if (!isHardConflictWithScene(sampledSkeleton))
-										//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
-									{
-										m_sampledEndSkeletons.push_back(sampledSkeleton);
-									}
+									sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::EndAction, samplePos);
 								}
 							}
 						}
 					}
 				}
+			}
+		}
+	}
+}
+
+void SkeletonSampler::sampleTestForSkeleton(Skeleton *skel, int phaseID, const MathLib::Vector3 &samplePos)
+{
+
+	if (!isHardConflictWithScene(skel))
+		//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
+	{
+		skel->setSampledPos(samplePos);
+
+		if (phaseID == ActionFeature::ActionPhase::StartAction)
+		{
+			m_sampledStartSkeletons.push_back(skel);
+		}
+
+		if (phaseID == ActionFeature::ActionPhase::EndAction)
+		{
+			skel->setScene(m_scene);
+
+			// compute all potential planes to place object			
+			skel->computePlacementRegion();
+			m_sampledEndSkeletons.push_back(skel);
+
+			// filter out useless skeleton, e.g no place to place object around (may not happen since there is always floor, but still possible)
+			if (!skel->hasAccessiblePlanes())
+			{
+				m_sampledEndSkeletons.pop_back();
 			}
 		}
 	}

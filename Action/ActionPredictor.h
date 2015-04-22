@@ -11,20 +11,6 @@ const double LABEL_DIFF_TH = 0.1;
 
 typedef std::map<int, std::vector<std::vector<std::vector<int>>>> ModelRelatedSkeletonIdList;
 
-class SuppPlane;
-
-// potiential object target locations
-struct ObjPotentialPlacement
-{
-	MathLib::Vector3 pos;
-
-	std::vector<SuppPlane*> potentialSuppPlanesToPlace;
-
-	std::vector<std::vector<double>> accessPlanesToPlace;
-
-	bool hasAccessiblePlanes() { return accessPlanesToPlace.size(); };
-};
-
 class ActionPredictor : public QObject
 {
 	Q_OBJECT
@@ -43,13 +29,11 @@ public:
 	void sampleSkeletons();
 	void sampleSkeletonsForActionPhrase(int phaseID);
 
-	void computePotentialObjPlacement();
-
 	void loadClassifiers();
 	bool isPhaseConsidered(int phaseID);
 
-	bool testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
-	bool testForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel);
+	bool classifyTestForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
+	bool classifyTestForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel);
 	
 	void repredicting(double prob, int showSkelNum);
 
@@ -112,8 +96,6 @@ private:
 
 	ModelRelatedSkeletonIdList m_randomSampledSkeletonIdList;
 	ModelRelatedSkeletonIdList m_randomPredictedSkeletonIdList;
-
-	std::vector<ObjPotentialPlacement> m_potentialObjPlacement;  // each end skeleton corresponds to one potential placement 
 
 	bool m_showSampledSkeleton;
 	bool m_showSampeRegion;

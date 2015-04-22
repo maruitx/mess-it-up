@@ -269,3 +269,42 @@ void SuppPlane::computeParas()
 	length = (m_corners[1] - m_corners[0]).magnitude();
 	width = (m_corners[2] - m_corners[1]).magnitude();
 }
+
+std::vector<double> SuppPlane::convertToAABBPlane()
+{
+	std::vector<double> aabbcorners(4);
+
+	double xmin, ymin, xmax, ymax;
+	xmin = ymin = 1e6; // x, y min
+	xmax = ymax = -1e6; // x, y max
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_corners[i].x < xmin)
+		{
+			xmin = m_corners[i].x;
+		}
+
+		if (m_corners[i].x > xmax)
+		{
+			xmax = m_corners[i].x;
+		}
+
+		if (m_corners[i].y < ymin)
+		{
+			ymin = m_corners[i].y;
+		}
+
+		if (m_corners[i].y > ymax)
+		{
+			ymax = m_corners[i].y;
+		}
+	}
+
+	aabbcorners[0] = xmin;
+	aabbcorners[1] = xmax;
+	aabbcorners[2] = ymin;
+	aabbcorners[3] = ymax;
+
+	return aabbcorners;
+}

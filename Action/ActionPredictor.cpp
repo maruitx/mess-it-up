@@ -4,6 +4,7 @@
 #include "../Geometry/SkeletonSampler.h"
 #include "ActionFeature.h"
 
+
 ActionPredictor::ActionPredictor(QObject *parent)
 	: QObject(parent)
 {
@@ -260,7 +261,8 @@ void ActionPredictor::drawSampledSkeletons(int modelID, int phaseID, int actionI
 		for (int i = 0; i < m_randomSampledSkeletonIdList[modelID][phaseID][actionID].size(); i++)
 		{
 			int skeID = m_randomSampledSkeletonIdList[modelID][phaseID][actionID][i];
-			m_sampledSkeletonsForActions[modelID][phaseID][actionID][skeID]->draw(phaseID);
+			Skeleton *currSkel = m_sampledSkeletonsForActions[modelID][phaseID][actionID][skeID];
+			currSkel->draw(phaseID);
 		}
 
 		// show sample region
@@ -278,7 +280,9 @@ void ActionPredictor::drawPredictedSkeletons(int modelID, int phaseID, int actio
 		for (int i = 0; i < m_randomPredictedSkeletonIdList[modelID][phaseID][actionID].size(); i++)
 		{
 			int skeID = m_randomPredictedSkeletonIdList[modelID][phaseID][actionID][i];
-			m_predictedSkeletonsForActions[modelID][phaseID][actionID][skeID]->draw(phaseID);
+			Skeleton *currSkel = m_predictedSkeletonsForActions[modelID][phaseID][actionID][skeID];
+			currSkel->draw(phaseID);
+			currSkel->drawPotentialPlacement();
 		}
 
 		// show sample region
@@ -440,18 +444,16 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 
 					m_sampledSkeletonsForActions[model_id][phaseID][action_id] = sampledSkeletons;
 
-					// compute all potential planes to place object
-					// filter out useless skeleton, e.g no place to place object around (may not happen since there is always floor, but still possible)
-					computePotentialObjPlacement(); 
-
 					SkeletonPtrList classifiedSkeletons;
 
 					// test with classifier
 					for (int skel_id = 0; skel_id < sampledSkeletons.size(); skel_id++)
 					{
 						Skeleton *currSkel = sampledSkeletons[skel_id];
-						//if (m_classifiers[phaseID][action_id] != nullptr && testForSkeletons(model_id, phaseID, action_id, currSkel)) // hard classification
-						//if (m_classifiers[phaseID][action_id] != nullptr && testForSkeletonsFuzzy(model_id, phaseID, action_id, currSkel)) // fuzzy classificaiton
+						currSkel->sampleObjPlacementPosNearby();
+
+						//if (m_classifiers[phaseID][action_id] != nullptr && classifyTestForSkeletons(model_id, phaseID, action_id, currSkel)) // hard classification
+						//if (m_classifiers[phaseID][action_id] != nullptr && classifyTestForSkeletonsFuzzy(model_id, phaseID, action_id, currSkel)) // fuzzy classificaiton
 						{
 							classifiedSkeletons.push_back(currSkel);
 						}
@@ -476,7 +478,7 @@ void ActionPredictor::setShowEndPose(int state)
 	updateDrawArea();
 }
 
-bool ActionPredictor::testForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel)
+bool ActionPredictor::classifyTestForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel)
 {
 	ActionFeature newFeature(m_scene);
 
@@ -513,7 +515,7 @@ void ActionPredictor::setDrawSampleRegionStatus(int s)
 // works for binary classification problems only
 // return probability or confidence of the sample belonging to the second class
 // It is calculated as the proportion of decision trees that classified the sample to the second class
-bool ActionPredictor::testForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel)
+bool ActionPredictor::classifyTestForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel)
 {
 	ActionFeature newFeature(m_scene);
 
@@ -550,20 +552,3 @@ void ActionPredictor::repredicting(double prob, int showSkelNum)
 	genRandomSkeletonListForDisplay(showSkelNum);
 
 }
-
-void ActionPredictor::computePotentialObjPlacement()
-{
-	for (int model_id = 0; model_id < m_scene->getModelNum(); model_id++)
-	{
-		for (int action_id = 0; action_id < ACTION_NUM; action_id++)
-		{
-			int skelNum = m_sampledSkeletonsForActions[model_id][ActionFeature::ActionPhase::EndAction][action_id].size();
-
-			if (skelNum > 0)
-			{
-				return;
-			}
-		}
-	}
-}
-

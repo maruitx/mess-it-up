@@ -6,6 +6,7 @@ class CModel;
 
 const double EdgeLength_Threshold = 0.1;
 const double Area_Threshold = 0.02;
+const double AngleThreshold = 1;
 
 class SuppPlane
 {
@@ -24,6 +25,8 @@ public:
 	SuppPlane(std::vector<MathLib::Vector3> &PointSet, const std::vector<MathLib::Vector3> obbAxis);
 
 	void setModel(CModel *m) { m_model = m; };
+	void setModelID(int id) { m_modelID = id; };
+	int getModelID() { return m_modelID; };
 
 	void Build(std::vector<MathLib::Vector3> &PointSet);
 	void BuildAAPlane(std::vector<MathLib::Vector3> &PointSet);
@@ -39,12 +42,14 @@ public:
 	MathLib::Vector3 GetCorner(int i) {return m_corners[i];};
 	double GetWidth() { return width;};
 	double GetLength() {return length;};
-	double GetZ() {return m_corners[0].z;};	
+	double GetZ() {return center.z;};	
 	double GetArea() { return width*length; };
 
 	std::vector<MathLib::Vector3> GetAxis() { return axis; };
 
 	bool isTooSmall();
+
+	std::vector<double> convertToAABBPlane();
 
 private:
 	double length;
@@ -61,6 +66,7 @@ private:
 	std::vector<MathLib::Vector3> m_SuppPointSet;
 
 	CModel *m_model;
+	int m_modelID;
 
 };
 

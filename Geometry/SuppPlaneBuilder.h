@@ -24,8 +24,6 @@ public:
 	std::vector<SuppPlane*> getAllSuppPlanes() { return m_suppPlanes; };
 	SuppPlane* getLargestAreaSuppPlane();
 
-	bool isVertexUpright(Surface_mesh::Vertex_property<Surface_mesh::Point> &vpoints, Surface_mesh::Vertex v);
-
 private:
 	CModel *m_model;
 	int m_method;

@@ -3,8 +3,6 @@
 #include "SimplePointCloud.h"
 #include "SuppPlane.h"
 
-const double AngleThreshold = 1;
-
 SuppPlaneBuilder::SuppPlaneBuilder()
 {
 }
@@ -33,6 +31,8 @@ void SuppPlaneBuilder::build(int method)
 			m_suppPlanes.push_back(new SuppPlane(m_SuppPtsSet[i], m_model->getOBBAxis()));
 
 			SuppPlane* currPlane = m_suppPlanes[m_suppPlanes.size() - 1];
+			currPlane->setModelID(m_model->getID());
+
 			if (currPlane->isTooSmall())
 			{
 				m_suppPlanes.pop_back();
@@ -42,6 +42,7 @@ void SuppPlaneBuilder::build(int method)
 	}
 }
 
+// need to think: didn't consider model transform
 void SuppPlaneBuilder::collectSuppPtsSet()
 {
 	SimplePointCloud& pts = m_model->getPointCloud();
@@ -68,7 +69,7 @@ void SuppPlaneBuilder::collectSuppPtsSet()
 		//	SupportPointSoup.push_back(pts[id]);
 		//}
 
-		if (isVertexUpright(vpoints, vit))
+		if (m_model->isVertexUpRight(vit, AngleThreshold))
 		{
 			SupportPointSoup.push_back(pts[id]);
 		}
@@ -163,45 +164,4 @@ SuppPlane* SuppPlaneBuilder::getLargestAreaSuppPlane()
 	}
 
 	return m_suppPlanes[maxPlaneID];
-}
-
-// vertex is upright as long as one of its neighbor faces is upright
-bool SuppPlaneBuilder::isVertexUpright(Surface_mesh::Vertex_property<Surface_mesh::Point> &vpoints, Surface_mesh::Vertex v)
-{
-	Surface_mesh::Halfedge  h = m_model->meshData()->halfedge(v);
-
-	if (h.is_valid())
-	{
-		const Surface_mesh::Halfedge hend = h;
-		const Surface_mesh::Point p0 = vpoints[v];
-
-		Point   n, p1, p2;
-
-		do
-		{
-			if (!m_model->meshData()->is_boundary(h))
-			{
-				p1 = vpoints[m_model->meshData()->to_vertex(h)];
-				p1 -= p0;
-				p1.normalize();
-
-				p2 = vpoints[m_model->meshData()->from_vertex(m_model->meshData()->prev_halfedge(h))];
-				p2 -= p0;
-				p2.normalize();
-
-				n = p1.cross(p2).normalized();
-
-				MathLib::Vector3 vn = MathLib::Vector3(n[0], n[1], n[2]);
-				if (MathLib::Acos(vn.dot(m_upRightVec)) < AngleThreshold)
-				{
-					return true;
-				}
-			}
-
-			h = m_model->meshData()->cw_rotated_halfedge(h);
-
-		} while (h != hend);
-	}
-
-	return false;
 }

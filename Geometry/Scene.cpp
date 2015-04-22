@@ -64,6 +64,7 @@ void CScene::loadScene(const QString filename)
 		newModel->setLabel(modelName);
 		newModel->setFilePath(m_sceneFilePath);
 		newModel->setID(i);
+		newModel->setSceneUpRightVec(m_uprightVec);
 		m_modelList.push_back(newModel);
 		m_modelNameIdMap[modelName] = i;
 	}
@@ -130,9 +131,6 @@ void CScene::draw()
 	{
 		int id = 0;
 
-		//glPushMatrix();
-		//glMultMatrixd(m_transMat.data());
-
 		foreach(CModel *m, m_modelList)
 		{
 			if (m_isShowModel)
@@ -173,8 +171,6 @@ void CScene::draw()
 		{
 			drawModelName();
 		}
-
-		//glPopMatrix();
 	}
 }
 

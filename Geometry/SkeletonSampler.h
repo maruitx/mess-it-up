@@ -18,15 +18,20 @@ public:
 	void sampleSkeletonAroundModel(int modelID);
 	void sampleSkeletonAroundModelFromSkelList(int modelID, const QString &method);
 
+	void sampleArrangeSkeletonsInScene(const QString &method);
+
+	void sampleTestForSkeleton(Skeleton *skel, int phaseID, const MathLib::Vector3 &samplePos);
+	bool isHardConflictWithScene(Skeleton *skel);
+
 	std::vector<Skeleton*> getSampledStartSkeletons() { return m_sampledStartSkeletons; };
 	std::vector<Skeleton*> getSampledEndSkeletons() { return m_sampledEndSkeletons; };
 	
 	std::vector<double> getSampleRange(int modelID) { return m_sampleStartRegions[modelID]; };
 	std::vector<MathLib::Vector3>& getSamplePositions(int modelID) { return m_sampleStartPositions[modelID]; };
 
-	bool isHardConflictWithScene(Skeleton *skel);
 
-	void sampleArrangeSkeletonsInScene(const QString &method);
+
+
 
 private:
 	Skeleton *m_inputSkeleton;

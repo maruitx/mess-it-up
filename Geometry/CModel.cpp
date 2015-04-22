@@ -600,7 +600,6 @@ SurfaceMesh::Vector3 CModel::getTransformedOBBCenter()
 	return SurfaceMesh::Vector3(trans_cent.x, trans_cent.y, trans_cent.z);
 }
 
-
 SurfaceMesh::Vector3 CModel::getOBBCenter()
 {
 	MathLib::Vector3 cent = m_GOBB.cent;
@@ -752,7 +751,7 @@ double CModel::getClosestDistToVoxel(SurfaceMesh::Vector3 &pt)
 		voxelize();
 	}
 
-	Eigen::Vector4d trans_pt = m_transMat*Eigen::Vector4d(pt[0], pt[1], pt[2], 0);
+	Eigen::Vector4d trans_pt = m_transMat.inverse()*Eigen::Vector4d(pt[0], pt[1], pt[2], 0);
 
 	return m_voxeler->getClosestDistToVoxle(Eigen::Vector3d(trans_pt[0], trans_pt[1], trans_pt[2]));
 }
@@ -765,3 +764,106 @@ void CModel::drawSuppPlane()
 	}
 }
 
+int CModel::PickByRay(MathLib::Vector3 startPoint, MathLib::Vector3 rayDir, double &depth, MathLib::Vector3 &faceNormal)
+{
+	Surface_mesh::Vertex_property<Surface_mesh::Vector3> points = m_mesh->vertex_property<Surface_mesh::Vector3>("v:point");
+	Surface_mesh::Face_property<Surface_mesh::Vector3> fnormals = m_mesh->face_property<Surface_mesh::Vector3>("f:normal");
+
+	Surface_mesh::Face_iterator fit, fend = m_mesh->faces_end();
+	Surface_mesh::Vertex_around_face_circulator fvit, fvend;
+
+	MathLib::Vector3	e1, e2, p, s, q;
+	double		t(0), u(0), v(0), w(0), tmp(0);
+	int		pi = -1;
+	int faceID ;
+
+	for (fit = m_mesh->faces_begin(); fit != fend; fit++)
+	{
+		MathLib::Vector3 faceVert[3];
+		fvit = fvend = m_mesh->vertices(fit);
+
+		int vertID = 0;
+		// collect vertices of the face
+		do{
+			Surface_mesh::Vector3 vert = points[fvit];
+			faceVert[vertID++] = MathLib::Vector3(vert[0], vert[1], vert[2]);
+		} while (++fvit != fvend);
+
+		MathLib::Vector3 &v1 = faceVert[0];
+		MathLib::Vector3 &v2 = faceVert[1];
+		MathLib::Vector3 &v3 = faceVert[2];
+		e1.set(v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]);
+		e2.set(v3[0] - v1[0], v3[1] - v1[1], v3[2] - v1[2]);
+		p = rayDir.cross(e2);
+		tmp = p.dot(e1);
+		if (IsZero(tmp)) {
+			continue;
+		}
+		tmp = 1.0f / tmp;
+		s.set(startPoint.x - v1[0], startPoint.y - v1[1], startPoint.z - v1[2]);
+		u = tmp * p.dot(s);
+		if (u < 0.0f || u > 1.0f) {
+			continue;
+		}
+		q = s.cross(e1);
+		v = tmp * q.dot(rayDir);
+		if (v < 0.0f || v > 1.0f) {
+			continue;
+		}
+		w = u + v;
+		if (w > 1.0f) {
+			continue;
+		}
+		t = tmp * q.dot(e2);
+		if (t > 0 && t < depth) {
+			pi = (*fit).idx();
+			depth = t;
+			faceNormal = MathLib::Vector3(fnormals[fit][0], fnormals[fit][1], fnormals[fit][2]);
+		}
+	}
+	
+	return pi;
+}
+
+// vertex is upright as long as one of its neighbor faces is upright
+bool CModel::isVertexUpRight(Surface_mesh::Vertex v, double angleTh)
+{
+	Surface_mesh::Vertex_property<Surface_mesh::Vector3> vpoints = m_mesh->vertex_property<Surface_mesh::Vector3>("v:point");
+
+	Surface_mesh::Halfedge  h = m_mesh->halfedge(v);
+
+	if (h.is_valid())
+	{
+		const Surface_mesh::Halfedge hend = h;
+		const Surface_mesh::Point p0 = vpoints[v];
+
+		Point   n, p1, p2;
+
+		do
+		{
+			if (!m_mesh->is_boundary(h))
+			{
+				p1 = vpoints[m_mesh->to_vertex(h)];
+				p1 -= p0;
+				p1.normalize();
+
+				p2 = vpoints[m_mesh->from_vertex(m_mesh->prev_halfedge(h))];
+				p2 -= p0;
+				p2.normalize();
+
+				n = p1.cross(p2).normalized();
+
+				MathLib::Vector3 vn = MathLib::Vector3(n[0], n[1], n[2]);
+				if (MathLib::Acos(vn.dot(m_sceneUpRightVec)) < angleTh)
+				{
+					return true;
+				}
+			}
+
+			h = m_mesh->cw_rotated_halfedge(h);
+
+		} while (h != hend);
+	}
+
+	return false;
+}

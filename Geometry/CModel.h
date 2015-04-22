@@ -33,6 +33,10 @@ public:
 	void setID(int i) { m_id = i; };
 	int getID() { return m_id; };
 
+	void setSceneUpRightVec(const MathLib::Vector3 &upright) { m_sceneUpRightVec = upright; };
+
+	Eigen::Matrix4d getTransMat() { return m_transMat; };
+
 	Eigen::AlignedBox3d bbox() { return m_mesh->bbox(); };
 	SurfaceMesh::SurfaceMeshModel* meshData() { return m_mesh; };
 	SurfaceMesh::Vector3 getOBBCenter();
@@ -75,6 +79,8 @@ public:
 	std::vector<SuppPlane*> getAllSuppPlanes() { return m_suppPlaneBuilder->getAllSuppPlanes(); };
 	SuppPlane* getLargestAreaSuppPlane() { return m_suppPlaneBuilder->getLargestAreaSuppPlane(); };
 
+	bool isVertexUpRight(Surface_mesh::Vertex v, double angleTh);
+
 	// skeleton
 	void testInteractSkeleton(Skeleton *sk);
 	bool isInteractSkeleton() { return m_isInteractSkeleton; };
@@ -94,7 +100,7 @@ public:
 	void setPicked(bool state) { m_isPicked = state; };
 	void updatePickedState() { m_isPicked = !m_isPicked; };
 	bool isPicked() { return m_isPicked; };
-
+	int PickByRay(MathLib::Vector3 startPoint, MathLib::Vector3 rayDir, double &depth, MathLib::Vector3 &faceNormal);
 	// arrangement
 	bool isFixed() { return m_isFixed; };
 
@@ -111,6 +117,7 @@ private:
 	QString m_filePath;
 	int m_id;
 	double m_metric;
+	MathLib::Vector3 m_sceneUpRightVec;
 
 	Eigen::Matrix4d m_transMat;
 	bool m_isTransformed;
