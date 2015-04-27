@@ -6,18 +6,20 @@
 #include "../Utilities/CustomDrawObjects.h"
 
 QColor colorset[2][2] = { { QColor(255, 0, 0), QColor(0, 255, 0) }, { QColor(220, 0, 220), QColor(0, 220, 220) } };
+double JointRadius = 3 * PointRadius3D;
+double HeadRadius = 3 * JointRadius;
 
 Skeleton::Skeleton()
 {
 }
 
-Skeleton::Skeleton(QVector<Eigen::Vector4d> pts)
-	:m_joints(pts)
+Skeleton::Skeleton(QVector<Eigen::Vector4d> pts):
+m_joints(pts), m_isPicked(false)
 {
-
 }
 
-Skeleton::Skeleton(std::vector<MathLib::Vector3> pts)
+Skeleton::Skeleton(std::vector<MathLib::Vector3> pts):
+m_isPicked(false)
 {
 	m_joints.resize(pts.size());
 
@@ -60,14 +62,19 @@ void Skeleton::draw(int drawMode/*= 0*/)
 	}
 
 	glPopAttrib();
+
+	if (m_isPicked)
+	{
+		drawOBB();
+	}	
 }
 
 void Skeleton::drawJoint(int id, QColor c /*= QColor(255,0,0)*/)
 {
-	float r = 3*PointSize3D;
+	float r = JointRadius;
 	if (id == HEAD)
 	{
-		r = 3 * r;
+		r = HeadRadius;
 	}
 
 	glColorQt(c);
@@ -207,13 +214,16 @@ void Skeleton::computePlacementRegion()
 			{
 				m_potentialObjPlacement.potentialSuppPlanesToPlace.push_back(allSuppPlanes[i]);
 
-				std::vector<double> intersectionPlane(6);
-				intersectionPlane[0] = x_max_min;
-				intersectionPlane[1] = x_min_max;
-				intersectionPlane[2] = y_max_min;
-				intersectionPlane[3] = y_min_max;
-				intersectionPlane[4] = allSuppPlanes[i]->GetZ() + 0.01;
-				intersectionPlane[5] = m_id;
+				AcessPlane intersectionPlane;
+				intersectionPlane.corners.resize(4);
+
+				intersectionPlane.corners[0] = x_max_min;
+				intersectionPlane.corners[1] = x_min_max;
+				intersectionPlane.corners[2] = y_max_min;
+				intersectionPlane.corners[3] = y_min_max;
+				intersectionPlane.zVal = allSuppPlanes[i]->GetZ() + 0.01;
+				intersectionPlane.modelID = m_id;
+				intersectionPlane.suppPlaneID = allSuppPlanes[i]->getSuppPlaneID();
 
 				m_potentialObjPlacement.accessPlanesToPlace.push_back(intersectionPlane);
 			}
@@ -230,7 +240,7 @@ void Skeleton::drawPotentialPlacement()
 {
 	if (m_potentialObjPlacement.hasAccessiblePlanes()>0)
 	{
-		m_potentialObjPlacement.drawAccessPlanes(QColor(255, 255, 80));
+		m_potentialObjPlacement.drawAccessPlanes(QColor(255, 255, 80, 220));
 		m_potentialObjPlacement.drawSampledLocations(QColor(20,255,40));
 
 	}
@@ -241,7 +251,122 @@ void Skeleton::sampleObjPlacementPosNearby()
 	m_potentialObjPlacement.samplePotentialLocation();
 }
 
-bool ObjPotentialPlacement::randomSampleOnAccessPlanes(MathLib::Vector3 &samplePos)
+void Skeleton::computeOrientation()
+{
+	Eigen::Vector4d shoulderDir = m_joints[SHOULDER_LEFT] - m_joints[SHOULDER_RIGHT];
+	m_shoulderDir = MathLib::Vector3(shoulderDir[0], shoulderDir[1], shoulderDir[2]);
+	m_shoulderDir.normalize();
+
+	Eigen::Vector4d torsoDir = m_joints[SHOULDER_CENTER] - m_joints[SPINE];
+	m_torsoDir = MathLib::Vector3(torsoDir[0], torsoDir[1], torsoDir[2]);
+	m_torsoDir.normalize();
+
+	m_torsoNormal = m_shoulderDir.cross(m_torsoDir);
+}
+
+void Skeleton::computeOBB()
+{
+	std::vector<MathLib::Vector3> axis;
+	MathLib::Vector3 center;
+	MathLib::Vector3 obbSize;
+	std::vector<MathLib::Vector3> vertices(8);
+
+	// compute axis
+
+	//         up
+	//     n   ^
+	//      \  |
+	//       \ |
+	//        \|	
+	//	s<-----o
+
+	axis.resize(3);
+	axis[1] = m_scene->getUprightVec();
+
+	double shoulderDirProjToUpVal = axis[1].dot(m_shoulderDir);
+	MathLib::Vector3 shoulderDirProjToUpVec = axis[1] * shoulderDirProjToUpVal;
+
+	axis[0] = m_shoulderDir - shoulderDirProjToUpVec;
+	axis[0].normalize();
+
+	axis[2] = axis[0].cross(axis[1]);
+
+	// compute 8 corners
+	double a_max[3], a_min[3];
+	for (int i = 0; i < 3; i++)
+	{
+		a_max[i] = std::numeric_limits<int>::min();
+		a_min[i] = std::numeric_limits<int>::max();
+	}
+
+	std::vector<MathLib::Vector3> jointsToShoulderCenterVec(20);
+	MathLib::Vector3 shoulderCenter = this->getJoint(SHOULDER_CENTER);
+
+	for (int i = 0; i < 20; i++)
+	{
+		jointsToShoulderCenterVec[i] = this->getJoint(i) - shoulderCenter;
+	}
+
+	// find max and min value along the obb axis
+	for (int id = 0; id < 20; id++)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			double jointVecProjToAxisVal;
+
+			jointVecProjToAxisVal = jointsToShoulderCenterVec[id].dot(axis[i]);
+			if (jointVecProjToAxisVal > a_max[i])
+			{
+				a_max[i] = jointVecProjToAxisVal;
+			}
+
+			if (jointVecProjToAxisVal < a_min[i])
+			{
+				a_min[i] = jointVecProjToAxisVal;
+			}
+		}
+	}
+
+	// expand the box a little bit
+	a_min[0] -= JointRadius;
+	a_min[1] -= JointRadius;
+	a_min[2] -= JointRadius;
+
+	a_max[0] += JointRadius;
+	a_max[1] += HeadRadius;
+	a_max[2] += JointRadius;
+
+	vertices[0] = shoulderCenter + axis[0] * a_min[0] + axis[1] * a_min[1] + axis[2] * a_min[2];
+	vertices[1] = shoulderCenter + axis[0] * a_max[0] + axis[1] * a_min[1] + axis[2] * a_min[2];
+	vertices[2] = shoulderCenter + axis[0] * a_max[0] + axis[1] * a_min[1] + axis[2] * a_max[2];
+	vertices[3] = shoulderCenter + axis[0] * a_min[0] + axis[1] * a_min[1] + axis[2] * a_max[2];
+
+	vertices[4] = shoulderCenter + axis[0] * a_min[0] + axis[1] * a_max[1] + axis[2] * a_min[2];
+	vertices[5] = shoulderCenter + axis[0] * a_max[0] + axis[1] * a_max[1] + axis[2] * a_min[2];
+	vertices[6] = shoulderCenter + axis[0] * a_max[0] + axis[1] * a_max[1] + axis[2] * a_max[2];
+	vertices[7] = shoulderCenter + axis[0] * a_min[0] + axis[1] * a_max[1] + axis[2] * a_max[2];
+
+	for (int i = 0; i < 8; i++)
+	{
+		center += vertices[i];
+	}
+	center = center*(1.0 / 8);
+
+	for (int i = 0; i < 3; i++)
+	{
+		obbSize[i] = std::abs(a_min[i]) + std::abs(a_max[i]);
+	}
+
+
+	m_OBB = COBB(center, axis, obbSize);
+}
+
+void Skeleton::drawOBB()
+{
+	m_OBB.DrawBox(false, m_isPicked, false, false, false);
+}
+
+bool ObjPotentialPlacement::randomSampleOnAccessPlanes(ObjLocation &sampleLoc)
 {
 	bool isPosValid = false;
 
@@ -252,18 +377,19 @@ bool ObjPotentialPlacement::randomSampleOnAccessPlanes(MathLib::Vector3 &sampleP
 		double rand_x = (double)std::rand() / (double)RAND_MAX;
 		double rand_y = (double)std::rand() / (double)RAND_MAX;
 
-		double length = accessPlanesToPlace[planeID][1] - accessPlanesToPlace[planeID][0];
-		double width = accessPlanesToPlace[planeID][3] - accessPlanesToPlace[planeID][2];
+		double length = accessPlanesToPlace[planeID].corners[1] - accessPlanesToPlace[planeID].corners[0];
+		double width = accessPlanesToPlace[planeID].corners[3] - accessPlanesToPlace[planeID].corners[2];
+		int modelID = accessPlanesToPlace[planeID].modelID;
 
-		samplePos.x = accessPlanesToPlace[planeID][0] + rand_x*length;
-		samplePos.y = accessPlanesToPlace[planeID][2] + rand_y*width;
-		samplePos.z = accessPlanesToPlace[planeID][4];
-
-		int modelID = accessPlanesToPlace[planeID][5];
+		sampleLoc.pos[0] = accessPlanesToPlace[planeID].corners[0] + rand_x*length;
+		sampleLoc.pos[1] = accessPlanesToPlace[planeID].corners[2] + rand_y*width;
+		sampleLoc.pos[2] = accessPlanesToPlace[planeID].zVal;
+		sampleLoc.modelID = modelID;
+		sampleLoc.suppPlaneID = accessPlanesToPlace[planeID].suppPlaneID;
 
 		CModel *m = m_scene->getModel(modelID);
-		Eigen::Matrix4d modelTransMat = m->getTransMat();
-		Eigen::Vector4d transSamplePos = modelTransMat.inverse()*Eigen::Vector4d(samplePos[0], samplePos[1], samplePos[2], 0);
+		Eigen::Matrix4d modelTransMat = m->getInitTransMat();
+		Eigen::Vector4d transSamplePos = modelTransMat.inverse()*Eigen::Vector4d(sampleLoc.pos[0], sampleLoc.pos[1], sampleLoc.pos[2], 0);
 
 		MathLib::Vector3 startPos = MathLib::Vector3(transSamplePos[0], transSamplePos[1], transSamplePos[2]);
 		MathLib::Vector3 rayDir = MathLib::Vector3(0, 0, -1);
@@ -274,7 +400,7 @@ bool ObjPotentialPlacement::randomSampleOnAccessPlanes(MathLib::Vector3 &sampleP
 
 		if (faceID != -1)
 		{
-			if (MathLib::Acos(faceNormal.dot(m_scene->getUprightVec())) < AngleThreshold)
+			//if (MathLib::Acos(faceNormal.dot(m_scene->getUprightVec())) < AngleThreshold)
 			{
 				double hitPosZ = startPos.z + rayDir.z*depthVal;
 
@@ -295,13 +421,13 @@ void ObjPotentialPlacement::samplePotentialLocation()
 
 	while (iterCount < 100)
 	{
-		if (sampledLocation.size() == 5) return;
+		if (sampledLocations.size() == SampleLocationNum) return;
 
-		MathLib::Vector3 samplePos;	
+		ObjLocation sampleLoc;
 
-		if (randomSampleOnAccessPlanes(samplePos))
+		if (randomSampleOnAccessPlanes(sampleLoc))
 		{
-			sampledLocation.push_back(samplePos);
+			sampledLocations.push_back(sampleLoc);
 		}
 		
 		iterCount++;
@@ -316,10 +442,10 @@ void ObjPotentialPlacement::drawAccessPlanes(QColor c)
 	for (int planeID = 0; planeID < accessPlanesToPlace.size(); planeID++)
 	{
 		glBegin(GL_QUADS);
-		glVertex3f(accessPlanesToPlace[planeID][0], accessPlanesToPlace[planeID][2], accessPlanesToPlace[planeID][4]);
-		glVertex3f(accessPlanesToPlace[planeID][1], accessPlanesToPlace[planeID][2], accessPlanesToPlace[planeID][4]);
-		glVertex3f(accessPlanesToPlace[planeID][1], accessPlanesToPlace[planeID][3], accessPlanesToPlace[planeID][4]);
-		glVertex3f(accessPlanesToPlace[planeID][0], accessPlanesToPlace[planeID][3], accessPlanesToPlace[planeID][4]);
+		glVertex3f(accessPlanesToPlace[planeID].corners[0], accessPlanesToPlace[planeID].corners[2], accessPlanesToPlace[planeID].zVal);
+		glVertex3f(accessPlanesToPlace[planeID].corners[1], accessPlanesToPlace[planeID].corners[2], accessPlanesToPlace[planeID].zVal);
+		glVertex3f(accessPlanesToPlace[planeID].corners[1], accessPlanesToPlace[planeID].corners[3], accessPlanesToPlace[planeID].zVal);
+		glVertex3f(accessPlanesToPlace[planeID].corners[0], accessPlanesToPlace[planeID].corners[3], accessPlanesToPlace[planeID].zVal);
 		glEnd();
 	}
 
@@ -331,12 +457,13 @@ void ObjPotentialPlacement::drawSampledLocations(QColor c)
 	glDisable(GL_LIGHTING);
 	glColorQt(c);
 
-	for (int i = 0; i < sampledLocation.size(); i++)
+	for (int i = 0; i < sampledLocations.size(); i++)
 	{
-		float r = PointSize3D;
-		renderSphere(sampledLocation[i][0], sampledLocation[i][1], sampledLocation[i][2], r);
+		float r = 2*PointRadius3D;
+		renderSphere(sampledLocations[i].pos[0], sampledLocations[i].pos[1], sampledLocations[i].pos[2], r);
 	}
 
 	glEnable(GL_LIGHTING);
 }
+
 

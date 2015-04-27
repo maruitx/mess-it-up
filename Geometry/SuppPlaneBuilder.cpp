@@ -40,6 +40,12 @@ void SuppPlaneBuilder::build(int method)
 			}
 		}
 	}
+
+	// plane id w.r.t current supplane list
+	for (int i = 0; i < m_suppPlanes.size(); i++)
+	{
+		m_suppPlanes[i]->setSuppPlaneID(i);
+	}
 }
 
 // need to think: didn't consider model transform

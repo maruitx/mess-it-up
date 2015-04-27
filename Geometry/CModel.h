@@ -14,6 +14,7 @@
 
 class SimplePointCloud;
 class Skeleton;
+struct ObjLocation;
 
 class CModel
 {
@@ -35,8 +36,6 @@ public:
 
 	void setSceneUpRightVec(const MathLib::Vector3 &upright) { m_sceneUpRightVec = upright; };
 
-	Eigen::Matrix4d getTransMat() { return m_transMat; };
-
 	Eigen::AlignedBox3d bbox() { return m_mesh->bbox(); };
 	SurfaceMesh::SurfaceMeshModel* meshData() { return m_mesh; };
 	SurfaceMesh::Vector3 getOBBCenter();
@@ -44,7 +43,7 @@ public:
 	QVector<SurfaceMesh::Vector3> getTransformedOBBVertices();
 	std::vector<MathLib::Vector3> getOBBAxis() { return m_GOBB.axis; };
 
-	void readScanObj(SurfaceMesh::SurfaceMeshModel *mesh, std::string filename);
+	void readObjFile(SurfaceMesh::SurfaceMeshModel *mesh, std::string filename);
 
 	void extractToPointCloud();
 	SimplePointCloud& getPointCloud();
@@ -55,7 +54,9 @@ public:
 	void drawAABBox();
 	void drawOBB();
 
-	void setTransMat(const Eigen::Matrix4d &m);
+	Eigen::Matrix4d getInitTransMat() { return m_recordTransMat; };
+	void setTempDisplayTransMat(const Eigen::Matrix4d &m);
+	void setInitTransMat(const Eigen::Matrix4d &m);
 
 	bool IsContact(CModel *pOther, bool onlyOBB, double dDistT, MathLib::Vector3 &Dir);
 	bool IsSupport(CModel *pOther, bool onlyOBB, double dDistT, const MathLib::Vector3 &Upright);
@@ -67,7 +68,7 @@ public:
 
 	void setAABB();
 	void computeOBB(int fixAxis = -1);
-	void updateOBBTransMat() { m_GOBB.transMat = m_transMat; };
+	void updateOBBTransMat() { m_GOBB.recordTransMat = m_recordTransMat; };
 	double getOBBBottomHeight(MathLib::Vector3 &uprightVec);
 	std::vector<double> getOBBSize();
 
@@ -78,6 +79,7 @@ public:
 	void drawSuppPlane();
 	std::vector<SuppPlane*> getAllSuppPlanes() { return m_suppPlaneBuilder->getAllSuppPlanes(); };
 	SuppPlane* getLargestAreaSuppPlane() { return m_suppPlaneBuilder->getLargestAreaSuppPlane(); };
+	SuppPlane* getSuppPlane(int id) { return m_suppPlaneBuilder->getSuppPlane(id); };
 
 	bool isVertexUpRight(Surface_mesh::Vertex v, double angleTh);
 
@@ -101,8 +103,12 @@ public:
 	void updatePickedState() { m_isPicked = !m_isPicked; };
 	bool isPicked() { return m_isPicked; };
 	int PickByRay(MathLib::Vector3 startPoint, MathLib::Vector3 rayDir, double &depth, MathLib::Vector3 &faceNormal);
+
 	// arrangement
 	bool isFixed() { return m_isFixed; };
+	bool testStabilityForNewLocation(const MathLib::Vector3 &newLocation, SuppPlane *suppPlane); // whether collision will happen if move to new location, reject if yes
+	void updateCurrentLocation();
+	MathLib::Vector3 getCurrentLocation() { return m_currentLocation; };
 
 	int suppParentID;
 	std::vector<int> suppChindrenList;
@@ -119,8 +125,14 @@ private:
 	double m_metric;
 	MathLib::Vector3 m_sceneUpRightVec;
 
-	Eigen::Matrix4d m_transMat;
+	MathLib::Vector3 m_currentLocation;
+	MathLib::Vector3 m_newLocation;
+
+	Eigen::Matrix4d m_tempDisplayMat;
+	Eigen::Matrix4d m_recordTransMat;
 	bool m_isTransformed;
+
+	Eigen::Matrix4d m_tempTransMat;
 
 	SurfaceMesh::SurfaceMeshModel *m_mesh;
 	SimplePointCloud m_pts;

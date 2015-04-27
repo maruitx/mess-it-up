@@ -27,6 +27,9 @@ public:
 	void setModel(CModel *m) { m_model = m; };
 	void setModelID(int id) { m_modelID = id; };
 	int getModelID() { return m_modelID; };
+	void setSuppPlaneID(int id) { m_planeID = id; };
+	int getSuppPlaneID() { return m_planeID; };
+
 
 	void Build(std::vector<MathLib::Vector3> &PointSet);
 	void BuildAAPlane(std::vector<MathLib::Vector3> &PointSet);
@@ -67,6 +70,7 @@ private:
 
 	CModel *m_model;
 	int m_modelID;
+	int m_planeID; //  which plane in the support plane list
 
 };
 

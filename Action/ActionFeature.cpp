@@ -92,7 +92,7 @@ void ActionFeature::computeActionFeatureAt(int frame_id, std::vector<double> &ac
 		int m_id = modelTrackMats[i].first;
 		if (model->getID() == m_id)
 		{
-			model->setTransMat(modelTrackMats[i].second);
+			model->setInitTransMat(modelTrackMats[i].second);
 		}
 	}
 
@@ -135,7 +135,7 @@ void ActionFeature::computeSkeletonShapeFeature(Skeleton *skeleton, std::vector<
 
 	// body pose feature similar to Sung et al. ICRA12
 	// compute relative distance from hand to head
-	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_RIGHT] - joints[Skeleton::SHOULDER_LEFT];
+	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_LEFT] - joints[Skeleton::SHOULDER_RIGHT];
 	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::SPINE];
 
 	shoulderDirection.normalize();
@@ -265,7 +265,7 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 	skeletonObjectFeature.insert(skeletonObjectFeature.end(), interStateVec.begin(), interStateVec.end());
 
 	// orientation
-	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_RIGHT] - joints[Skeleton::SHOULDER_LEFT];
+	MathLib::Vector3 shoulderDirection = joints[Skeleton::SHOULDER_LEFT] - joints[Skeleton::SHOULDER_RIGHT];
 	MathLib::Vector3 torsoDirection = joints[Skeleton::SHOULDER_CENTER] - joints[Skeleton::SPINE];
 
 	shoulderDirection.normalize();
@@ -297,9 +297,9 @@ void ActionFeature::computeSkeletonObjInterFeatures(Skeleton *skeleton, CModel *
 		skeletonObjectFeature.push_back(thetaInXY);
 		skeletonObjectFeature.push_back(thetaInYZ);		
 	}
-
 }
 
+// important, need to fix: modify to be suitable for computing features at new locations
 void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature)
 {
 	CModel *model = m_scene->getModel(model_id);
@@ -321,6 +321,30 @@ void ActionFeature::computeActionFeatureForSkel(Skeleton *skeleton, int model_id
 	actionFeature.insert(actionFeature.end(), objectGeoFeature.begin(), objectGeoFeature.end());
 	actionFeature.insert(actionFeature.end(), objectStructFeature.begin(), objectStructFeature.end());
 	actionFeature.insert(actionFeature.end(), skeletonObjectFeature.begin(), skeletonObjectFeature.end());
+}
+
+// compute feature for model re-arranged to each potential location
+void ActionFeature::computeActionFeatureForSkelAndModel(Skeleton *skeleton, int model_id, std::vector<std::vector<double>> &actionFeatureList)
+{
+	int sampleLocationNum = skeleton->getSampledLocationNum();
+	actionFeatureList.resize(sampleLocationNum);
+
+	CModel *interactModel = m_scene->getModel(model_id);
+
+	for (int i = 0; i < sampleLocationNum; i++)
+	{
+		ObjLocation newLocation = skeleton->getSampledLocation(i);
+		int supportModelID = newLocation.modelID;
+		int supportPlaneID = newLocation.suppPlaneID;
+
+		CModel *supportModel = m_scene->getModel(supportModelID);
+		SuppPlane *suppPlane = supportModel->getSuppPlane(supportPlaneID);
+
+		if (interactModel->testStabilityForNewLocation(MathLib::Vector3(newLocation.pos[0], newLocation.pos[1], newLocation.pos[2]), suppPlane))
+		{
+			computeActionFeatureForSkel(skeleton, model_id, actionFeatureList[i]);
+		}	
+	}
 }
 
 std::map<int, std::vector<double>>& ActionFeature::getFeatureVector(ActionPhase actionFeatureType)
@@ -353,3 +377,5 @@ void ActionFeature::computeSkeletonMotionFeature()
 {
 
 }
+
+

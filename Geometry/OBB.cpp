@@ -26,6 +26,9 @@ COBB::COBB(const COBB& obb)
 
 COBB::COBB(const MathLib::Vector3 &c, const std::vector<MathLib::Vector3> &a, const MathLib::Vector3 &s)
 {
+	axis.resize(3);
+	vp.resize(8);
+
 	SetData(c, a, s);
 }
 
@@ -43,7 +46,8 @@ void COBB::Unitize(const MathLib::Vector3 &c, double s)
 }
 
 void COBB::SetAAData(const MathLib::Vector3 &c, const MathLib::Vector3 &s)
-{	// Axis-aligned data
+{	
+	// Axis-aligned data
 	cent = c;
 	axis[0].set(1.0, 0.0, 0.0);
 	axis[1].set(0.0, 1.0, 0.0);
@@ -57,6 +61,7 @@ void COBB::SetData(double *sides, double *matrix)
 	if (sides==NULL || matrix==NULL) {
 		return;
 	}
+
 	size.set(sides[0], sides[1], sides[2]);
 	cent.set(matrix[12], matrix[13], matrix[14]);
 	axis[0].set(matrix[0], matrix[1], matrix[2]);
@@ -70,6 +75,7 @@ void COBB::SetData(const MathLib::Vector3 &c, const std::vector<MathLib::Vector3
 	if (a.size() != 3) {
 		return;
 	}
+
 	cent = c;
 	for (int i=0; i<2; i++) {
 		axis[i] = a[i];
@@ -1388,7 +1394,7 @@ bool COBB::IsInsideWithTrans(const MathLib::Vector3 &p) const
 {
 
 	MathLib::Vector3 trans_vp;
-	Eigen::Vector4d newPt = transMat*Eigen::Vector4d(vp[6].x, vp[6].y, vp[6].z, 1.0);
+	Eigen::Vector4d newPt = recordTransMat*Eigen::Vector4d(vp[6].x, vp[6].y, vp[6].z, 1.0);
 	trans_vp = MathLib::Vector3(newPt[0] / newPt[3], newPt[1] / newPt[3], newPt[2] / newPt[3]);
 
 	double d;
@@ -1411,7 +1417,7 @@ bool COBB::IsInsideWithTrans(const MathLib::Vector3 &p) const
 void COBB::ClosestPointWithTrans(const MathLib::Vector3 &p, MathLib::Vector3 &cp) const
 {
 	MathLib::Vector3 trans_cent;
-	Eigen::Vector4d newPt = transMat*Eigen::Vector4d(cent.x, cent.y, cent.z, 1.0);
+	Eigen::Vector4d newPt = recordTransMat*Eigen::Vector4d(cent.x, cent.y, cent.z, 1.0);
 	trans_cent = MathLib::Vector3(newPt[0] / newPt[3], newPt[1] / newPt[3], newPt[2] / newPt[3]);
 
 	MathLib::Vector3 d = p - trans_cent;
@@ -1433,7 +1439,7 @@ bool COBB::PickByRayWithTrans(const MathLib::Vector3 &sp, const MathLib::Vector3
 
 	for (int i = 0; i < trans_vp.size(); i++)
 	{
-		Eigen::Vector4d newPt = transMat*Eigen::Vector4d(vp[i].x, vp[i].y, vp[i].z, 1.0);
+		Eigen::Vector4d newPt = recordTransMat*Eigen::Vector4d(vp[i].x, vp[i].y, vp[i].z, 1.0);
 		trans_vp[i] = MathLib::Vector3(newPt[0] / newPt[3], newPt[1] / newPt[3], newPt[2] / newPt[3]);
 	}
 
@@ -1477,13 +1483,26 @@ MathLib::Vector3 COBB::GetTransformedCenter()
 {
 	MathLib::Vector3 trans_cent;
 
-	Eigen::Vector4d newPt = transMat*Eigen::Vector4d(cent.x, cent.y, cent.z, 1.0);
+	Eigen::Vector4d newPt = recordTransMat*Eigen::Vector4d(cent.x, cent.y, cent.z, 1.0);
 	trans_cent = MathLib::Vector3(newPt[0] / newPt[3], newPt[1] / newPt[3], newPt[2] / newPt[3]);
 
 	return trans_cent;
 }
 
 std::vector<MathLib::Vector3> COBB::GetTransformedVertices()
+{
+	std::vector<MathLib::Vector3> trans_vp = vp;
+
+	for (int i = 0; i < trans_vp.size(); i++)
+	{
+		Eigen::Vector4d newPt = recordTransMat*Eigen::Vector4d(vp[i].x, vp[i].y, vp[i].z, 1.0);
+		trans_vp[i] = MathLib::Vector3(newPt[0] / newPt[3], newPt[1] / newPt[3], newPt[2] / newPt[3]);
+	}
+
+	return trans_vp;
+}
+
+std::vector<MathLib::Vector3> COBB::GetTransformedVertices(const Eigen::Matrix4d &transMat)
 {
 	std::vector<MathLib::Vector3> trans_vp = vp;
 

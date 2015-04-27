@@ -123,12 +123,13 @@ public:
 
 	bool IsInteract(const std::vector<MathLib::Vector3> &pts, double dist, std::vector<int> &states);
 
-	Eigen::Matrix4d transMat;
+	Eigen::Matrix4d recordTransMat;
 	bool IsInsideWithTrans(const MathLib::Vector3 &p) const;
 	void ClosestPointWithTrans(const MathLib::Vector3 &p, MathLib::Vector3 &cp) const;
 
 	MathLib::Vector3 GetTransformedCenter();
 	std::vector<MathLib::Vector3> GetTransformedVertices();
+	std::vector<MathLib::Vector3> GetTransformedVertices(const Eigen::Matrix4d &transMat);
 
 public:
 	MathLib::Vector3					cent;		// center

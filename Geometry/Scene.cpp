@@ -730,7 +730,7 @@ void CScene::testInteractSkeleton(Skeleton *sk)
 
 void CScene::setModelTransMat(int modelID, const Eigen::Matrix4d &m)
 {
-	m_modelList[modelID]->setTransMat(m);
+	m_modelList[modelID]->setInitTransMat(m);
 }
 
 QVector<QString> CScene::getModelNameList()

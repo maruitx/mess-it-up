@@ -232,13 +232,6 @@ void mess_mode::openActionLabeler()
 
 void mess_mode::openActionViewer()
 {
-	//if (actionLearner != NULL && actionLearner->isFinishPredict())
-	//{
-	//	actionViewer = new ActionViewer(actionLearner);
-	//	actionViewer->createWidget();
-
-	//}
-
 	if (actionPreditor != NULL && actionPreditor->isFinishPredict())
 	{
 		actionViewer = new ActionViewer(actionPreditor);

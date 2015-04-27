@@ -16,7 +16,11 @@ public:
 
 	int getCurrSelectModelID() { return ui.modelNameListWidget->currentRow(); };
 	int getCurrSelectActionID() { return ui.actionListWidget->currentRow(); };
+	int getCurrSelectSkelID() { return ui.predictEndPhaseListWidget->currentRow(); };
+	int getCurrSelectLocationID() { return ui.prediectNewLocationListWidget->currentRow(); };
 
+	void setPredictSkelListItem(int skelNum);
+	void setLocationListItem(int locationNum);
 
 	Ui::ActionViewerWidget ui;
 

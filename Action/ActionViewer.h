@@ -12,7 +12,6 @@ class ActionViewer : public QObject
 	Q_OBJECT
 
 public:
-	ActionViewer(ActionLearner *actionLearner);
 	ActionViewer(ActionPredictor *actionPredictor);
 	~ActionViewer();
 
@@ -32,6 +31,11 @@ public slots:
 	void setShowVoxelOctree(int state);
 	void setCenterModelID();
 
+	void updatePredictedSkelAndLocationList();
+	void selectSkelAndUpdateLocationList();
+
+	void viewModelInNewLocation();
+
 public:
 	QVector<QString> allModelNameList;
 	ActionPredictor *actionPredictor;
@@ -44,6 +48,7 @@ private:
 
 	int m_selectModelID;
 	int m_selectActionID;
+	std::vector<int> m_displayedSkelIDList;
 
 	bool m_hasWidget;
 };

@@ -3,6 +3,7 @@
 #include <QVector>
 #include "SurfaceMeshHelper.h"
 #include "../Math/mathlib.h"
+#include "OBB.h"
 
 class CScene;
 class SuppPlane;
@@ -27,18 +28,35 @@ const int BoneMap[19][2] =
 	{ 16, 17 }, { 17, 18 }, { 18, 19 }
 };
 
-const int PosSampleNum = 5;
+const int SampleLocationNum = 5;
 const int MaxIterNum = 100;
+
+struct AcessPlane
+{
+	std::vector<double> corners;
+	double zVal;
+	int modelID;
+	int suppPlaneID; // which support plane in the model
+};
+
+struct ObjLocation
+{
+	MathLib::Vector3 pos;
+	int modelID;
+	int suppPlaneID;
+};
 
 // potential object target locations
 struct ObjPotentialPlacement
 {
 	std::vector<SuppPlane*> potentialSuppPlanesToPlace; // supp planes from other model
-	std::vector<std::vector<double>> accessPlanesToPlace; // intersection between skeleton access rectangle and other model's supp planes
-	std::vector<MathLib::Vector3> sampledLocation;
+	std::vector<AcessPlane> accessPlanesToPlace; // intersection between skeleton access rectangle and other model's supp planes
+	
+	std::vector<ObjLocation> sampledLocations;
+	std::vector<ObjLocation> predictedLocations;
 
 	void samplePotentialLocation();
-	bool randomSampleOnAccessPlanes(MathLib::Vector3 &samplePos);
+	bool randomSampleOnAccessPlanes(ObjLocation &samplePos);
 	bool isPosValid();
 
 	bool hasAccessiblePlanes() { return !accessPlanesToPlace.empty(); };
@@ -55,6 +73,7 @@ private:
 class Skeleton
 {
 public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 	/*
     		3	
@@ -80,22 +99,22 @@ public:
 		SPINE,
 		SHOULDER_CENTER,
 		HEAD,
-		SHOULDER_LEFT,
-		ELBOW_LEFT,
-		WRIST_LEFT,
-		HAND_LEFT,
 		SHOULDER_RIGHT,
 		ELBOW_RIGHT,
 		WRIST_RIGHT,
 		HAND_RIGHT,
-		HIP_LEFT,
-		KNEE_LEFT,
-		ANKLE_LEFT,
-		FOOT_LEFT,
+		SHOULDER_LEFT,
+		ELBOW_LEFT,
+		WRIST_LEFT,
+		HAND_LEFT,	
 		HIP_RIGHT,
 		KNEE_RIGHT,
 		ANKLE_RIGHT,
-		FOOT_RIGHT
+		FOOT_RIGHT,
+		HIP_LEFT,
+		KNEE_LEFT,
+		ANKLE_LEFT,
+		FOOT_LEFT
 	};
 
 	Skeleton();
@@ -115,6 +134,13 @@ public:
 	std::vector<MathLib::Vector3> getJoints();
 	std::vector<SurfaceMesh::Vector3> getSurfaceMeshJoints();
 	std::vector<MathLib::Vector3> getNormalizedJoints();
+	
+	void computeOrientation();
+	MathLib::Vector3 getShoulderDir() { return m_shoulderDir; };
+	MathLib::Vector3 getTorsoNormal() { return m_torsoNormal; };
+
+	void computeOBB();
+	void drawOBB();
 
 	std::vector<MathLib::Vector3> getTransformedJoints(double transX, double transY, double transZ, double thetaZ, MathLib::Vector3 upright);
 
@@ -128,14 +154,30 @@ public:
 	void drawPotentialPlacement();
 
 	void sampleObjPlacementPosNearby();
-
 	bool hasAccessiblePlanes() { return m_potentialObjPlacement.hasAccessiblePlanes(); };
+
+	int getSampledLocationNum() { return m_potentialObjPlacement.sampledLocations.size(); };
+	ObjLocation getSampledLocation(int id) { return m_potentialObjPlacement.sampledLocations[id]; };
+
+	int getPredictedLocationNum() { return m_potentialObjPlacement.predictedLocations.size(); };
+	ObjLocation getPredictedLocation(int id) { return m_potentialObjPlacement.predictedLocations[id]; };
+
+	void setObjPredictedLocation(std::vector<ObjLocation> locations) { m_potentialObjPlacement.predictedLocations = locations; };
+
+	void setPicked(bool s) { m_isPicked = s; };
 
 private:
 	QVector<Eigen::Vector4d> m_joints;
-	MathLib::Vector3 m_sampledPos;
+	MathLib::Vector3 m_shoulderDir;
+	MathLib::Vector3 m_torsoDir;
+	MathLib::Vector3 m_torsoNormal;	
+
+	COBB m_OBB;
+	
+	MathLib::Vector3 m_sampledPos; // postion of "foot center"
+
+	bool m_isPicked;
 
 	CScene *m_scene;
 	ObjPotentialPlacement m_potentialObjPlacement;
 };
-

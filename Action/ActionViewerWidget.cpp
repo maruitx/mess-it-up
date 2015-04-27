@@ -24,12 +24,13 @@ ActionViewerWidget::ActionViewerWidget(ActionViewer *viewer, QWidget *parent)
 	m_showSampledSkelNum = ui.showSkelNumSlider->value();
 	updateShowSkelNumLabel();
 
-	connect(ui.modelNameListWidget, SIGNAL(itemSelectionChanged()), m_viewer->actionPredictor, SLOT(updateDrawArea()));
-	connect(ui.actionListWidget, SIGNAL(itemSelectionChanged()), m_viewer->actionPredictor, SLOT(updateDrawArea()));
 	connect(ui.modelNameListWidget, SIGNAL(itemSelectionChanged()), m_viewer, SLOT(setCenterModelID()));
 
 	connect(ui.modelNameListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(updateShowSkelNumLabel()));
 	connect(ui.actionListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(updateShowSkelNumLabel()));
+
+	connect(ui.modelNameListWidget, SIGNAL(itemSelectionChanged()), m_viewer, SLOT(updatePredictedSkelAndLocationList()));
+	connect(ui.actionListWidget, SIGNAL(itemSelectionChanged()), m_viewer, SLOT(updatePredictedSkelAndLocationList()));
 
 	connect(ui.showSampledSkelButton, SIGNAL(clicked()), m_viewer->actionPredictor, SLOT(updateDrawArea()));
 	connect(ui.showPredictedSkelButton, SIGNAL(clicked()), m_viewer->actionPredictor, SLOT(updateDrawArea()));
@@ -46,6 +47,8 @@ ActionViewerWidget::ActionViewerWidget(ActionViewer *viewer, QWidget *parent)
 	connect(ui.showCenterModelVoxelBox, SIGNAL(stateChanged(int)), m_viewer, SLOT(setShowModelVoxel(int)));	
 	connect(ui.showCenterModelOctreeBox, SIGNAL(stateChanged(int)), m_viewer, SLOT(setShowVoxelOctree(int)));
 
+	connect(ui.predictEndPhaseListWidget, SIGNAL(itemSelectionChanged()), m_viewer, SLOT(selectSkelAndUpdateLocationList()));
+	connect(ui.prediectNewLocationListWidget, SIGNAL(itemSelectionChanged()), m_viewer, SLOT(viewModelInNewLocation()));
 }
 
 ActionViewerWidget::~ActionViewerWidget()
@@ -127,4 +130,30 @@ void ActionViewerWidget::repredicting()
 
 	m_viewer->actionPredictor->repredicting(probTh, skelNum);
 	updateShowSkelNumLabel();
+}
+
+
+void ActionViewerWidget::setPredictSkelListItem(int skelNum)
+{
+	ui.predictEndPhaseListWidget->clear();
+
+	for (int i = 0; i < skelNum; i++)
+	{
+		ui.predictEndPhaseListWidget->addItem(QString("skeleton%1").arg(i));
+	}
+
+	ui.predictEndPhaseListWidget->setCurrentRow(0);
+}
+
+void ActionViewerWidget::setLocationListItem(int locationNum)
+{
+	ui.prediectNewLocationListWidget->clear();
+
+	ui.prediectNewLocationListWidget->addItem(QString("original"));
+	for (int i = 0; i < locationNum; i++)
+	{
+		ui.prediectNewLocationListWidget->addItem(QString("location%1").arg(i));
+	}
+
+	ui.prediectNewLocationListWidget->setCurrentRow(0);
 }

@@ -164,10 +164,13 @@ void ActionPredictor::loadActionRepSkels(int phaseID)
 			}
 
 			Skeleton *newSkel = new Skeleton(joints);
+			newSkel->setScene(m_scene);
 
-			if (m_useFeatureType == "synth")
+			//if (m_useFeatureType == "synth")
 			{
 				newSkel->AlignToOrigin();
+				newSkel->computeOrientation();
+				newSkel->computeOBB();
 			}
 			
 			m_loadedSkeletonsForTest[phaseID][actionID].push_back(newSkel);
@@ -314,7 +317,7 @@ void ActionPredictor::drawSampleRange(int modelID)
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 
-	glColor4f(green[0], green[1], green[2], 0.1f);
+	glColor4f(green[0], green[1], green[2], 0.8f);
 
 	MathLib::Vector3 upright = m_scene->getUprightVec();
 
@@ -330,17 +333,17 @@ void ActionPredictor::drawSampleRange(int modelID)
 	*/
 
 	glBegin(GL_TRIANGLES);
-	for (int i = 0; i < 4; i++) {
-		glNormal3f(upright.x, upright.y, upright.z);
-		glVertex3d(sampleRange[0], sampleRange[2], 0);
-		glVertex3d(sampleRange[1], sampleRange[2], 0);
-		glVertex3d(sampleRange[0], sampleRange[3], 0);
 
-		glNormal3f(upright.x, upright.y, upright.z);
-		glVertex3d(sampleRange[0], sampleRange[3], 0);
-		glVertex3d(sampleRange[1], sampleRange[2], 0);
-		glVertex3d(sampleRange[1], sampleRange[3], 0);
-	}
+	glNormal3f(upright.x, upright.y, upright.z);
+	glVertex3d(sampleRange[0], sampleRange[2], 0.01);
+	glVertex3d(sampleRange[1], sampleRange[2], 0.01);
+	glVertex3d(sampleRange[0], sampleRange[3], 0.01);
+
+	glNormal3f(upright.x, upright.y, upright.z);
+	glVertex3d(sampleRange[0], sampleRange[3], 0.01);
+	glVertex3d(sampleRange[1], sampleRange[2], 0.01);
+	glVertex3d(sampleRange[1], sampleRange[3], 0.01);
+
 	glEnd();
 	glPopAttrib();
 
@@ -349,7 +352,7 @@ void ActionPredictor::drawSampleRange(int modelID)
 	std::vector<MathLib::Vector3>& samplePostions = m_skeletonSampler->getSamplePositions(modelID);
 	for (int i = 0; i < samplePostions.size(); i++)
 	{
-		float r = PointSize3D;
+		float r = PointRadius3D;
 		renderSphere(samplePostions[i][0], samplePostions[i][1], samplePostions[i][2], r);
 	}
 }
@@ -370,6 +373,8 @@ void ActionPredictor::resampleSkeletonForDisplay(int num)
 {
 	m_randomSampledSkeletonIdList.clear();
 	genRandomSkeletonListForDisplay(num);
+
+	emit finishPrediction();
 }
 
 void ActionPredictor::sampleSkeletons()
@@ -399,6 +404,8 @@ void ActionPredictor::sampleSkeletons()
 	{
 		sampleSkeletonsForActionPhrase(phase_id);
 	}
+
+	emit finishPrediction();
 }
 
 bool ActionPredictor::isPhaseConsidered(int phaseID)
@@ -453,7 +460,7 @@ void ActionPredictor::sampleSkeletonsForActionPhrase(int phaseID)
 						currSkel->sampleObjPlacementPosNearby();
 
 						//if (m_classifiers[phaseID][action_id] != nullptr && classifyTestForSkeletons(model_id, phaseID, action_id, currSkel)) // hard classification
-						//if (m_classifiers[phaseID][action_id] != nullptr && classifyTestForSkeletonsFuzzy(model_id, phaseID, action_id, currSkel)) // fuzzy classificaiton
+						if (m_classifiers[phaseID][action_id] != nullptr && classifyTestForSkeletonsFuzzy(model_id, phaseID, action_id, currSkel)) // fuzzy classificaiton
 						{
 							classifiedSkeletons.push_back(currSkel);
 						}
@@ -517,31 +524,18 @@ void ActionPredictor::setDrawSampleRegionStatus(int s)
 // It is calculated as the proportion of decision trees that classified the sample to the second class
 bool ActionPredictor::classifyTestForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel)
 {
-	ActionFeature newFeature(m_scene);
-
-	std::vector<double> actionFeature;
-
-	newFeature.computeActionFeatureForSkel(skel, modelID, actionFeature);
-
-	//// test feature with classifier
-	//cv::Mat testFeatureMat;
-	//convertToMat(actionFeature, testFeatureMat);
-
-	CvMat* testFeatureMat = 0;
-	testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
-	convertStdVecToCvMat(actionFeature, testFeatureMat);
-
-	// important need to fix: feature dim doesn't match
-	float probVal = m_classifiers[phaseID][actionID]->predict_prob(testFeatureMat);
-
-	if (probVal > m_classProbThreshold)
+	bool state;
+	if (phaseID == ActionFeature::ActionPhase::StartAction)
 	{
-		return true;
+		state = classifyStartSkeletonFuzzy(modelID, actionID, skel);
 	}
-	else
+
+	if (phaseID == ActionFeature::ActionPhase::EndAction)
 	{
-		return false;
+		state = classifyEndSkeletonFuzzy(modelID, actionID, skel);
 	}
+
+	return state;
 }
 
 void ActionPredictor::repredicting(double prob, int showSkelNum)
@@ -551,4 +545,99 @@ void ActionPredictor::repredicting(double prob, int showSkelNum)
 	sampleSkeletons();
 	genRandomSkeletonListForDisplay(showSkelNum);
 
+	emit finishPrediction();
 }
+
+bool ActionPredictor::classifyStartSkeletonFuzzy(int modelID, int actionID, Skeleton *skel)
+{
+	ActionFeature newFeature(m_scene);
+
+	std::vector<double> actionFeature;
+
+	newFeature.computeActionFeatureForSkel(skel, modelID, actionFeature);
+
+	CvMat* testFeatureMat = 0;
+	testFeatureMat = cvCreateMat(1, actionFeature.size(), CV_32F);
+	convertStdVecToCvMat(actionFeature, testFeatureMat);
+
+	// important need to fix: feature dim doesn't match
+	//float probVal = m_classifiers[ActionFeature::ActionPhase::StartAction][actionID]->predict_prob(testFeatureMat);
+
+	//if (probVal > m_classProbThreshold)
+	{
+		return true;
+	}
+
+		return false;
+}
+
+bool ActionPredictor::classifyEndSkeletonFuzzy(int modelID, int actionID, Skeleton *skel)
+{
+	ActionFeature newFeature(m_scene);
+
+	std::vector<std::vector<double>> actionFeatureList;
+	
+	newFeature.computeActionFeatureForSkelAndModel(skel, modelID, actionFeatureList);
+	
+	CvMat* testFeatureMat = 0;
+	testFeatureMat = cvCreateMat(1, actionFeatureList[0].size(), CV_32F);
+
+	std::vector<ObjLocation> predictPos;
+
+	for (int i = 0; i < actionFeatureList.size(); i++)
+	{
+		// some action feature is empty, since some potential location is not valid, causing collision when move model there
+		if (actionFeatureList[i].size() > 0)
+		{
+			convertStdVecToCvMat(actionFeatureList[i], testFeatureMat);
+
+			//float probVal = m_classifiers[ActionFeature::ActionPhase::StartAction][actionID]->predict_prob(testFeatureMat);
+
+			//if (probVal > m_classProbThreshold)
+			{
+				predictPos.push_back(skel->getSampledLocation(i));
+			}
+		}
+	}
+
+	if (!predictPos.empty())
+	{
+		skel->setObjPredictedLocation(predictPos);
+		return true;
+	}
+
+	return false;
+}
+
+int ActionPredictor::getRandomPredictedSkelListSize(int modelID, int actionID)
+{
+	return m_randomPredictedSkeletonIdList[modelID][ActionFeature::ActionPhase::EndAction][actionID].size();
+}
+
+int ActionPredictor::getSkelIDFromRandomPredictedSkelList(int modelID, int actionID, int idInList)
+{
+	return m_randomPredictedSkeletonIdList[modelID][ActionFeature::ActionPhase::EndAction][actionID][idInList];
+}
+
+
+int ActionPredictor::getNewLocationNumOfSkel(int modelID, int actionID, int skelID)
+{
+	return m_predictedSkeletonsForActions[modelID][ActionFeature::ActionPhase::EndAction][actionID][skelID]->getPredictedLocationNum();
+}
+
+std::vector<int> ActionPredictor::getRandomPredictedSkelList(int modelID, int actionID)
+{
+	return m_randomPredictedSkeletonIdList[modelID][ActionFeature::ActionPhase::EndAction][actionID];
+}
+
+void ActionPredictor::setSkeletonPicked(int modelID, int actionID, int skelID, bool state)
+{
+	m_predictedSkeletonsForActions[modelID][ActionFeature::ActionPhase::EndAction][actionID][skelID]->setPicked(state);
+}
+
+MathLib::Vector3 ActionPredictor::getNewLocation(int modelID, int actionID, int skelID, int locationID)
+{
+	return m_predictedSkeletonsForActions[modelID][ActionFeature::ActionPhase::EndAction][actionID][skelID]->getPredictedLocation(locationID).pos;
+}
+
+

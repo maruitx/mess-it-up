@@ -58,6 +58,7 @@ public:
 	// for test stage, also could be used for learning synthetic skeletons
 	// simply compute feature for one skeleton at sampled location
 	void computeActionFeatureForSkel(Skeleton *skeleton, int model_id, std::vector<double> &actionFeature);
+	void computeActionFeatureForSkelAndModel(Skeleton *skeleton, int model_id, std::vector<std::vector<double>> &actionFeatureList);
 
 	int centerModelID() { return m_actionInstance.modelID; };
 	int actionID(){ return m_actionInstance.actionID; };

@@ -62,6 +62,8 @@ void SkeletonSampler::sampleSkeletonAroundModel(int modelID)
 				//if (!m_scene->isIntersectModel(SurfaceMesh::Vector3(samplePos.x, samplePos.y, -1), SurfaceMesh::Vector3(samplePos.x, samplePos.y, 3), 0))
 				{
 					sampledSkeleton->setScene(m_scene);
+					sampledSkeleton->computeOrientation();
+					sampledSkeleton->computeOBB();
 					m_sampledStartSkeletons.push_back(sampledSkeleton);
 				}			
 			}
@@ -111,7 +113,7 @@ void SkeletonSampler::sampleSkeletonAroundModelFromSkelList(int modelID, const Q
 					std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 					Skeleton *sampledSkeleton = new Skeleton(joints);
-					sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::StartAction, samplePos);
+					validatyTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::StartAction, samplePos);
 				}
 
 				if (method == "all")
@@ -121,7 +123,7 @@ void SkeletonSampler::sampleSkeletonAroundModelFromSkelList(int modelID, const Q
 						std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 						Skeleton *sampledSkeleton = new Skeleton(joints);
-						sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::StartAction, samplePos);
+						validatyTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::StartAction, samplePos);
 					}
 				}
 			}
@@ -216,7 +218,7 @@ void SkeletonSampler::sampleArrangeSkeletonsInScene(const QString &method)
 								std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 								Skeleton *sampledSkeleton = new Skeleton(joints);
-								sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::EndAction,samplePos);
+								validatyTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::EndAction,samplePos);
 								
 							}
 
@@ -227,7 +229,7 @@ void SkeletonSampler::sampleArrangeSkeletonsInScene(const QString &method)
 									std::vector<MathLib::Vector3> joints = m_inputSkeletonList[id]->getTransformedJoints(samplePos.x, samplePos.y, samplePos.z, k*MathLib::ML_PI_4, m_scene->getUprightVec());
 
 									Skeleton *sampledSkeleton = new Skeleton(joints);
-									sampleTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::EndAction, samplePos);
+									validatyTestForSkeleton(sampledSkeleton, ActionFeature::ActionPhase::EndAction, samplePos);
 								}
 							}
 						}
@@ -238,7 +240,7 @@ void SkeletonSampler::sampleArrangeSkeletonsInScene(const QString &method)
 	}
 }
 
-void SkeletonSampler::sampleTestForSkeleton(Skeleton *skel, int phaseID, const MathLib::Vector3 &samplePos)
+void SkeletonSampler::validatyTestForSkeleton(Skeleton *skel, int phaseID, const MathLib::Vector3 &samplePos)
 {
 
 	if (!isHardConflictWithScene(skel))
@@ -254,6 +256,9 @@ void SkeletonSampler::sampleTestForSkeleton(Skeleton *skel, int phaseID, const M
 		if (phaseID == ActionFeature::ActionPhase::EndAction)
 		{
 			skel->setScene(m_scene);
+
+			skel->computeOrientation();
+			skel->computeOBB();
 
 			// compute all potential planes to place object			
 			skel->computePlacementRegion();

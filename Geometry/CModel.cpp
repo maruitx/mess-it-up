@@ -4,6 +4,7 @@
 #include "TriTriIntersect.h"
 #include "Skeleton.h"
 #include "Voxeler.h"
+#include "../Utilities/CustomDrawObjects.h"
 #include <QFile>
 
 const double VOXEL_SIZE = 0.05;
@@ -17,7 +18,8 @@ CModel::CModel()
 
 	m_isPicked = false;
 	m_isInteractSkeleton = false;
-	m_transMat = Eigen::Matrix4d::Identity();
+	m_recordTransMat = Eigen::Matrix4d::Identity();
+	m_tempDisplayMat = Eigen::Matrix4d::Identity();
 	m_isTransformed = false;
 
 	m_isFixed = false;
@@ -37,18 +39,18 @@ void CModel::loadModel(QString filename, double metric)
 
 	//m_mesh->read(qPrintable(filename));
 
-	this->readScanObj(m_mesh, qPrintable(filename));
+	this->readObjFile(m_mesh, qPrintable(filename));
 
 	m_mesh->update_face_normals();
 	m_mesh->update_vertex_normals();
 	m_mesh->updateBoundingBox();
 
 	setAABB();
-	m_GOBB.transMat = m_transMat;
+	m_GOBB.recordTransMat = m_recordTransMat;
 
 }
 
-void CModel::readScanObj(SurfaceMesh::SurfaceMeshModel *mesh, std::string filename)
+void CModel::readObjFile(SurfaceMesh::SurfaceMeshModel *mesh, std::string filename)
 {
 	char   s[200];
 	float  x, y, z;
@@ -200,6 +202,8 @@ void CModel::draw()
 
 void CModel::buildDisplayList()
 {
+	Eigen::Matrix4d finalTransMat = m_tempDisplayMat*m_recordTransMat;
+
 	if (glIsList(m_displayListID))
 	{
 		glDeleteLists(m_displayListID, 1);
@@ -218,16 +222,18 @@ void CModel::buildDisplayList()
 	}
 
 	glNewList(m_displayListID, GL_COMPILE);
-	QuickMeshDraw::drawMeshSolid(m_mesh, c, m_transMat);
+	QuickMeshDraw::drawMeshSolid(m_mesh, c, finalTransMat);
 	glEndList();
 }
 
 void CModel::drawAABBox()
 {
+	Eigen::Matrix4d finalTransMat = m_tempDisplayMat*m_recordTransMat;
+
 	QColor c = GetColorFromSet(m_id);
 
 	glPushMatrix();
-	glMultMatrixd(m_transMat.data());
+	glMultMatrixd(finalTransMat.data());
 	QuickMeshDraw::drawAABBox(m_mesh->bbox(), c);
 	glPopMatrix();
 }
@@ -363,11 +369,18 @@ void CModel::drawOBB()
 
 	//glColorQt(c);
 
+	Eigen::Matrix4d finalTransMat = m_tempDisplayMat*m_recordTransMat;
+
 	glPushMatrix();
-	glMultMatrixd(m_transMat.data());
+	glMultMatrixd(finalTransMat.data());
 
 	m_GOBB.DrawBox(false, m_isPicked, false, false, m_isInteractSkeleton);
 	glPopMatrix();
+
+	updateCurrentLocation();
+	glColorQt(QColor(200, 40, 40));
+	float r = 2 * PointRadius3D;
+	renderSphere(m_currentLocation[0], m_currentLocation[1], m_currentLocation[2], r);
 }
 
 bool CModel::IsSimilar(CModel *pOther, const MathLib::Vector3 &Upright)
@@ -584,10 +597,18 @@ void CModel::testInteractSkeleton(Skeleton *sk)
 	}
 }
 
-void CModel::setTransMat(const Eigen::Matrix4d &m)
+void CModel::setTempDisplayTransMat(const Eigen::Matrix4d &m)
 {
-	m_transMat = m;
-	m_GOBB.transMat = m;
+	m_tempDisplayMat = m;
+
+	//rebuild display list
+	buildDisplayList();
+}
+
+void CModel::setInitTransMat(const Eigen::Matrix4d &m)
+{
+	m_recordTransMat = m;
+	m_GOBB.recordTransMat = m;
 
 	//rebuild display list
 	buildDisplayList();
@@ -751,7 +772,7 @@ double CModel::getClosestDistToVoxel(SurfaceMesh::Vector3 &pt)
 		voxelize();
 	}
 
-	Eigen::Vector4d trans_pt = m_transMat.inverse()*Eigen::Vector4d(pt[0], pt[1], pt[2], 0);
+	Eigen::Vector4d trans_pt = m_recordTransMat.inverse()*Eigen::Vector4d(pt[0], pt[1], pt[2], 0);
 
 	return m_voxeler->getClosestDistToVoxle(Eigen::Vector3d(trans_pt[0], trans_pt[1], trans_pt[2]));
 }
@@ -866,4 +887,27 @@ bool CModel::isVertexUpRight(Surface_mesh::Vertex v, double angleTh)
 	}
 
 	return false;
+}
+
+// next to do
+// test for collision at new location
+bool CModel::testStabilityForNewLocation(const MathLib::Vector3 &newLocation, SuppPlane *suppPlane)
+{
+	MathLib::Vector3 translationVec = newLocation - m_currentLocation;
+	Eigen::Affine3d tempTransform(Eigen::Translation3d(Eigen::Vector3d(translationVec.x, translationVec.y, translationVec.z)));
+
+	Eigen::Matrix4d tempTransMat = tempTransform.matrix();
+
+	std::vector<MathLib::Vector3> obbVerts = m_GOBB.GetTransformedVertices(tempTransMat);
+
+	MathLib::Vector3 *suppPlaneCorners = suppPlane->GetCorners();
+
+	// next to do, do overlap test
+
+	return true;
+}
+
+void CModel::updateCurrentLocation()
+{
+	m_currentLocation = m_GOBB.cent - m_GOBB.axis[2] * 0.5*m_GOBB.size[2];
 }

@@ -17,7 +17,7 @@ using namespace Eigen;
 #define GL_MULTISAMPLE  0x809D
 #endif
 
-const double PointSize3D = 0.01;
+const double PointRadius3D = 0.01;
 
 // Custom QVector3D
 class QVector3: public QVector3D{
@@ -331,7 +331,7 @@ public:
 		{
 			Vector3d center = planes[i].first;
 			glv(center);
-			glv(Vector3(center + ((Vector3d)n[i] * 0.2 * scale)));
+			glv(Surface_mesh::Vector3(center + ((Vector3d)n[i] * 0.2 * scale)));
 		}
 		glEnd();
 

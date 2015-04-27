@@ -23,6 +23,7 @@ public:
 
 	std::vector<SuppPlane*> getAllSuppPlanes() { return m_suppPlanes; };
 	SuppPlane* getLargestAreaSuppPlane();
+	SuppPlane* getSuppPlane(int id) { return m_suppPlanes[id]; };
 
 private:
 	CModel *m_model;

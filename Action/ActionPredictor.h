@@ -34,6 +34,8 @@ public:
 
 	bool classifyTestForSkeletons(int modelID, int phaseID, int actionID, Skeleton *skel);
 	bool classifyTestForSkeletonsFuzzy(int modelID, int phaseID, int actionID, Skeleton *skel);
+	bool classifyStartSkeletonFuzzy(int modelID, int actionID, Skeleton *skel);
+	bool classifyEndSkeletonFuzzy(int modelID, int actionID, Skeleton *skel);
 	
 	void repredicting(double prob, int showSkelNum);
 
@@ -41,6 +43,15 @@ public:
 	void resampleSkeletonForDisplay(int num);
 	int getSampledSkelNum(int modelID, int actionID);
 	int getPredictedSkelNum(int modelID, int actionID);
+	
+	std::vector<int> getRandomPredictedSkelList(int modelID, int actionID);
+	int getRandomPredictedSkelListSize(int modelID, int actionID);
+	int getSkelIDFromRandomPredictedSkelList(int modelID, int actionID, int idInList);
+	
+	int getNewLocationNumOfSkel(int modelID, int actionID, int skelID);
+	MathLib::Vector3 getNewLocation(int modelID, int actionID, int skelID, int locationID);
+
+	void setSkeletonPicked(int modelID, int actionID, int skelID, bool state);
 
 	void drawSampledSkeletons(int modelID, int phaseID, int actionID);
 	void drawSampleRange(int modelID);
@@ -54,7 +65,6 @@ public:
 
 	CScene* getScene() { return m_scene; };
 
-	void updateDrawArea();
 
 public slots:
 	void loadTrainingResult();
@@ -63,6 +73,11 @@ public slots:
 	void setShowStartPose(int state);
 	void setShowEndPose(int state);
 	void setDrawSampleRegionStatus(int s);
+
+	void updateDrawArea();
+
+signals:
+	void finishPrediction();
 
 
 private:

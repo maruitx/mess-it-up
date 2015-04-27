@@ -20,7 +20,7 @@ public:
 
 	void sampleArrangeSkeletonsInScene(const QString &method);
 
-	void sampleTestForSkeleton(Skeleton *skel, int phaseID, const MathLib::Vector3 &samplePos);
+	void validatyTestForSkeleton(Skeleton *skel, int phaseID, const MathLib::Vector3 &samplePos);
 	bool isHardConflictWithScene(Skeleton *skel);
 
 	std::vector<Skeleton*> getSampledStartSkeletons() { return m_sampledStartSkeletons; };
